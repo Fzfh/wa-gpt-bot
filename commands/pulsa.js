@@ -1,5 +1,4 @@
-const { getProdukDariTabel } = require('./produk') // Ubah path biar konsisten dari commands
-
+const { getProdukDariTabel } = require('./produk')
 const produkMap = new Map()
 const selectedNominalMap = new Map()
 const lastCommandMap = new Map()

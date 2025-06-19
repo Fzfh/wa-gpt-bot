@@ -5,7 +5,7 @@ const produkMap = new Map()
 const selectedKoutaNominalMap = new Map()
 const lastKoutaCommandMap = new Map()
 
-// 🔄 Load data kouta dari file JSON
+//  Load data kouta dari file JSON ada di data bang
 function getKoutaList() {
   const filePath = path.join(__dirname, '../data/kouta.json')
   try {

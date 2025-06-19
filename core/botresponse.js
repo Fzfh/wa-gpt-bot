@@ -152,7 +152,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
         const hasMediaDirect = msg.message?.imageMessage || msg.message?.videoMessage
         const caption = msg.message?.imageMessage?.caption || msg.message?.videoMessage?.caption || ''
 
-        // 🧠 Kalau pakai caption langsung "s"
+        // Kalau pakai caption langsung "s"
         const captionMatch = ['s', 'sticker'].includes(caption.toLowerCase())
 
         if (hasMediaQuoted || captionMatch) {

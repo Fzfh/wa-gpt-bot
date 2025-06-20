@@ -10,7 +10,7 @@ const {
 const blessingKeywords = ['blessing', 'welkin', 'moon', 'blessingofthewelkinmoon']
 const { qrisImagePath, paymentList } = require('../payment/payment')
 
-async function handleTopupInput(sock, msg, lowerText, userId, sender) {
+async function handleTopupInput(sock, msg, lowerText, actualUserId, sender) {
   // Step 1: Pilih Game
   if (lowerText.startsWith('topup ')) {
     const inputGame = lowerText.replace('topup ', '').trim().toLowerCase()
@@ -26,7 +26,7 @@ async function handleTopupInput(sock, msg, lowerText, userId, sender) {
     }
 
     const normalizedGame = aliasMap[inputGame] || inputGame
-    lastTopupCommandMap.set(userId, normalizedGame)
+    lastTopupCommandMap.set(actualUserId, normalizedGame)
 
     await sock.sendMessage(sender, {
       text: `✅ Game *${normalizedGame.toUpperCase()}* dipilih.\nSekarang ketik nominal, misal: *86dm*, *diamond 344*, *gc 60*`
@@ -38,8 +38,8 @@ async function handleTopupInput(sock, msg, lowerText, userId, sender) {
   // Step 2: Blessing Genshin
   const cleanedText = lowerText.replace(/\s+/g, '').toLowerCase()
   if (blessingKeywords.includes(cleanedText)) {
-    lastTopupCommandMap.set(userId, 'genshin')
-    selectedTopupNominalMap.set(userId, 60000)
+    lastTopupCommandMap.set(actualUserId, 'genshin')
+    selectedTopupNominalMap.set(actualUserId, 60000)
 
     const teks = formatInvoice('Blessing of the Welkin Moon', 60000, 'genshin')
     await sock.sendMessage(sender, { text: teks }, { quoted: msg })
@@ -51,12 +51,12 @@ async function handleTopupInput(sock, msg, lowerText, userId, sender) {
     }, { quoted: msg })
 
     // Hapus sesi setelah blessing
-    lastTopupCommandMap.delete(userId)
+    lastTopupCommandMap.delete(actualUserId)
     return true
   }
 
   // Step 3: Cek nominal (pakai engine dari topup.js)
-  const gameKey = (lastTopupCommandMap.get(userId) || '').toLowerCase()
+  const gameKey = (lastTopupCommandMap.get(actualUserId) || '').toLowerCase()
   const validGames = ['ml', 'ff', 'genshin', 'pubg', 'valorant']
   if (!gameKey || !validGames.includes(gameKey)) {
     return false // ❌ Biar gak spam balasan kalau user ngetik sembarang
@@ -67,7 +67,7 @@ async function handleTopupInput(sock, msg, lowerText, userId, sender) {
     return false // ❌ Biarkan handler lain yang proses kalau gagal cocok
   }
 
-  selectedTopupNominalMap.set(userId, harga)
+  selectedTopupNominalMap.set(actualUserId, harga)
 
   const teks = formatInvoice(lowerText, harga, gameKey)
   await sock.sendMessage(sender, { text: teks }, { quoted: msg })
@@ -79,21 +79,39 @@ async function handleTopupInput(sock, msg, lowerText, userId, sender) {
   }, { quoted: msg })
 
   // 🧹 Selesai topup, hapus sesi
-  lastTopupCommandMap.delete(userId)
+  lastTopupCommandMap.delete(actualUserId)
 
   return true
 }
 
 function formatInvoice(namaProduk, harga, game) {
   const instruksiMap = {
-    genshin: `- ID Game\n- Server (Asia/America/etc)\n- Bukti transfer`,
-    ml: `- ID Game\n- Zone ID\n- Bukti transfer`,
-    pubg: `- ID Game\n- Bukti transfer`,
-    ff: `- ID Game\n- Bukti transfer`,
-    valorant: `- ID Game\n- Bukti transfer`
+    genshin: {
+      instruksi: `- ID Game\n- Server (Asia/America/etc)\n- Bukti transfer`,
+      contoh: `ID: 812345678\nServer: Asia\nBukti TF: (foto transfer)`
+    },
+    ml: {
+      instruksi: `- ID Game\n- Zone ID\n- Bukti transfer`,
+      contoh: `ID: 812345678\nZone: 1234\nBukti TF: (foto transfer)`
+    },
+    pubg: {
+      instruksi: `- ID Game\n- Bukti transfer`,
+      contoh: `ID: 812345678\nBukti TF: (foto transfer)`
+    },
+    ff: {
+      instruksi: `- ID Game\n- Bukti transfer`,
+      contoh: `ID: 812345678\nBukti TF: (foto transfer)`
+    },
+    valorant: {
+      instruksi: `- ID Game\n- Bukti transfer`,
+      contoh: `ID: 812345678\nBukti TF: (foto transfer)`
+    }
   }
 
-  const instruksi = instruksiMap[game] || '- ID Game\n- Bukti transfer'
+  const { instruksi, contoh } = instruksiMap[game] || {
+    instruksi: '- ID Game\n- Bukti transfer',
+    contoh: 'ID: 812345678\nBukti TF: (foto transfer)'
+  }
 
   return `✅ Kamu memilih *${namaProduk}*\n💰 Harga: Rp${harga.toLocaleString('id-ID')}
 
@@ -106,9 +124,8 @@ Setelah transfer, kirimkan:
 ${instruksi}
 
 ======= *CONTOH* =======
-ID: 812345678
-Server: Asia
-Bukti TF: (foto transfer)`
+${contoh}`
 }
+
 
 module.exports = { handleTopupInput }

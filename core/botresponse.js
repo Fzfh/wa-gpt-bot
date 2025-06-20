@@ -1,5 +1,6 @@
 const spamTracker = new Map()
 const mutedUsers = new Map()
+const memoryMap = new Map()
 const muteDuration = 2 * 60 * 1000
 const add = require('../commands/add');
 // const { handleAutoKick } = require('../commands/auto_kick')
@@ -178,11 +179,24 @@ if (text.startsWith('/') || text.startsWith('.')) {
 
 
     if (text.startsWith('.jawab ')) {
-      const query = text.slice(7).trim()
-      const aiReply = await askOpenAI(query)
-      await sock.sendPresenceUpdate('composing', sender) // Typing...
-      return sock.sendMessage(sender, { text: aiReply }, { quoted: msg })
-    }
+  const query = text.slice(7).trim()
+  const userId = sender
+
+  await sock.sendPresenceUpdate('composing', sender)
+  const history = memoryMap.get(userId) || []
+  history.push({ role: 'user', content: query })
+  const aiReply = await askOpenAI(history)
+  history.push({ role: 'assistant', content: aiReply })
+  memoryMap.set(userId, history.slice(-15)) // max 15 percakapan
+
+  return sock.sendMessage(sender, { text: aiReply }, { quoted: msg })
+}
+
+if (text === '.reset') {
+  memoryMap.delete(sender)
+  return sock.sendMessage(sender, { text: 'Ingatan Serra tentang kamu dihapus... 😢 Tapi kamu tetap spesial di hati aku~' })
+}
+
 
     if (text.startsWith('/') && !['/menu', '/reset', '/riwayat', '/clear'].includes(lowerText)) {
       return sock.sendMessage(sender, { text: 'Maaf, aku gak ngerti perintah itu 😵. Coba ketik /menu yaa!' }, { quoted: msg })

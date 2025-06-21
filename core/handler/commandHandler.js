@@ -26,7 +26,8 @@ function clearAllInvoices() {
   writeInvoices([])
 }
 
-async function handleCommand(sock, msg, lowerText, userId, from, body) {
+async function handleCommand(sock, msg, lowerText, userId, from, body, sender) 
+ {
   if (topupGames.includes(lowerText.replace('topup ', ''))) {
     const game = lowerText.replace('topup ', '')
     lastCommandMap.set(userId, game)

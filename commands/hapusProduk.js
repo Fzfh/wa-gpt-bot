@@ -17,27 +17,19 @@ module.exports = async function hapusProduk(sock, msg, from, body) {
     msg.message?.imageMessage?.caption ||
     body || '';
   const lower = textAsli.toLowerCase().trim();
-
-  const isGroup = chat.endsWith('@g.us');
-  let isAdmin = false;
-
-  if (isGroup) {
-    try {
-      const metadata = await sock.groupMetadata(chat);
-      const participant = metadata.participants.find(p => p.id === sender);
-      isAdmin = participant?.admin !== undefined;
-    } catch (e) {
-      console.error('Gagal ambil metadata grup:', e);
+  const sender = msg.key.participant || from;
+  
+    if (from.endsWith('@g.us')) {
+      const metadata = await sock.groupMetadata(from);
+      const isAdmin = metadata.participants.some(p => p.id === sender && (p.admin === 'admin' || p.admin === 'superadmin'));
+  
+      if (!isAdmin) {
+        return sock.sendMessage(chat, {
+          text: `🚫 Maaf yaa, fitur *Tambah Produk* cuma bisa dipake admin grup 😎`
+        }, { quoted: msg });
+      }
+    } else {
     }
-  } else {
-    isAdmin = true;
-  }
-
-  if (!isAdmin) {
-    return sock.sendMessage(chat, {
-      text: `❌ Fitur *hapus produk* hanya untuk *admin grup*!`,
-    }, { quoted: msg });
-  }
 
   // Reset sesi jika /hapus diketik ulang
   if (lower === '/hapus') {

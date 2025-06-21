@@ -8,7 +8,7 @@ const DATA_PATHS = {
   kouta: path.join(__dirname, '../data/kouta.json'),
 };
 
-module.exports = async function hapusProduk(sock, msg, from, body) {
+module.exports = async function hapusProduk(sock, msg, from, body,  userId) {
   const chat = msg.key.remoteJid;
   const sender = msg.key.participant || from;
   const textAsli =

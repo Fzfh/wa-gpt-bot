@@ -3,8 +3,6 @@ const { listTopup, lastTopupCommandMap, selectedTopupNominalMap } = require('../
 const { handlePulsa, selectedNominalMap: pulsaNominalMap, lastCommandMap: pulsaLastMap } = require('../../commands/pulsa')
 const { handlekouta, selectedNominalMap: koutaNominalMap, lastCommandMap: koutaLastMap } = require('../../commands/kouta')
 const tambahProduk = require('../../commands/tambahProduk');
-const from = msg.key.remoteJid;
-
 const sessionMap = new Map()
 
 function setSession(userId, sessionName) {
@@ -22,9 +20,9 @@ function getSession(userId) {
 // Tambahkan game baru
 const topupGames = ['ff', 'ml', 'genshin', 'pubg', 'valo']
 
-async function handleStaticCommand(sock, msg, lowerText, userId) {
-  const sender = msg.key.remoteJid
-  const from = sender
+async function handleStaticCommand(sock, msg, lowerText, userId, body) {
+  const from = msg.key.remoteJid
+  const sender = from
   const currentSession = getSession(userId)
 
   // Handle Pulsa

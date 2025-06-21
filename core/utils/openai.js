@@ -21,13 +21,13 @@ async function askOpenAI(userHistory = []) {
     const model = models[i]
     try {
       console.log(`🧠 Coba model: ${model}`)
-      const res = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
+      const res = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
         model,
         messages: [systemPrompt, ...userHistory],
         max_tokens: 900
       }, {
         headers: {
-          'Authorization': `Bearer ${process.env.API_KEY}`,
+          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
           'Content-Type': 'application/json',
           'HTTP-Referer': 'https://aurabot.netlify.app',
           'X-Title': 'Wa-GPT-Bot'

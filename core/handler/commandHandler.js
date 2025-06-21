@@ -1,6 +1,6 @@
 const { listTopup } = require('../../commands/topup')
 const tambahProduk = require('../../commands/tambahProduk');
-const { getSession, setSession, clearSession } = require('./staticCommand')
+const { sessionMap } = require('./staticCommand')
 const fs = require('fs')
 const path = require('path')
 

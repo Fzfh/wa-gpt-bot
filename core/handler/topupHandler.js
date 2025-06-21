@@ -19,6 +19,18 @@ const validGames = [
 ]
 
 async function handleTopupInput(sock, msg, lowerText, actualUserId, sender) {
+    if (lowerText === '/keluar') {
+    if (lastTopupCommandMap.has(actualUserId) || selectedTopupNominalMap.has(actualUserId)) {
+      lastTopupCommandMap.delete(actualUserId)
+      selectedTopupNominalMap.delete(actualUserId)
+      await sock.sendMessage(sender, {
+        text: `✅ Sesi *topup* telah dibatalkan.`
+      }, { quoted: msg })
+      return true
+    }
+    // jika tidak dalam sesi topup, biarkan lanjut ke handler lain
+    return false
+  }
   // 🌟 STEP 1: PILIH GAME
   if (lowerText.startsWith('topup ')) {
     const inputGame = lowerText.replace('topup ', '').trim().toLowerCase()
@@ -35,7 +47,7 @@ async function handleTopupInput(sock, msg, lowerText, actualUserId, sender) {
       valo: 'Valorant',
       radianite: 'Valorant'
     }
-
+    
     const normalizedGame = aliasMap[inputGame] || capitalizeWords(inputGame)
     lastTopupCommandMap.set(actualUserId, normalizedGame)
 

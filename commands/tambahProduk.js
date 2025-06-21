@@ -23,8 +23,12 @@ function saveToJson(filePath, kategori, dataBaru) {
 
 module.exports = async function tambahProduk(sock, msg, from, body) {
   const chat = msg.key.remoteJid;
-  const textAsli = msg.message.conversation || body; // 🔧 Ambil teks asli, bukan lower
-  const lower = body.toLowerCase().trim();
+  const textAsli = msg.message?.conversation 
+    || msg.message?.extendedTextMessage?.text 
+    || msg.message?.imageMessage?.caption 
+    || body; // 🔧 ini penting!
+  const lower = textAsli.toLowerCase().trim(); // 🔧 bukan dari body ya!
+
 
   // 👉 Tangani perintah keluar dari sesi tambah
   const sesi = sessionMap.get(from);

@@ -3,7 +3,7 @@ const { handlePulsa, selectedNominalMap: pulsaNominalMap, lastCommandMap: pulsaL
 const { handlekouta, selectedNominalMap: koutaNominalMap, lastCommandMap: koutaLastMap } = require('../../commands/kouta')
 const tambahProduk = require('../../commands/tambahProduk');
 
-const sessionMap = require('../core/sessionStore');
+const sessionMap = require('../../core/sessionStore');
 
 function setSession(userId, sessionName) {
   sessionMap.set(userId, sessionName)

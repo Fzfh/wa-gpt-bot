@@ -1,5 +1,6 @@
 const { listTopup } = require('../../commands/topup')
 const tambahProduk = require('../../commands/tambahProduk');
+const hapusProduk = require('../../commands/hapusProduk');
 const { sessionMap } = require('./staticCommand')
 const fs = require('fs')
 const path = require('path')
@@ -35,6 +36,9 @@ async function handleCommand(sock, msg, lowerText, userId, from, body, sender)
   }
    if (sessionMap.has(from) || body.toLowerCase().startsWith('/tambah')) {
       return await tambahProduk(sock, msg, from, body);
+    }
+  if (sessionMap.has(from) || body.toLowerCase().startsWith('/hapus')) {
+      return await hapusProduk(sock, msg, from, body);
     }
 
   switch (lowerText) {

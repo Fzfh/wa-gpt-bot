@@ -24,25 +24,26 @@ function saveToJson(filePath, kategori, dataBaru) {
 module.exports = async function tambahProduk(sock, msg, from, body) {
   const chat = msg.key.remoteJid;
   const lower = body.toLowerCase().trim();
-  // Tangani jika user ingin keluar dari sesi tambah
-  if (sessionMap.has(from) && lower === '/keluar') {
-    sessionMap.delete(from)
+
+  // 👉 Tangani perintah keluar dari sesi tambah
+  const sesi = sessionMap.get(from);
+  if (sesi && sesi.type === 'tambah' && lower === '/keluar') {
+    sessionMap.delete(from);
     return sock.sendMessage(chat, {
-      text: `✅ Sesi *tambah produk* telah dibatalkan. Kamu bisa ketik /tambah lagi kalau mau mulai ulang.`
-    }, { quoted: msg })
+      text: `✅ Sesi *tambah produk* telah dibatalkan. Ketik */tambah* lagi kalau ingin mulai ulang yaa 💖`
+    }, { quoted: msg });
   }
 
-  // Jika belum ada sesi
-  if (!sessionMap.has(from) && lower === '/tambah') {
-    sessionMap.set(from, { stage: 'pilih_jenis' });
+  // === Jika belum ada sesi dan user ketik /tambah ===
+  if (!sesi && lower === '/tambah') {
+    sessionMap.set(from, { stage: 'pilih_jenis', type: 'tambah' });
     return sock.sendMessage(chat, {
       text: `📦 *Tambah Produk*\n1. Topup Game\n2. Pulsa\n3. Kuota\n\n✏️ Ketik angka *1*, *2*, atau *3* untuk memilih.`,
     }, { quoted: msg });
   }
 
-  // Ambil sesi user
-  const sesi = sessionMap.get(from);
-  if (!sesi) return;
+  // Jika tidak ada sesi aktif, keluar
+  if (!sesi || sesi.type !== 'tambah') return;
 
   // === Step 1: Pilih Jenis Produk ===
   if (sesi.stage === 'pilih_jenis') {

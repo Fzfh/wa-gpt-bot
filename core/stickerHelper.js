@@ -8,6 +8,7 @@ const { downloadMediaMessage } = require('@whiskeysockets/baileys');
 const { createCanvas, loadImage } = require('@napi-rs/canvas')
 const { Sticker, StickerTypes } = require('wa-sticker-formatter');
 const twemoji = require('twemoji');
+
 // const { StickerTypes, Sticker } = require('wa-sticker-formatter');
 // const Jimp = require('jimp');
 
@@ -135,68 +136,51 @@ function wrapText(ctx, text, maxWidth) {
   return lines;
 }
 
-async function createStickerFromText(text) {
-  const width = 512;
-  const height = 512;
-  const fontSize = 48;
-  const padding = 30;
 
+async function createStickerFromText(text) {
+  const width = 512, height = 512, fontSize = 48, padding = 30;
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
-
   ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, width, height);
 
   ctx.font = `${fontSize}px Arial`;
   ctx.textBaseline = 'top';
 
+  let x = padding, y = padding;
   const lineHeight = fontSize + 10;
-  let x = padding;
-  let y = padding;
-
   const graphemes = Array.from(text);
 
   for (const char of graphemes) {
     const isEmoji = twemoji.test(char);
-
     if (x > width - padding - fontSize) {
       x = padding;
       y += lineHeight;
     }
 
     if (isEmoji) {
-      try {
-        const codepoint = twemoji.convert.toCodePoint(char);
-        const emojiUrl = `https://twemoji.maxcdn.com/v/latest/72x72/${codepoint}.png`;
-        const response = await fetch(emojiUrl);
-        const arrayBuffer = await response.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        const img = await loadImage(buffer);
+      const codepoint = twemoji.convert.toCodePoint(char);
+      const emojiPath = path.join(__dirname, '..', 'emojis', 'twemoji', 'png', `${codepoint}.png`);
+      if (fs.existsSync(emojiPath)) {
+        const img = await loadImage(emojiPath);
         ctx.drawImage(img, x, y, fontSize, fontSize);
-        x += fontSize;
-      } catch (err) {
-        console.warn('Gagal ambil emoji:', err);
-        ctx.fillStyle = 'black';
-        ctx.fillText('❓', x, y);
-        x += fontSize;
+      } else {
+        ctx.fillText(char, x, y);
       }
+      x += fontSize;
     } else {
-      ctx.fillStyle = 'black';
       ctx.fillText(char, x, y);
       x += ctx.measureText(char).width;
     }
   }
 
   const buffer = canvas.toBuffer('image/png');
-
-  const sticker = new Sticker(buffer, {
+  return await new Sticker(buffer, {
     pack: 'AuraBot',
     author: 'AURA',
     type: StickerTypes.DEFAULT,
     quality: 100,
-  });
-
-  return await sticker.toBuffer();
+  }).toBuffer();
 }
 
 

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const sessionMap = new Map();
+const sessionMap = require('../core/sessionStore');
 
 const DATA_PATHS = {
   topup: path.join(__dirname, '../data/topupdata.json'),

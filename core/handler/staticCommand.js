@@ -64,7 +64,7 @@ if (lowerText === 'beli kuota') {
   if (body.toLowerCase().startsWith('/hapus')) {
     return await hapusProduk(sock, msg, from, body)
   }
-
+return false
 
   switch (lowerText) {
     case '/menu':
@@ -189,6 +189,10 @@ Tinggal chat admin yaa, fast respon ✨`
       }, { quoted: msg })
       return true
   }
+  // ✅ Tambahkan ini di paling akhir!
+if (sessionMap.get(userId)?.type === 'hapus') {
+  return await hapusProduk(sock, msg, from, body)
+}
 
   // Topup Game - Deteksi topup [namaGame]
   if (lowerText.startsWith('topup ')) {

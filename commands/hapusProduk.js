@@ -1,4 +1,3 @@
-
 const fs = require('fs');
 const path = require('path');
 const sessionMap = require('../core/sessionStore');
@@ -19,52 +18,44 @@ module.exports = async function hapusProduk(sock, msg, from, body) {
   const lower = textAsli.toLowerCase().trim();
   const sender = msg.key.participant || from;
 
+  // Cek admin
   if (from.endsWith('@g.us')) {
     const metadata = await sock.groupMetadata(from);
     const isAdmin = metadata.participants.some(p => p.id === sender && (p.admin === 'admin' || p.admin === 'superadmin'));
-
     if (!isAdmin) {
       return sock.sendMessage(chat, {
-        text: `🚫 Maaf yaa, fitur *Hapus Produk* cuma bisa dipake admin grup 😎`
+        text: `🚫 Maaf yaa, fitur *Hapus Produk* cuma buat admin grup 😘`,
       }, { quoted: msg });
     }
   }
 
+  // Reset jika /hapus
   if (lower === '/hapus') {
     sessionMap.set(sender, { stage: 'pilih_jenis', type: 'hapus' });
     return sock.sendMessage(chat, {
-      text: `🗑️ *Hapus Produk*
-
-1. Topup Game
-2. Pulsa
-3. Kouta
-
-Ketik angka: *1*, *2*, atau *3*`,
+      text: `🗑️ *Hapus Produk*\n\n1. Topup Game\n2. Pulsa\n3. Kouta\n\n📝 Ketik angka *1*, *2*, atau *3* untuk memilih.`,
     }, { quoted: msg });
   }
 
   const sesi = sessionMap.get(sender);
   if (!sesi || sesi.type !== 'hapus') return;
 
+  // Tahap: pilih_jenis
   if (sesi.stage === 'pilih_jenis') {
     const jenisMap = { '1': 'topup', '2': 'pulsa', '3': 'kouta' };
     const jenis = jenisMap[lower];
     if (!jenis) {
-      return sock.sendMessage(chat, {
-        text: `❌ Pilih angka *1*, *2*, atau *3* yaa 😘`,
-      }, { quoted: msg });
+      return sock.sendMessage(chat, { text: `⚠️ Pilih angka *1*, *2*, atau *3* yaa.` }, { quoted: msg });
     }
     sesi.jenis = jenis;
     sesi.stage = 'pilih_kategori';
     sessionMap.set(sender, sesi);
-
-    const contoh = jenis === 'topup' ? 'Mobile Legends / PUBG' : 'Three / Telkomsel';
     return sock.sendMessage(chat, {
-      text: `📌 Ketik nama *${jenis === 'topup' ? 'game' : 'provider'}*.
-Contoh: ${contoh}`,
+      text: `📌 Ketik nama *${jenis === 'topup' ? 'game' : 'provider'}* yang ingin kamu hapus produknya.\nContoh: *ML*, *Three*`,
     }, { quoted: msg });
   }
 
+  // Tahap: pilih_kategori
   if (sesi.stage === 'pilih_kategori') {
     const jenis = sesi.jenis;
     const kategori = lower;
@@ -80,20 +71,13 @@ Contoh: ${contoh}`,
         sessionMap.delete(sender);
         return sock.sendMessage(chat, { text: `❌ Game *${kategori}* tidak ditemukan.` }, { quoted: msg });
       }
-
       sesi.indexGame = gameIndex;
       sesi.produkList = game.items;
       sessionMap.set(sender, sesi);
 
       const list = game.items.map((item, i) => `${i + 1}. ${item.nominal} - Rp${item.harga.toLocaleString('id-ID')}`).join('\n');
-
       return sock.sendMessage(chat, {
-        text: `🎮 *${game.game}*
-
-Pilih produk yang ingin dihapus:
-${list}
-
-Ketik nomornya, misal: *2*`,
+        text: `🎮 *${game.game}*\n\nPilih produk yang ingin dihapus:\n${list}\n\nKetik angkanya, misal: *2*`,
       }, { quoted: msg });
     } else {
       const filtered = data.filter(p => p.provider.toLowerCase() === kategori);
@@ -103,28 +87,22 @@ Ketik nomornya, misal: *2*`,
           text: `❌ Tidak ada produk dengan provider *${kategori}*`,
         }, { quoted: msg });
       }
-
       sesi.filteredProduk = filtered;
       sessionMap.set(sender, sesi);
 
       const list = filtered.map((p, i) => `${i + 1}. ${p.produk} - Rp${p.harga.toLocaleString('id-ID')} (ID: ${p.id})`).join('\n');
-
       return sock.sendMessage(chat, {
-        text: `📱 *${kategori.toUpperCase()}*
-
-Pilih produk untuk dihapus:
-${list}
-
-Ketik angka, misal: *1*`,
+        text: `📱 *${kategori.toUpperCase()}*\n\nPilih produk untuk dihapus:\n${list}\n\nKetik angka, misal: *1*`,
       }, { quoted: msg });
     }
   }
 
+  // Tahap: pilih_produk
   if (sesi.stage === 'pilih_produk') {
     const jenis = sesi.jenis;
     const index = parseInt(lower) - 1;
     if (isNaN(index) || index < 0) {
-      return sock.sendMessage(chat, { text: `❌ Pilihan tidak valid.` }, { quoted: msg });
+      return sock.sendMessage(chat, { text: `❌ Input tidak valid.` }, { quoted: msg });
     }
 
     if (jenis === 'topup') {
@@ -139,7 +117,6 @@ Ketik angka, misal: *1*`,
       const removed = produkList.splice(index, 1);
       fs.writeFileSync(DATA_PATHS.topup, JSON.stringify(data, null, 2));
       sessionMap.delete(sender);
-
       return sock.sendMessage(chat, {
         text: `✅ Produk *${removed[0].nominal}* dari *${game.game}* berhasil dihapus.`,
       }, { quoted: msg });

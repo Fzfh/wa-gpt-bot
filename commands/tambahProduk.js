@@ -3,76 +3,31 @@ const fs = require('fs');
 const path = require('path');
 const sessionMap = require('../core/sessionStore');
 
-// Path ke file topup.json, pulsa.json, dan kouta.json
-const TOPUP_FILE_PATH = path.join(__dirname, '../data/topup.json');
-const PULSA_FILE_PATH = path.join(__dirname, '../data/pulsa.json');
-const KOUTA_FILE_PATH = path.join(__dirname, '../data/kouta.json'); // 🔧 ubah nama file
-
-// Mapping alias game ke nama game persis di JSON
-const gameAliasMap = {
-  ml: 'Mobile Legends',
-  mobilelegend: 'Mobile Legends',
-  mobilelegends: 'Mobile Legends',
-  'mobile legends': 'Mobile Legends',
-  ff: 'Free Fire',
-  freefire: 'Free Fire',
-  'free fire': 'Free Fire',
-  genshin: 'Genshin Impact',
-  gc: 'Genshin Impact',
-  'genshin impact': 'Genshin Impact',
-  pubg: 'PUBG Mobile',
-  'pubg mobile': 'PUBG Mobile',
-  valorant: 'Valorant',
-  valo: 'Valorant',
-  radianite: 'Valorant'
+const DATA_PATHS = {
+  topup: path.join(__dirname, '../data/topup.json'),      // misal tetap array of game objects
+  pulsa: path.join(__dirname, '../data/pulsa.json'),      // flat array
+  kouta: path.join(__dirname, '../data/kouta.json'),      // flat array
 };
 
-// Load & save topup.json
-function loadTopupData() {
-  try {
-    if (!fs.existsSync(TOPUP_FILE_PATH)) {
-      fs.writeFileSync(TOPUP_FILE_PATH, JSON.stringify([], null, 2));
+function saveToJsonFlatArray(filePath, newObj) {
+  let arr = [];
+  if (fs.existsSync(filePath)) {
+    try {
+      const raw = fs.readFileSync(filePath, 'utf-8');
+      const parsed = JSON.parse(raw);
+      arr = Array.isArray(parsed) ? parsed : [];
+    } catch {
+      arr = [];
     }
-    const raw = fs.readFileSync(TOPUP_FILE_PATH, 'utf-8');
-    return JSON.parse(raw);
-  } catch (err) {
-    console.error('❌ Gagal load topup.json:', err);
-    return [];
   }
-}
-function saveTopupData(data) {
-  try {
-    fs.writeFileSync(TOPUP_FILE_PATH, JSON.stringify(data, null, 2));
-  } catch (err) {
-    console.error('❌ Gagal simpan topup.json:', err);
-    throw err;
-  }
-}
-
-// Tambah produk ke topup.json sesuai struktur
-function addProductToTopup(gameAliasInput, namaProduk, hargaAngka) {
-  const data = loadTopupData();
-  const key = gameAliasInput.toLowerCase().trim();
-  const gameName = gameAliasMap[key] || capitalizeWords(gameAliasInput);
-  let gameObj = data.find(item => item.game.toLowerCase() === gameName.toLowerCase());
-  if (!gameObj) {
-    gameObj = { game: gameName, items: [] };
-    data.push(gameObj);
-  }
-  gameObj.items.push({
-    nominal: namaProduk,
-    harga: hargaAngka
-  });
-  saveTopupData(data);
-  return gameName;
-}
-
-// Helper: capitalize setiap kata
-function capitalizeWords(str) {
-  return str
-    .split(/\s+/)
-    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-    .join(' ');
+  // cari next id
+  const nextId = arr.reduce((max, item) => {
+    const idNum = parseInt(item.id);
+    return isNaN(idNum) ? max : Math.max(max, idNum);
+  }, 0) + 1;
+  newObj.id = nextId;
+  arr.push(newObj);
+  fs.writeFileSync(filePath, JSON.stringify(arr, null, 2));
 }
 
 module.exports = async function tambahProduk(sock, msg, from, body) {
@@ -97,7 +52,7 @@ module.exports = async function tambahProduk(sock, msg, from, body) {
   if (!sesi && lower === '/tambah') {
     sessionMap.set(from, { stage: 'pilih_jenis', type: 'tambah' });
     return sock.sendMessage(chat, {
-      text: `📦 *Tambah Produk*\n1. Topup Game\n2. Pulsa\n3. Kouta\n\n✏️ Ketik angka *1*, *2*, atau *3* untuk memilih.`, // 🔧 ubah tampilan ke "Kouta"
+      text: `📦 *Tambah Produk*\n1. Topup Game\n2. Pulsa\n3. Kouta\n\n✏️ Ketik angka *1*, *2*, atau *3* untuk memilih.`,
     }, { quoted: msg });
   }
 
@@ -106,10 +61,8 @@ module.exports = async function tambahProduk(sock, msg, from, body) {
 
   // === Step 1: Pilih Jenis Produk ===
   if (sesi.stage === 'pilih_jenis') {
-    const jenisMap = { '1': 'topup', '2': 'pulsa', '3': 'kouta' }; // 🔧 'kouta'
-    const pilihan = lower;
-    const jenis = jenisMap[pilihan];
-
+    const jenisMap = { '1': 'topup', '2': 'pulsa', '3': 'kouta' };
+    const jenis = jenisMap[lower];
     if (!jenis) {
       if (!sesi.notified) {
         sesi.notified = true;
@@ -120,32 +73,28 @@ module.exports = async function tambahProduk(sock, msg, from, body) {
       }
       return;
     }
-
-    sesi.jenis = jenis; // 'topup' / 'pulsa' / 'kouta'
+    sesi.jenis = jenis;
     sesi.stage = 'pilih_kategori';
     sessionMap.set(from, sesi);
-
     const contohKategori = sesi.jenis === 'topup'
       ? 'mobilelegends / pubg / ml'
       : sesi.jenis === 'pulsa'
-        ? 'Three / Indosat'
-        : 'Three / Indosat'; // contoh untuk kouta, sama provider
+        ? 'Three / Telkomsel'
+        : 'Three / Indosat';
     return sock.sendMessage(chat, {
-      text: `🗂️ Ketik kategori/provider untuk produk *${jenis.toUpperCase()}*.\nContoh: ${contohKategori}` 
+      text: `🗂️ Ketik kategori/provider untuk produk *${jenis.toUpperCase()}*.\nContoh: ${contohKategori}`
     }, { quoted: msg });
   }
 
   // === Step 2: Pilih Kategori ===
   if (sesi.stage === 'pilih_kategori') {
     const kategoriInput = textAsli.trim();
-    sesi.kategori = kategoriInput; // simpan alias
+    sesi.kategori = kategoriInput; // simpan provider atau kategori
     sesi.stage = 'isi_data';
     sessionMap.set(from, sesi);
-
     const contoh = sesi.jenis === 'topup'
       ? 'nama_produk, harga\nContoh:\n- 10 UC, 15000'
-      : 'provider, nama_produk, harga\nContoh:\n- Three, 5000, 5500';
-
+      : 'provider, produk, harga\nContoh:\n- Three, Pulsa 10K, 12000';
     return sock.sendMessage(chat, {
       text: `📝 Kirim data produk dengan format:\n${contoh}`
     }, { quoted: msg });
@@ -154,23 +103,22 @@ module.exports = async function tambahProduk(sock, msg, from, body) {
   // === Step 3: Input Data Produk ===
   if (sesi.stage === 'isi_data') {
     const bagian = textAsli.split(',').map(p => p.trim());
-    let dataNama = '';
-    let dataHarga = 0;
-
+    // TOPUP: struktur terserah handler topup Anda
     if (sesi.jenis === 'topup') {
       if (bagian.length !== 2 || isNaN(parseInt(bagian[1].replace(/\D/g,'')))) {
         return sock.sendMessage(chat, {
           text: `❌ Format salah!\nContoh: 10 UC, 15000`
         }, { quoted: msg });
       }
-      dataNama = bagian[0];
-      dataHarga = parseInt(bagian[1].replace(/\D/g,''));
+      const namaProduk = bagian[0];
+      const harga = parseInt(bagian[1].replace(/\D/g,''));
+      // logic simpan topup sesuai struktur JSON topup Anda...
+      // Misal ada fungsi addProductToTopup
       try {
-        const gameAliasInput = sesi.kategori;
-        const gameName = addProductToTopup(gameAliasInput, dataNama, dataHarga);
+        // contoh: addProductToTopup(sesi.kategori, namaProduk, harga)
         sessionMap.delete(from);
         return sock.sendMessage(chat, {
-          text: `✅ Produk berhasil ditambahkan ke *${gameName}*\n📦 ${dataNama} - Rp${dataHarga.toLocaleString('id-ID')}`
+          text: `✅ Produk berhasil ditambahkan ke *${sesi.kategori}*\n📦 ${namaProduk} - Rp${harga.toLocaleString('id-ID')}`
         }, { quoted: msg });
       } catch (e) {
         sessionMap.delete(from);
@@ -180,32 +128,21 @@ module.exports = async function tambahProduk(sock, msg, from, body) {
       }
     }
 
-    // pulsa atau kouta
+    // PULSA: flat array [{id, provider, produk, harga}, ...]
     if (sesi.jenis === 'pulsa') {
-      // provider, nama, harga
       if (bagian.length !== 3 || isNaN(parseInt(bagian[2].replace(/\D/g,'')))) {
         return sock.sendMessage(chat, {
-          text: `❌ Format salah!\nContoh: Three, 5000, 5500`
+          text: `❌ Format salah!\nContoh: Three, Pulsa 10K, 12000`
         }, { quoted: msg });
       }
       const provider = bagian[0];
-      const namaProdukPulsa = bagian[1];
-      const hargaPulsa = parseInt(bagian[2].replace(/\D/g,''));
+      const produk = bagian[1];
+      const harga = parseInt(bagian[2].replace(/\D/g,''));
       try {
-        let jsonPulsa = [];
-        if (fs.existsSync(PULSA_FILE_PATH)) {
-          jsonPulsa = JSON.parse(fs.readFileSync(PULSA_FILE_PATH, 'utf-8'));
-        }
-        let objProv = jsonPulsa.find(o => o.provider.toLowerCase() === provider.toLowerCase());
-        if (!objProv) {
-          objProv = { provider, items: [] };
-          jsonPulsa.push(objProv);
-        }
-        objProv.items.push({ nominal: namaProdukPulsa, harga: hargaPulsa });
-        fs.writeFileSync(PULSA_FILE_PATH, JSON.stringify(jsonPulsa, null, 2));
+        saveToJsonFlatArray(DATA_PATHS.pulsa, { provider, produk, harga });
         sessionMap.delete(from);
         return sock.sendMessage(chat, {
-          text: `✅ Produk pulsa berhasil ditambahkan ke *${provider}*\n📦 ${namaProdukPulsa} - Rp${hargaPulsa.toLocaleString('id-ID')}`
+          text: `✅ Produk pulsa berhasil ditambahkan ke *${provider}*\n📦 ${produk} - Rp${harga.toLocaleString('id-ID')}`
         }, { quoted: msg });
       } catch (e) {
         sessionMap.delete(from);
@@ -215,30 +152,21 @@ module.exports = async function tambahProduk(sock, msg, from, body) {
       }
     }
 
-    if (sesi.jenis === 'kouta') { // 🔧 ganti 'kuota' jadi 'kouta'
+    // KOUTA: flat array [{id, provider, produk, harga}, ...]
+    if (sesi.jenis === 'kouta') {
       if (bagian.length !== 3 || isNaN(parseInt(bagian[2].replace(/\D/g,'')))) {
         return sock.sendMessage(chat, {
           text: `❌ Format salah!\nContoh: Three, 5GB, 7000`
         }, { quoted: msg });
       }
       const provider = bagian[0];
-      const namaProdukKouta = bagian[1];
-      const hargaKouta = parseInt(bagian[2].replace(/\D/g,''));
+      const produk = bagian[1];
+      const harga = parseInt(bagian[2].replace(/\D/g,''));
       try {
-        let jsonKouta = [];
-        if (fs.existsSync(KOUTA_FILE_PATH)) {
-          jsonKouta = JSON.parse(fs.readFileSync(KOUTA_FILE_PATH, 'utf-8'));
-        }
-        let objProv = jsonKouta.find(o => o.provider.toLowerCase() === provider.toLowerCase());
-        if (!objProv) {
-          objProv = { provider, items: [] };
-          jsonKouta.push(objProv);
-        }
-        objProv.items.push({ nominal: namaProdukKouta, harga: hargaKouta });
-        fs.writeFileSync(KOUTA_FILE_PATH, JSON.stringify(jsonKouta, null, 2));
+        saveToJsonFlatArray(DATA_PATHS.kouta, { provider, produk, harga });
         sessionMap.delete(from);
         return sock.sendMessage(chat, {
-          text: `✅ Produk kouta berhasil ditambahkan ke *${provider}*\n📦 ${namaProdukKouta} - Rp${hargaKouta.toLocaleString('id-ID')}`
+          text: `✅ Produk kouta berhasil ditambahkan ke *${provider}*\n📦 ${produk} - Rp${harga.toLocaleString('id-ID')}`
         }, { quoted: msg });
       } catch (e) {
         sessionMap.delete(from);

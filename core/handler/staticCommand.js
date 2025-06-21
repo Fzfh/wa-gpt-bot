@@ -1,7 +1,8 @@
 // staticCommand.js
-const { listTopup } = require('../../commands/topup')
-const { handlePulsa } = require('../../commands/pulsa')
-const { handlekouta } = require('../../commands/kouta')
+const { listTopup, lastTopupCommandMap, selectedTopupNominalMap } = require('../../commands/topup')
+const { handlePulsa, selectedNominalMap: pulsaNominalMap, lastCommandMap: pulsaLastMap } = require('../../commands/pulsa')
+const { handlekouta, selectedNominalMap: koutaNominalMap, lastCommandMap: koutaLastMap } = require('../../commands/kouta')
+
 
 const sessionMap = new Map()
 
@@ -116,17 +117,19 @@ Tinggal chat admin yaa, fast respon ✨`
       }, { quoted: msg })
       return true
 
-       case '/keluar':
+     case '/keluar':
       if (!['topup', 'pulsa', 'kouta'].includes(currentSession)) {
-        return false // nggak balas apa-apa
+        return false // Diam aja kalau gak dalam sesi
       }
-
+    
       clearSession(userId)
+      lastTopupCommandMap.delete(userId) // <- ini penting!
+      selectedTopupNominalMap.delete(userId) // <- ini juga
+    
       await sock.sendMessage(sender, {
         text: `✅ Sesi *${currentSession}* kamu sudah diakhiri.`
       }, { quoted: msg })
       return true
-
 
     case 'beli bot':
       await sock.sendMessage(sender, {

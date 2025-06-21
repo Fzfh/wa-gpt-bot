@@ -209,8 +209,12 @@ if (text === '.reset') {
 }
 
 function registerGroupUpdateListener(sock) {
-  sock.ev.removeAllListeners('group-participants.update')
+  sock.ev.removeAllListeners('group-participants.update') 
+  sock.ev.on('group-participants.update', async (update) => {
+    await handleWelcome(sock, update) 
+  })
 }
+
 module.exports = {
   handleResponder,
   greetedUsers,

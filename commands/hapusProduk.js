@@ -10,7 +10,6 @@ const DATA_PATHS = {
 
 module.exports = async function hapusProduk(sock, msg, from, body) {
   const chat = msg.key.remoteJid;
-  const sender = msg.key.participant || from;
   const textAsli =
     msg.message?.conversation ||
     msg.message?.extendedTextMessage?.text ||

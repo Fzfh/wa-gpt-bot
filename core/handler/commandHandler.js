@@ -1,4 +1,5 @@
 const { listTopup } = require('../../commands/topup')
+const tambahProduk = require('../../commands/tambahProduk');
 const fs = require('fs')
 const path = require('path')
 
@@ -30,41 +31,57 @@ async function handleCommand(sock, msg, lowerText, userId, sender) {
     lastCommandMap.set(userId, game)
     return await listTopup(sock, msg, game)
   }
+   if (sessionMap.has(from) || body.toLowerCase().startsWith('/tambah')) {
+      return await tambahProduk(sock, msg, from, body);
+    }
 
   switch (lowerText) {
     case '/menu':
       return sock.sendMessage(sender, {
-        text: `╭━━━[ ✨ *AURA BOT MENU* ✨ ]━━━╮
+        text: 
+`╭━━━[ ✨ *AURA BOT MENU* ✨ ]━━━╮
 ┃
 ┃ 🖼️ *Sticker dari Gambar/Video*
-┃   ➤ Kirim media + caption: *s* / *sticker*
+┃   ➤ Kirim media (foto/video)
+┃   ➤ Tambahkan caption: *s* atau *sticker*
 ┃
-┃ 📝 *Sticker dari Teks*
-┃   ➤ Ketik: *stickertext teks kamu*
-┃   ➤ Alias cepat: *st teks kamu*
+┃ ✍️ *Sticker dari Teks / Emoji*
+┃   ➤ Ketik: *stickertext teks/emoji*
+┃   ➤ Contoh: stickertext Aura 💖 Pro
 ┃
-┃ 💌 *Menfess Anonim* ➤ /menfess
+┃ 💌 *Menfess Anonim*
+┃   ➤ /menfess
 ┃
-┃ 🎮 *Top Up Game* ➤ ketik:
-┃   ➤ topup ${topupGames.join('\n┃   ➤ topup ')}
+┃ 🎮 *Top Up Game*
+┃   ➤ topup ff
+┃   ➤ topup ml
+┃   ➤ topup genshin
+┃   ➤ topup pubg
+┃   ➤ topup valo
 ┃
 ┃ 📱 *Isi Pulsa & Kuota*
 ┃   ➤ beli pulsa
 ┃   ➤ beli kuota
 ┃
-┃ 🤖 *Beli Bot*
-┃   ➤ beli bot
+┃ 🛍️ *Tambah Produk (Admin)*
+┃   ➤ /tambah
+┃   ➤ Tambah produk: topup / pulsa / kuota
 ┃
-┃ 📜 *Admin Command*
-┃   ➤ /riwayat
-┃   ➤ /reset
+┃ 📜 *Riwayat Transaksi*
+┃   ➤ /riwayat — Tampilkan 20 invoice terakhir
+┃   ➤ /clear — Hapus semua invoice (Admin)
 ┃
-┃ ❓ *Petunjuk Pembelian*
+┃ 🤖 *Beli Bot WA*
+┃   ➤ beli bot — Lihat harga & fitur bot
+┃
+┃ ❓ *Cara Pembelian*
 ┃   ➤ .carabeli
+┃   ➤ admin — Hubungi langsung via WA
 ╰━━━━━━━━━━━━━━━━━━━━━━━╯
 
-🧠 *Ketik sesuai yang tersedia yaa adik-adik!*
-📌 _Jangan typo biar AURA gak bingung 😵_`
+🧠 *Ketik sesuai menu ya adik-adik manis!*
+📌 _Hindari typo biar AURA gak overheat 🤖🔥_
+`
       }, { quoted: msg })
 
     case '.carabeli':

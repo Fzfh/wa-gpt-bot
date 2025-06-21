@@ -2,6 +2,7 @@
 const { listTopup, lastTopupCommandMap, selectedTopupNominalMap } = require('../../commands/topup')
 const { handlePulsa, selectedNominalMap: pulsaNominalMap, lastCommandMap: pulsaLastMap } = require('../../commands/pulsa')
 const { handlekouta, selectedNominalMap: koutaNominalMap, lastCommandMap: koutaLastMap } = require('../../commands/kouta')
+const tambahProduk = require('../../commands/tambahProduk');
 
 
 const sessionMap = new Map()
@@ -34,15 +35,16 @@ async function handleStaticCommand(sock, msg, lowerText, userId) {
   switch (lowerText) {
     case '/menu':
       await sock.sendMessage(sender, {
-        text: `╭━━━[ ✨ *AURA BOT MENU* ✨ ]━━━╮
+        text: 
+`╭━━━[ ✨ *AURA BOT MENU* ✨ ]━━━╮
 ┃
 ┃ 🖼️ *Sticker dari Gambar/Video*
 ┃   ➤ Kirim media (foto/video)
 ┃   ➤ Tambahkan caption: *s* atau *sticker*
 ┃
-┃ 📝 *Sticker dari Text*
-┃   ➤ Ketik: *stickertext teks kamu*
-┃   ➤ Contoh: stickertext Aura Jago Coding jirs
+┃ ✍️ *Sticker dari Teks / Emoji*
+┃   ➤ Ketik: *stickertext teks/emoji*
+┃   ➤ Contoh: stickertext Aura 💖 Pro
 ┃
 ┃ 💌 *Menfess Anonim*
 ┃   ➤ /menfess
@@ -58,19 +60,25 @@ async function handleStaticCommand(sock, msg, lowerText, userId) {
 ┃   ➤ beli pulsa
 ┃   ➤ beli kuota
 ┃
-┃ 🤖 *Beli Bot*
-┃   ➤ beli bot
+┃ 🛍️ *Tambah Produk (Admin)*
+┃   ➤ /tambah
+┃   ➤ Tambah produk: topup / pulsa / kuota
 ┃
-┃ 📜 *Admin Command*
-┃   ➤ /riwayat
-┃   ➤ /reset
+┃ 📜 *Riwayat Transaksi*
+┃   ➤ /riwayat — Tampilkan 20 invoice terakhir
+┃   ➤ /clear — Hapus semua invoice (Admin)
 ┃
-┃ ❓ *Petunjuk Pembelian*
+┃ 🤖 *Beli Bot WA*
+┃   ➤ beli bot — Lihat harga & fitur bot
+┃
+┃ ❓ *Cara Pembelian*
 ┃   ➤ .carabeli
+┃   ➤ admin — Hubungi langsung via WA
 ╰━━━━━━━━━━━━━━━━━━━━━━━╯
 
-🧠 *Ketik sesuai yang tersedia yaa adik-adik!*
-📌 _Jangan typo biar AURA gak bingung 😵_`
+🧠 *Ketik sesuai menu ya adik-adik manis!*
+📌 _Hindari typo biar AURA gak overheat 🤖🔥_
+`
       }, { quoted: msg })
       return true
 
@@ -137,7 +145,9 @@ Tinggal chat admin yaa, fast respon ✨`
       }, { quoted: msg })
       return true
   }
-
+  if (sessionMap.has(from) || body.toLowerCase().startsWith('/tambah')) {
+      return await tambahProduk(sock, msg, from, body);
+    }
   // Topup Game - Cek jika mulai dengan "topup namaGame"
   if (lowerText.startsWith('topup ')) {
     const game = lowerText.split(' ')[1]

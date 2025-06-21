@@ -2,9 +2,9 @@ const axios = require('axios')
 require('dotenv').config();
 
 const models = [
-  "deepseek/deepseek-r1-0528:free", 
-  "mistralai/mistral-7b-instruct:free",
-  "deepseek/deepseek-coder:free"
+  "mixtral-8x7b-32768", 
+  "llama3-8b-8192",
+  "llama3-70b-8192"
 ]
 let lastSuccessfulModel = null
 async function askOpenAI(userHistory = []) {

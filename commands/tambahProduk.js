@@ -2,6 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const sessionMap = require('../core/sessionStore');
+const { adminList } = require('../setting/setting');
 
 const DATA_PATHS = {
   topup: path.join(__dirname, '../data/topup.json'),      // misal tetap array of game objects
@@ -38,6 +39,12 @@ module.exports = async function tambahProduk(sock, msg, from, body) {
     (msg.message?.imageMessage?.caption) ||
     body || '';
   const lower = textAsli.toLowerCase().trim();
+  
+    if (!adminList.includes(from)) {
+    return sock.sendMessage(chat, {
+      text: `🚫 Maaf ya, fitur *Tambah Produk* hanya bisa digunakan oleh admin 😘`,
+    }, { quoted: msg });
+  }
 
   // Tangani /keluar dalam sesi tambah
   const sesi = sessionMap.get(from);

@@ -31,21 +31,21 @@ module.exports = async function hapusProduk(sock, msg, from, body,  userId) {
 
   // 🌟 Keluar dari sesi
   if (lower === '/keluar') {
-    if (sessionMap.has(sender)) {
-      sessionMap.delete(sender);
+    if (sessionMap.has(userId)) {
+      sessionMap.delete(userId);
       return sock.sendMessage(chat, { text: `🚪 Sesi *hapus produk* telah dibatalkan.` }, { quoted: msg });
     }
   }
 
   // 🌟 Mulai sesi baru
   if (lower === '/hapus') {
-    sessionMap.set(sender, { stage: 'pilih_jenis', type: 'hapus' });
+    sessionMap.set(userId, { stage: 'pilih_jenis', type: 'hapus' });
     return sock.sendMessage(chat, {
       text: `🗑️ *Hapus Produk*\n\n1. Topup Game\n2. Pulsa\n3. Kouta\n\n📝 Ketik angka *1*, *2*, atau *3* untuk memilih.`,
     }, { quoted: msg });
   }
 
-  const sesi = sessionMap.get(sender);
+  const sesi = sessionMap.get(userId);
   if (!sesi || sesi.type !== 'hapus') return;
 
   // Step 1
@@ -59,7 +59,7 @@ module.exports = async function hapusProduk(sock, msg, from, body,  userId) {
     }
     sesi.jenis = jenis;
     sesi.stage = 'pilih_kategori';
-    sessionMap.set(sender, sesi);
+    sessionMap.set(userId, sesi);
     const contoh = jenis === 'topup' ? 'Mobile Legends' : 'Three / Telkomsel';
     return sock.sendMessage(chat, {
       text: `🗂️ Ketik nama *${jenis === 'topup' ? 'game' : 'provider'}* yang ingin dihapus.\nContoh: *${contoh}*`,
@@ -79,13 +79,13 @@ module.exports = async function hapusProduk(sock, msg, from, body,  userId) {
       const gameIndex = data.findIndex(g => g.game.toLowerCase() === kategori);
       const game = data[gameIndex];
       if (!game) {
-        sessionMap.delete(sender);
+        sessionMap.delete(userId);
         return sock.sendMessage(chat, { text: `❌ Game *${kategori}* tidak ditemukan.` }, { quoted: msg });
       }
 
       sesi.indexGame = gameIndex;
       sesi.produkList = game.items;
-      sessionMap.set(sender, sesi);
+      sessionMap.set(userId, sesi);
 
       const list = game.items.map((item, i) => `${i + 1}. ${item.nominal} - Rp${item.harga.toLocaleString('id-ID')}`).join('\n');
 
@@ -95,14 +95,14 @@ module.exports = async function hapusProduk(sock, msg, from, body,  userId) {
     } else {
       const filtered = data.filter(p => p.provider.toLowerCase() === kategori);
       if (filtered.length === 0) {
-        sessionMap.delete(sender);
+        sessionMap.delete(userId);
         return sock.sendMessage(chat, {
           text: `❌ Tidak ada produk dengan provider *${kategori}*`,
         }, { quoted: msg });
       }
 
       sesi.filteredProduk = filtered;
-      sessionMap.set(sender, sesi);
+      sessionMap.set(userId, sesi);
 
       const list = filtered.map((p, i) => `${i + 1}. ${p.produk} - Rp${p.harga.toLocaleString('id-ID')} (ID: ${p.id})`).join('\n');
 
@@ -131,7 +131,7 @@ module.exports = async function hapusProduk(sock, msg, from, body,  userId) {
 
       const removed = produkList.splice(index, 1);
       fs.writeFileSync(DATA_PATHS.topup, JSON.stringify(data, null, 2));
-      sessionMap.delete(sender);
+      sessionMap.delete(userId);
 
       return sock.sendMessage(chat, {
         text: `✅ Produk *${removed[0].nominal}* dari *${game.game}* berhasil dihapus.`,
@@ -148,7 +148,7 @@ module.exports = async function hapusProduk(sock, msg, from, body,  userId) {
 
       const removed = data.splice(indexData, 1);
       fs.writeFileSync(DATA_PATHS[jenis], JSON.stringify(data, null, 2));
-      sessionMap.delete(sender);
+      sessionMap.delete(userId);
 
       return sock.sendMessage(chat, {
         text: `✅ Produk *${removed[0].produk}* dari *${removed[0].provider}* berhasil dihapus.`,

@@ -1,4 +1,5 @@
 const greetedRecently = new Set();
+const farewelledRecently = new Set(); 
 
 module.exports = async function handleWelcome(sock, update) {
   const { id, participants, action } = update;
@@ -38,4 +39,30 @@ module.exports = async function handleWelcome(sock, update) {
       });
     }
   }
-}
+
+  if (action === 'remove') {
+    for (const user of participants) {
+      if (farewelledRecently.has(user)) continue;
+
+      farewelledRecently.add(user);
+      setTimeout(() => farewelledRecently.delete(user), 30_000); // 30 detik cooldown
+
+      const userName = user.split('@')[0];
+      let profilePicture;
+
+      try {
+        profilePicture = await sock.profilePictureUrl(user, 'image');
+      } catch (err) {
+        profilePicture = './media/g.png';
+      }
+
+      const goodbyeText = `👋 Selamat tinggal @${userName}, semoga sukses di luar sana ya! 🌈✨`;
+
+      await sock.sendMessage(id, {
+        image: { url: profilePicture },
+        caption: goodbyeText,
+        mentions: [user],
+      });
+    }
+  }
+};

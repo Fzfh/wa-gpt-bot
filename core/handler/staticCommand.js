@@ -3,7 +3,7 @@ const { listTopup, lastTopupCommandMap, selectedTopupNominalMap } = require('../
 const { handlePulsa, selectedNominalMap: pulsaNominalMap, lastCommandMap: pulsaLastMap } = require('../../commands/pulsa')
 const { handlekouta, selectedNominalMap: koutaNominalMap, lastCommandMap: koutaLastMap } = require('../../commands/kouta')
 const tambahProduk = require('../../commands/tambahProduk');
-
+const from = msg.key.remoteJid;
 
 const sessionMap = new Map()
 

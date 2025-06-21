@@ -1,8 +1,6 @@
-// 📁 commands/hapusProduk.js
 const fs = require('fs');
 const path = require('path');
 const sessionMap = require('../core/sessionStore');
-const { adminList } = require('../setting/setting');
 
 const DATA_PATHS = {
   topup: path.join(__dirname, '../data/topup.json'),
@@ -10,90 +8,93 @@ const DATA_PATHS = {
   kouta: path.join(__dirname, '../data/kouta.json'),
 };
 
-module.exports = async function hapusProduk(sock, msg, from, body) {
-  const chat = msg.key.remoteJid;
-  const textAsli =
-    (msg.message?.conversation) ||
-    (msg.message?.extendedTextMessage?.text) ||
-    (msg.message?.imageMessage?.caption) ||
-    body || '';
-  const lower = textAsli.toLowerCase().trim();
+async function isUserAdmin(sock, jid, userId) {
+  try {
+    const metadata = await sock.groupMetadata(jid)
+    const participant = metadata.participants.find(p => p.id === userId)
+    return participant && ['admin', 'superadmin'].includes(participant.admin)
+  } catch (err) {
+    return false
+  }
+}
 
-  if (!adminList.includes(from)) {
-    return sock.sendMessage(chat, {
-      text: `🚫 Maaf ya, fitur *Hapus Produk* hanya untuk admin saja 😘`,
-    }, { quoted: msg });
+module.exports = async function hapusProduk(sock, msg, from, body) {
+  const chat = msg.key.remoteJid
+  const sender = msg.key.participant || msg.key.remoteJid
+  const lower = (
+    msg.message?.conversation ||
+    msg.message?.extendedTextMessage?.text ||
+    msg.message?.imageMessage?.caption ||
+    body || ''
+  ).toLowerCase().trim()
+
+  // ✅ Cek admin jika dari grup, skip kalau dari private chat
+  const isGroup = chat.endsWith('@g.us')
+  if (isGroup) {
+    const isAdmin = await isUserAdmin(sock, chat, sender)
+    if (!isAdmin) {
+      return sock.sendMessage(chat, { text: '❌ Hanya admin grup yang bisa pakai perintah ini!' }, { quoted: msg })
+    }
   }
 
-  const sesi = sessionMap.get(from);
+  const sesi = sessionMap.get(sender)
 
   if (!sesi && lower === '/hapus') {
-    sessionMap.set(from, { stage: 'pilih_jenis', type: 'hapus' });
+    sessionMap.set(sender, { stage: 'pilih_jenis', type: 'hapus' })
     return sock.sendMessage(chat, {
-      text: `🗑️ *Hapus Produk*
-1. Topup Game
-2. Pulsa
-3. Kouta
-
-✏️ Ketik angka *1*, *2*, atau *3* untuk memilih.`
-    }, { quoted: msg });
+      text: `🗑️ *Hapus Produk*\n1. Topup Game\n2. Pulsa\n3. Kouta\n\n✏️ Ketik angka *1*, *2*, atau *3* untuk memilih.`
+    }, { quoted: msg })
   }
 
-  if (!sesi || sesi.type !== 'hapus') return;
+  if (!sesi || sesi.type !== 'hapus') return
 
   if (sesi.stage === 'pilih_jenis') {
-    const jenisMap = { '1': 'topup', '2': 'pulsa', '3': 'kouta' };
-    const jenis = jenisMap[lower];
-    if (!jenis) return;
+    const jenisMap = { '1': 'topup', '2': 'pulsa', '3': 'kouta' }
+    const jenis = jenisMap[lower]
+    if (!jenis) return
 
-    sesi.jenis = jenis;
-    sesi.stage = 'pilih_target';
-    sessionMap.set(from, sesi);
+    sesi.jenis = jenis
+    sesi.stage = 'pilih_target'
+    sessionMap.set(sender, sesi)
 
-    const data = JSON.parse(fs.readFileSync(DATA_PATHS[jenis]));
+    const data = JSON.parse(fs.readFileSync(DATA_PATHS[jenis]))
 
     if (jenis === 'topup') {
-      let listGame = data.map((item, index) => `${index + 1}. ${item.game}`).join('\n');
+      const list = data.map((g, i) => `${i + 1}. ${g.game}`).join('\n')
       return sock.sendMessage(chat, {
-        text: `🎮 Pilih game:
-${listGame}\n\nKetik angka game yang ingin dihapus produknya.`
-      }, { quoted: msg });
+        text: `🎮 Pilih game:\n${list}\n\nKetik angka game yang ingin dihapus.`
+      }, { quoted: msg })
     } else {
-      let list = data.map(item => `${item.id}. ${item.provider} - ${item.produk}`).join('\n');
+      const list = data.map(p => `${p.id}. ${p.provider} - ${p.produk}`).join('\n')
       return sock.sendMessage(chat, {
-        text: `📄 Pilih ID produk yang ingin dihapus:
-${list}\n\nKetik ID-nya, misal: 3`
-      }, { quoted: msg });
+        text: `📱 Pilih ID produk:\n${list}\n\nKetik ID-nya, misal: 4`
+      }, { quoted: msg })
     }
   }
 
   if (sesi.stage === 'pilih_target') {
-    const jenis = sesi.jenis;
-    const data = JSON.parse(fs.readFileSync(DATA_PATHS[jenis]));
+    const jenis = sesi.jenis
+    const data = JSON.parse(fs.readFileSync(DATA_PATHS[jenis]))
 
     if (jenis === 'topup') {
-      const index = parseInt(lower) - 1;
+      const index = parseInt(lower) - 1
       if (isNaN(index) || index < 0 || index >= data.length) {
-        return sock.sendMessage(chat, { text: `❌ Nomor tidak valid.` }, { quoted: msg });
+        return sock.sendMessage(chat, { text: '❌ Nomor tidak valid.' }, { quoted: msg })
       }
-      const removed = data.splice(index, 1);
-      fs.writeFileSync(DATA_PATHS[jenis], JSON.stringify(data, null, 2));
-      sessionMap.delete(from);
-      return sock.sendMessage(chat, {
-        text: `✅ Produk dari *${removed[0].game}* berhasil dihapus.`
-      }, { quoted: msg });
+      const removed = data.splice(index, 1)
+      fs.writeFileSync(DATA_PATHS[jenis], JSON.stringify(data, null, 2))
+      sessionMap.delete(sender)
+      return sock.sendMessage(chat, { text: `✅ Game *${removed[0].game}* berhasil dihapus.` }, { quoted: msg })
     } else {
-      const id = parseInt(lower);
-      const index = data.findIndex(item => item.id === id);
+      const id = parseInt(lower)
+      const index = data.findIndex(p => p.id === id)
       if (index === -1) {
-        return sock.sendMessage(chat, { text: `❌ ID tidak ditemukan.` }, { quoted: msg });
+        return sock.sendMessage(chat, { text: '❌ ID tidak ditemukan.' }, { quoted: msg })
       }
-      const removed = data.splice(index, 1);
-      fs.writeFileSync(DATA_PATHS[jenis], JSON.stringify(data, null, 2));
-      sessionMap.delete(from);
-      return sock.sendMessage(chat, {
-        text: `✅ Produk *${removed[0].produk}* berhasil dihapus.`
-      }, { quoted: msg });
+      const removed = data.splice(index, 1)
+      fs.writeFileSync(DATA_PATHS[jenis], JSON.stringify(data, null, 2))
+      sessionMap.delete(sender)
+      return sock.sendMessage(chat, { text: `✅ Produk *${removed[0].produk}* berhasil dihapus.` }, { quoted: msg })
     }
   }
-};
+}

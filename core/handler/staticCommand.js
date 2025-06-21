@@ -1,7 +1,7 @@
 const { listTopup, lastTopupCommandMap, selectedTopupNominalMap } = require('../../commands/topup')
 const { handlePulsa, selectedNominalMap: pulsaNominalMap, lastCommandMap: pulsaLastMap } = require('../../commands/pulsa')
 const { handlekouta, selectedNominalMap: koutaNominalMap, lastCommandMap: koutaLastMap } = require('../../commands/kouta')
-const hapusProduk = require('../commands/hapusProduk');
+const hapusProduk = require('../../commands/hapusProduk');
 const tambahProduk = require('../../commands/tambahProduk');
 
 const sessionMap = require('../../core/sessionStore');

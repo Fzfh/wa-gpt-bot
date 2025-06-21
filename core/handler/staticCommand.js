@@ -116,12 +116,17 @@ Tinggal chat admin yaa, fast respon ✨`
       }, { quoted: msg })
       return true
 
-    case '/keluar':
+       case '/keluar':
+      if (!['topup', 'pulsa', 'kouta'].includes(currentSession)) {
+        return false // nggak balas apa-apa
+      }
+
       clearSession(userId)
       await sock.sendMessage(sender, {
-        text: `✅ Sesi kamu sudah diakhiri! Ketik menu lain seperti *topup*, *beli pulsa*, atau lainnya.`
+        text: `✅ Sesi *${currentSession}* kamu sudah diakhiri.`
       }, { quoted: msg })
       return true
+
 
     case 'beli bot':
       await sock.sendMessage(sender, {

@@ -40,12 +40,13 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   }
 
   // Command Admin untuk tambah produk
-  if (sessionMap.has(from) || body.toLowerCase().startsWith('/tambah')) {
+  if (body.toLowerCase().startsWith('/tambah')) {
     return await tambahProduk(sock, msg, from, body)
   }
-  if (sessionMap.has(from) || body.toLowerCase().startsWith('/hapus')) {
+  if (body.toLowerCase().startsWith('/hapus')) {
     return await hapusProduk(sock, msg, from, body)
   }
+
 
   switch (lowerText) {
     case '/menu':

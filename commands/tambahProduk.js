@@ -1,4 +1,3 @@
-// 📁 File: commands/tambahProduk.js
 const fs = require('fs');
 const path = require('path');
 const sessionMap = new Map();
@@ -24,65 +23,75 @@ function saveToJson(filePath, kategori, dataBaru) {
 
 module.exports = async function tambahProduk(sock, msg, from, body) {
   const chat = msg.key.remoteJid;
-  const isSession = sessionMap.has(from);
+  const lower = body.toLowerCase().trim();
+  const sesi = sessionMap.get(from);
 
   // Step 1: Awal - /tambah
-  if (!isSession && body.toLowerCase() === '/tambah') {
+  if (!sesi && lower === '/tambah') {
     sessionMap.set(from, { stage: 'pilih_jenis' });
-    return await sock.sendMessage(chat, {
-      text: `📦 Tambah Produk
-1. Topup Game
-2. Pulsa
-3. Kuota`
-    }, { quoted: msg });
-  }
-
-  // Step 2: Pilih Jenis
-  if (isSession && sessionMap.get(from).stage === 'pilih_jenis') {
-    const pilih = body.trim();
-    const jenisMap = { '1': 'topup', '2': 'pulsa', '3': 'kuota' };
-    const jenis = jenisMap[pilih];
-
-    if (!jenis) return sock.sendMessage(chat, { text: '❌ Pilih 1, 2, atau 3 ya~' }, { quoted: msg });
-
-    sessionMap.set(from, { stage: 'pilih_kategori', jenis });
     return sock.sendMessage(chat, {
-      text: `Ketik kategori atau provider-nya:
-Contoh: mobilelegends / three / indosat`
+      text: `📦 *Tambah Produk*\n1. Topup Game\n2. Pulsa\n3. Kuota\n\n✏️ Ketik angka *1*, *2*, atau *3* untuk memilih.`,
     }, { quoted: msg });
   }
 
-  // Step 3: Pilih Kategori (ml, ff, dll / three / indosat)
-  if (isSession && sessionMap.get(from).stage === 'pilih_kategori') {
-    const sesi = sessionMap.get(from);
-    sesi.kategori = body.trim().toLowerCase();
+  // Step 2: Pilih Jenis Produk
+  if (sesi?.stage === 'pilih_jenis') {
+    const jenisMap = { '1': 'topup', '2': 'pulsa', '3': 'kuota' };
+    const jenis = jenisMap[lower];
+
+    if (!jenis) {
+      if (!sesi.notified) {
+        sesi.notified = true; // Agar tidak spam
+        sessionMap.set(from, sesi);
+        return sock.sendMessage(chat, {
+          text: `❌ Pilih angka *1*, *2*, atau *3* saja yaa~`
+        }, { quoted: msg });
+      }
+      return true;
+    }
+
+    sesi.jenis = jenis;
+    sesi.stage = 'pilih_kategori';
+    sessionMap.set(from, sesi);
+
+    return sock.sendMessage(chat, {
+      text: `🗂️ Ketik kategori atau provider untuk produk *${jenis.toUpperCase()}*.\nContoh: mobilelegends / three / indosat`
+    }, { quoted: msg });
+  }
+
+  // Step 3: Pilih Kategori
+  if (sesi?.stage === 'pilih_kategori') {
+    sesi.kategori = lower;
     sesi.stage = 'isi_data';
     sessionMap.set(from, sesi);
 
-    let contohInput = 'nama_produk, harga';
-    if (sesi.jenis !== 'topup') contohInput = 'provider, nama_produk, harga';
+    const contoh = sesi.jenis === 'topup'
+      ? 'nama_produk, harga\nContoh:\n- 199dm, 50000'
+      : 'provider, nama_produk, harga\nContoh:\n- Three, 5GB 1hr, 7000';
 
     return sock.sendMessage(chat, {
-      text: `📝 Kirim data produk dengan format:
-${contohInput}
-
-Contoh:
-- 199dm, 50000
-- Three, 10000, 11000`
+      text: `📝 Kirim data produk dengan format:\n${contoh}`
     }, { quoted: msg });
   }
 
-  // Step 4: Input Data
-  if (isSession && sessionMap.get(from).stage === 'isi_data') {
-    const sesi = sessionMap.get(from);
+  // Step 4: Isi Data
+  if (sesi?.stage === 'isi_data') {
     const bagian = body.split(',').map(p => p.trim());
 
     let data = {};
     if (sesi.jenis === 'topup') {
-      if (bagian.length !== 2) return sock.sendMessage(chat, { text: '❌ Format salah! Contoh: 199dm, 50000' }, { quoted: msg });
+      if (bagian.length !== 2) {
+        return sock.sendMessage(chat, {
+          text: `❌ Format salah!\nContoh: 199dm, 50000`
+        }, { quoted: msg });
+      }
       data = { nama: bagian[0], harga: parseInt(bagian[1]) };
     } else {
-      if (bagian.length !== 3) return sock.sendMessage(chat, { text: '❌ Format salah! Contoh: Three, 5GB 1hr, 7000' }, { quoted: msg });
+      if (bagian.length !== 3) {
+        return sock.sendMessage(chat, {
+          text: `❌ Format salah!\nContoh: Three, 5GB 1hr, 7000`
+        }, { quoted: msg });
+      }
       sesi.kategori = bagian[0].toLowerCase();
       data = { nama: bagian[1], harga: parseInt(bagian[2]) };
     }
@@ -91,8 +100,7 @@ Contoh:
       saveToJson(DATA_PATHS[sesi.jenis], sesi.kategori, data);
       sessionMap.delete(from);
       return sock.sendMessage(chat, {
-        text: `✅ Produk berhasil ditambahkan ke *${sesi.kategori}*
-📦 ${data.nama} - Rp${data.harga.toLocaleString()}`
+        text: `✅ Produk berhasil ditambahkan ke *${sesi.kategori}*\n📦 ${data.nama} - Rp${data.harga.toLocaleString()}`
       }, { quoted: msg });
     } catch (e) {
       sessionMap.delete(from);
@@ -101,4 +109,4 @@ Contoh:
       }, { quoted: msg });
     }
   }
-};
+}

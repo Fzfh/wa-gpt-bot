@@ -147,7 +147,7 @@ async function createStickerFromText(text) {
   ctx.fillRect(0, 0, width, height);
 
   ctx.fillStyle = 'black';
-  ctx.font = `${fontSize}px Arial`;
+  ctx.font = `${fontSize}px "Noto Color Emoji", Arial`;
   ctx.textBaseline = 'top';
 
   const lines = wrapText(ctx, text, width - padding * 2);

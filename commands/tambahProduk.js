@@ -3,7 +3,7 @@ const path = require('path');
 const sessionMap = require('../core/sessionStore');
 
 const DATA_PATHS = {
-  topup: path.join(__dirname, '../data/topupdata.json'),
+  topup: path.join(__dirname, '../data/topup.json'),
   pulsa: path.join(__dirname, '../data/pulsa.json'),
   kuota: path.join(__dirname, '../data/kuota.json'),
 };

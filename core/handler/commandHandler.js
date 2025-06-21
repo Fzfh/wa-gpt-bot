@@ -36,10 +36,10 @@ async function handleCommand(sock, msg, lowerText, userId, from, body, sender)
     return await listTopup(sock, msg, game)
   }
    if (sessionMap.has(from) || body.toLowerCase().startsWith('/tambah')) {
-      return await tambahProduk(sock, msg, from, body);
+      return await tambahProduk(sock, msg, from, body, userId);
     }
   if (sessionMap.has(from) || body.toLowerCase().startsWith('/hapus')) {
-      return await hapusProduk(sock, msg, from, body);
+      return await hapusProduk(sock, msg, from, body, userId);
     }
 
   switch (lowerText) {

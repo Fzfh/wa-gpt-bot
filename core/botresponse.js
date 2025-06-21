@@ -22,6 +22,9 @@ const { listTopup, getHargaFromDB, selectedTopupMap, lastTopupCommandMap } = req
 const { getProdukDariTabel } = require('../commands/produk')
 const { handlePulsa, selectedNominalMap: pulsaNominalMap, lastCommandMap: pulsaCommandMap } = require('../commands/pulsa')
 const { handlekouta, selectedKoutaNominalMap, lastKoutaCommandMap } = require('../commands/kouta')
+const sessionMap = require('../core/sessionStore');
+const hapusProduk = require('../commands/hapusProduk');
+const tambahProduk = require('../commands/tambahProduk');
 const greetedUsers = new Set()
 // const lastCommandMap = new Map()
 // const selectedNominalMap = new Map()
@@ -203,6 +206,14 @@ if (text === '.reset') {
       return sock.sendMessage(sender, { text: 'Maaf, aku gak ngerti perintah itu 😵. Coba ketik /menu yaa!' }, { quoted: msg })
     }
     }
+    if (sesi && sesi.type === 'hapus') {
+  return await hapusProduk(sock, msg, from, body);
+}
+const sesi = sessionMap.get(sender);
+    
+if (sesi && sesi.type === 'tambah') {
+  return await tambahProduk(sock, msg, from, body);
+}
   } catch (error) {
     console.error('❌ Error di handleResponder:', error)
   }

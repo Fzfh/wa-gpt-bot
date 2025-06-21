@@ -1,4 +1,5 @@
 const axios = require('axios')
+require('dotenv').config();
 
 const models = [
   "deepseek/deepseek-r1-0528:free", 
@@ -35,7 +36,7 @@ async function askOpenAI(userHistory = []) {
         max_tokens: 900
       }, {
         headers: {
-          'Authorization': `Bearer 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`,
+          'Authorization': `Bearer ${API_KEY}`,
           'Content-Type': 'application/json',
           'HTTP-Referer': 'https://aurabot.netlify.app',
           'X-Title': 'Wa-GPT-Bot'

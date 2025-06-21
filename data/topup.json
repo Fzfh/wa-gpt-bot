@@ -1,0 +1,112 @@
+[
+  {
+    "game": "Mobile Legends",
+    "items": [
+      { "nominal": "💎14 Diamond", "harga": 5000 },
+      { "nominal": "💎28 Diamond", "harga": 9000 },
+      { "nominal": "💎44 Diamond", "harga": 12000 },
+      { "nominal": "💎59 Diamond", "harga": 17000 },
+      { "nominal": "💎86 Diamond", "harga": 24000 },
+      { "nominal": "💎112 Diamond", "harga": 32000 },
+      { "nominal": "💎172 Diamond", "harga": 48000 },
+      { "nominal": "💎257 Diamond", "harga": 70000 },
+      { "nominal": "💎284 Diamond", "harga": 77000 },
+      { "nominal": "💎355 Diamond", "harga": 96000 },
+      { "nominal": "💎429 Diamond", "harga": 116000 },
+      { "nominal": "💎568 Diamond", "harga": 147000 },
+      { "nominal": "💎600 Diamond", "harga": 158000 },
+      { "nominal": "💎706 Diamond", "harga": 185000 },
+      { "nominal": "💎878 Diamond", "harga": 227000 },
+      { "nominal": "💎963 Diamond", "harga": 247000 },
+      { "nominal": "💎1159 Diamond", "harga": 295000 },
+      { "nominal": "💎1412 Diamond", "harga": 361000 },
+      { "nominal": "💎1506 Diamond", "harga": 383000 },
+      { "nominal": "💎1830 Diamond", "harga": 471000 },
+      { "nominal": "💎2195 Diamond", "harga": 528000 },
+      { "nominal": "💎2976 Diamond", "harga": 740000 },
+      { "nominal": "💎3688 Diamond", "harga": 908000 },
+      { "nominal": "💎4830 Diamond", "harga": 1520000 },
+      { "nominal": "💎6050 Diamond", "harga": 1450000 }, 
+      { "nominal": "💎7727 Diamond", "harga": 1860000 }
+    ]
+  },
+  {
+    "game": "Free Fire",
+    "items": [
+      { "nominal": "💎10 Diamond", "harga": 2000 },
+      { "nominal": "💎20 Diamond", "harga": 5000 },
+      { "nominal": "💎50 Diamond", "harga": 8000 },
+      { "nominal": "💎70 Diamond", "harga": 9000 },
+      { "nominal": "💎120 Diamond", "harga": 16000 },
+      { "nominal": "💎140 Diamond", "harga": 19000 },
+      { "nominal": "💎170 Diamond", "harga": 23000 },
+      { "nominal": "💎210 Diamond", "harga": 27000 },
+      { "nominal": "💎280 Diamond", "harga": 36000 },
+      { "nominal": "💎355 Diamond", "harga": 45000 },
+      { "nominal": "💎425 Diamond", "harga": 53000 },
+      { "nominal": "💎475 Diamond", "harga": 59000 },
+      { "nominal": "💎545 Diamond", "harga": 67000 },
+      { "nominal": "💎635 Diamond", "harga": 78000 },
+      { "nominal": "💎655 Diamond", "harga": 81000 },
+      { "nominal": "💎720 Diamond", "harga": 86000 },
+      { "nominal": "💎770 Diamond", "harga": 93000 },
+      { "nominal": "💎800 Diamond", "harga": 96000 },
+      { "nominal": "💎930 Diamond", "harga": 112000 },
+      { "nominal": "💎1000 Diamond", "harga": 120000 },
+      { "nominal": "💎1075 Diamond", "harga": 130000 },
+      { "nominal": "💎1200 Diamond", "harga": 145000 },
+      { "nominal": "💎1300 Diamond", "harga": 157000 },
+      { "nominal": "💎1440 Diamond", "harga": 171000 },
+      { "nominal": "💎1510 Diamond", "harga": 180000 },
+      { "nominal": "💎1795 Diamond", "harga": 215000 },
+      { "nominal": "💎1875 Diamond", "harga": 225000 },
+      { "nominal": "💎2100 Diamond", "harga": 255000 },
+      { "nominal": "💎2355 Diamond", "harga": 281000 },
+      { "nominal": "💎5600 Diamond", "harga": 669000 },
+      { "nominal": "💎7290 Diamond", "harga": 851000 }
+    ]
+  },
+  {
+    "game": "Genshin Impact",
+    "items": [
+      { "nominal": "🌠60 Genesis Crystal", "harga": 12000 },
+      { "nominal": "🌠300+30 Genesis Crystal", "harga": 60000 },
+      { "nominal": "🌠980+110 Genesis Crystal", "harga": 179000 },
+      { "nominal": "🌠1980+260 Genesis Crystal", "harga": 385000 },
+      { "nominal": "🌠3280+600 Genesis Crystal", "harga": 593000 },
+      { "nominal": "🌌Genshin Impact Blessing of The Welkin Moon", "harga": 75000 }
+    ]
+  },
+  {
+    "game": "PUBG Mobile",
+    "items": [
+      { "nominal": "💴15 UC", "harga": 9000 },
+      { "nominal": "💴25 UC", "harga": 11000 },
+      { "nominal": "💴35 UC", "harga": 16000 },
+      { "nominal": "💴60 UC", "harga": 16000 },
+      { "nominal": "💴70 UC", "harga": 23000 },
+      { "nominal": "💴100 UC", "harga": 30000 },
+      { "nominal": "💴150 UC", "harga": 45000 },
+      { "nominal": "💴200 UC", "harga": 59000 },
+      { "nominal": "💴250 UC", "harga": 72000 },
+      { "nominal": "💴300 UC", "harga": 78000 },
+      { "nominal": "💴350 UC", "harga": 87000 },
+      { "nominal": "💴500 UC", "harga": 116000 },
+      { "nominal": "💴525 UC", "harga": 131000 },
+      { "nominal": "💴750 UC", "harga": 175000 },
+      { "nominal": "💴1000 UC", "harga": 232000 },
+      { "nominal": "💴1250 UC", "harga": 289000 },
+      { "nominal": "💴1750 UC", "harga": 365000 },
+      { "nominal": "💴2500 UC", "harga": 510000 },
+      { "nominal": "💴Elite Pass Plus + Kupon Peti Klasik", "harga": 360000 }
+    ]
+  },
+  {
+    "game": "Valorant",
+    "items": [
+      { "nominal": "Radianite 375", "harga": 25000 },
+      { "nominal": "Radianite 750", "harga": 48000 },
+      { "nominal": "Radianite 1200", "harga": 75000 }
+    ]
+  }
+]

@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "provider": "Three",
+    "produk": "Pulsa 5k",
+    "harga": 7000
+  },
+  {
+    "id": 2,
+    "provider": "Three",
+    "produk": "Pulsa 10K",
+    "harga": 12000
+  },
+  {
+    "id": 3,
+    "provider": "Three",
+    "produk": "Pulsa 15K",
+    "harga": 17000
+  }, 
+  {
+    "id": 4,
+    "provider": "Three",
+    "produk": "Pulsa 20K",
+    "harga": 22000
+  },
+  {
+    "id": 5,
+    "provider": "Three",
+    "produk": "Pulsa 25K",
+    "harga": 27000
+  },
+  {
+    "id": 6,
+    "provider": "Three",
+    "produk": "Pulsa 30K",
+    "harga": 32000
+  },
+  {
+    "id": 7,
+    "provider": "Three",
+    "produk": "Pulsa 35K",
+    "harga": 37000
+  },
+  {
+    "id": 8,
+    "provider": "Three",
+    "produk": "Pulsa 40K",
+    "harga": 42000
+  },
+  {
+    "id": 9,
+    "provider": "Three",
+    "produk": "Pulsa 45K",
+    "harga": 47000
+  },
+  {
+    "id": 10,
+    "provider": "Three",
+    "produk": "Pulsa 50K",
+    "harga": 52000
+  },
+  {
+    "id": 11,
+    "provider": "Telkomsel",
+    "produk": "Pulsa 5K",
+    "harga": 8000
+  },
+  {
+    "id": 12,
+    "provider": "Telkomsel",
+    "produk": "Pulsa 10K",
+    "harga": 13000
+  }
+]

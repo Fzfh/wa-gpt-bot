@@ -1,0 +1,38 @@
+[
+  {
+    "invoiceId": "INV196834236",
+    "user": "120363419539730240@g.us",
+    "produk": "Transaksi",
+    "nominal": 2500,
+    "status": "unpaid",
+    "waktu": "20/6/2025, 13.49.56",
+    "msgId": "3EB0A56A941C3B574CA1ED"
+  },
+  {
+    "invoiceId": "INV223159629",
+    "user": "120363419539730240@g.us",
+    "produk": "Transaksi",
+    "nominal": 2500,
+    "status": "paid",
+    "waktu": "20/6/2025, 14.07.03",
+    "msgId": "3EB04E1B44DA526A4DFC81"
+  },
+  {
+    "invoiceId": "INV425188774",
+    "user": "62895326679840@s.whatsapp.net",
+    "produk": "Transaksi",
+    "nominal": 2500,
+    "status": "paid",
+    "waktu": "20/6/2025, 14.10.25",
+    "msgId": "3EB02A2E12FE9A9B5B75C1"
+  },
+  {
+    "invoiceId": "INV522904195",
+    "user": "62895326679840@s.whatsapp.net",
+    "produk": "Transaksi",
+    "nominal": 2500,
+    "status": "paid",
+    "waktu": "20/6/2025, 14.12.02",
+    "msgId": "3EB053749AA9A44F375FBD"
+  }
+]

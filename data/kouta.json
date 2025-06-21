@@ -1,0 +1,104 @@
+[
+  {
+    "id": 1,
+    "provider": "Three",
+    "produk": "1,5GB ALL + BONUS 0,5GB 1Hari",
+    "harga": 5000
+  },
+  {
+    "id": 2,
+    "provider": "Three",
+    "produk": "2GB 1Hari",
+    "harga": 6000
+  },
+  {
+    "id": 3,
+    "provider": "Three",
+    "produk": "5GB 2Hari",
+    "harga": 10000
+  },
+  {
+    "id": 4,
+    "provider": "Three",
+    "produk": "3GB ALL + 1GB BONUS 3Hari",
+    "harga": 12000
+  },
+  {
+    "id": 5,
+    "provider": "Three",
+    "produk": "6GB ALL + 2GB BONUS 5Hari",
+    "harga": 21000
+  },
+  {
+    "id": 6,
+    "provider": "Three",
+    "produk": "9GB ALL + 3GB BONUS 10Hari",
+    "harga": 31000
+  },
+  {
+    "id": 7,
+    "provider": "Three",
+    "produk": "100GB 28Hari",
+    "harga": 102000
+  },
+  {
+    "id": 8,
+    "provider": "Three",
+    "produk": "3GB ALL + 1GB BONUS 3Hari",
+    "harga": 12000
+  },
+  {
+    "id": 9,
+    "provider": "Telkomsel Bulanan",
+    "produk": "1GB ALL JARINGAN 30Hari",
+    "harga": 11000
+  },
+  {
+    "id": 10,
+    "provider": "Telkomsel Bulanan",
+    "produk": "3GB ALL JARINGAN 30Hari",
+    "harga": 24000
+  },
+  {
+    "id": 11,
+    "provider": "Telkomsel Bulanan",
+    "produk": "6GB ALL JARINGAN 30Hari",
+    "harga": 37000
+  },
+  {
+    "id": 12,
+    "provider": "Telkomsel Bulanan",
+    "produk": "12GB ALL JARINGAN 30Hari",
+    "harga": 56000
+  },
+  {
+    "id": 13,
+    "provider": "Telkomsel Bulanan",
+    "produk": "20GB ALL JARINGAN 30Hari",
+    "harga": 81000
+  },
+  {
+    "id": 14,
+    "provider": "Telkomsel Bulanan",
+    "produk": "45GB ALL JARINGAN 30Hari",
+    "harga": 114000
+  },
+  {
+    "id": 15,
+    "provider": "Telkomsel Bulanan",
+    "produk": "100GB ALL JARINGAN 30Hari",
+    "harga": 242000
+  },
+  {
+    "id": 16,
+    "provider": "Telkomsel Mini",
+    "produk": "1GB ALL 1Hari",
+    "harga": 8000
+  },
+  {
+    "id": 17,
+    "provider": "Telkomsel Mini",
+    "produk": "2,5GB ALL 5Hari",
+    "harga": 13000
+  }
+]

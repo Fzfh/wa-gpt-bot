@@ -136,6 +136,7 @@ function wrapText(ctx, text, maxWidth) {
 }
 
 
+
 async function createStickerFromText(text) {
   const width = 512;
   const height = 512;
@@ -152,44 +153,42 @@ async function createStickerFromText(text) {
   ctx.font = `${fontSize}px Arial`;
   ctx.textBaseline = 'top';
 
-  const emojiRegex = twemoji.regex;
-  const words = text.split(/(\s+)/); // pisah berdasarkan spasi, tapi tetap simpan spasi
-
+  const lineHeight = fontSize + 10;
   let x = padding;
   let y = padding;
-  const lineHeight = fontSize + 10;
 
-  for (let word of words) {
-    const match = emojiRegex.exec(word);
-    emojiRegex.lastIndex = 0;
+  // Pisahkan teks jadi array: huruf biasa & emoji
+  const graphemes = Array.from(text); // support emoji, huruf, dll
 
-    if (match) {
-      const codePoint = twemoji.convert.toCodePoint(match[0]);
-      const emojiUrl = `https://twemoji.maxcdn.com/v/latest/72x72/${codePoint}.png`;
+  for (const char of graphemes) {
+    const isEmoji = twemoji.test(char);
+    const charWidth = ctx.measureText(char).width;
 
+    // Pindah baris kalau melebihi lebar canvas
+    if (x + charWidth > width - padding) {
+      x = padding;
+      y += lineHeight;
+    }
+
+    if (isEmoji) {
       try {
+        const codepoint = twemoji.convert.toCodePoint(char);
+        const emojiUrl = `https://twemoji.maxcdn.com/v/latest/72x72/${codepoint}.png`;
         const res = await fetch(emojiUrl);
         const arrayBuffer = await res.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
         const img = await loadImage(buffer);
-        if (x + fontSize > width - padding) {
-          x = padding;
-          y += lineHeight;
-        }
+
         ctx.drawImage(img, x, y, fontSize, fontSize);
         x += fontSize;
       } catch (err) {
-        ctx.fillText(word, x, y);
-        x += ctx.measureText(word).width;
+        console.warn('Gagal render emoji:', char, err);
+        ctx.fillText(char, x, y); // fallback huruf
+        x += ctx.measureText(char).width;
       }
     } else {
-      const wordWidth = ctx.measureText(word).width;
-      if (x + wordWidth > width - padding) {
-        x = padding;
-        y += lineHeight;
-      }
-      ctx.fillText(word, x, y);
-      x += wordWidth;
+      ctx.fillText(char, x, y);
+      x += charWidth;
     }
   }
 

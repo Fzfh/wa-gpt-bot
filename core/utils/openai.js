@@ -36,7 +36,7 @@ async function askOpenAI(userHistory = []) {
         max_tokens: 900
       }, {
         headers: {
-          'Authorization': `Bearer ${API_KEY}`,
+          'Authorization': `Bearer ${process.env.API_KEY}`,
           'Content-Type': 'application/json',
           'HTTP-Referer': 'https://aurabot.netlify.app',
           'X-Title': 'Wa-GPT-Bot'

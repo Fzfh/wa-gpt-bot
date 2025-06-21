@@ -53,9 +53,9 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃   ➤ Kirim media (foto/video)
 ┃   ➤ Tambahkan caption: *s* atau *sticker*
 ┃
-┃ ✍️ *Sticker dari Teks / Emoji*
-┃   ➤ Ketik: *stickertext teks/emoji*
-┃   ➤ Contoh: stickertext Aura 💖 Pro
+┃ ✍️ *Sticker dari Teks*
+┃   ➤ Ketik: *stickertext teks*
+┃   ➤ Contoh: stickertext AuraBot
 ┃
 ┃ 💌 *Menfess Anonim*
 ┃   ➤ /menfess

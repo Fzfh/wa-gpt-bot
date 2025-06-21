@@ -24,6 +24,7 @@ const topupGames = ['ff', 'ml', 'genshin', 'pubg', 'valo']
 
 async function handleStaticCommand(sock, msg, lowerText, userId) {
   const sender = msg.key.remoteJid
+  const from = sender
   const currentSession = getSession(userId)
 
   // Handle Pulsa

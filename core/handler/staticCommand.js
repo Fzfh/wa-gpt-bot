@@ -25,11 +25,29 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   const sender = from
   const currentSession = getSession(userId)
 
-  // Handle Pulsa
-  if (await handlePulsa(sock, msg, lowerText, userId, sender)) return true
+  // ===== Tangani "beli pulsa" =====
+if (lowerText === 'beli pulsa') {
+  if (currentSession === 'pulsa') {
+    await sock.sendMessage(sender, {
+      text: `⚠️ Kamu sedang dalam sesi *pulsa*! Ketik */keluar* untuk keluar dulu ya.`
+    }, { quoted: msg })
+    return true
+  }
+  setSession(userId, 'pulsa')
+  return await handlePulsa(sock, msg, lowerText, userId, sender)
+}
 
-  // Handle Kuota
-  if (await handlekouta(sock, msg)) return true
+// ===== Tangani "beli kuota" =====
+if (lowerText === 'beli kuota') {
+  if (currentSession === 'kouta') {
+    await sock.sendMessage(sender, {
+      text: `⚠️ Kamu sedang dalam sesi *kuota*! Ketik */keluar* untuk keluar dulu ya.`
+    }, { quoted: msg })
+    return true
+  }
+  setSession(userId, 'kouta')
+  return await handlekouta(sock, msg)
+}
 
   // Khusus menangani input "Topup Game"
   if (lowerText === 'topup game') {

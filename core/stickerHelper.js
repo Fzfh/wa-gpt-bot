@@ -135,8 +135,6 @@ function wrapText(ctx, text, maxWidth) {
   return lines;
 }
 
-
-
 async function createStickerFromText(text) {
   const width = 512;
   const height = 512;
@@ -149,7 +147,6 @@ async function createStickerFromText(text) {
   ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, width, height);
 
-  ctx.fillStyle = 'black';
   ctx.font = `${fontSize}px Arial`;
   ctx.textBaseline = 'top';
 
@@ -157,15 +154,12 @@ async function createStickerFromText(text) {
   let x = padding;
   let y = padding;
 
-  // Pisahkan teks jadi array: huruf biasa & emoji
-  const graphemes = Array.from(text); // support emoji, huruf, dll
+  const graphemes = Array.from(text);
 
   for (const char of graphemes) {
     const isEmoji = twemoji.test(char);
-    const charWidth = ctx.measureText(char).width;
 
-    // Pindah baris kalau melebihi lebar canvas
-    if (x + charWidth > width - padding) {
+    if (x > width - padding - fontSize) {
       x = padding;
       y += lineHeight;
     }
@@ -174,21 +168,22 @@ async function createStickerFromText(text) {
       try {
         const codepoint = twemoji.convert.toCodePoint(char);
         const emojiUrl = `https://twemoji.maxcdn.com/v/latest/72x72/${codepoint}.png`;
-        const res = await fetch(emojiUrl);
-        const arrayBuffer = await res.arrayBuffer();
+        const response = await fetch(emojiUrl);
+        const arrayBuffer = await response.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
         const img = await loadImage(buffer);
-
         ctx.drawImage(img, x, y, fontSize, fontSize);
         x += fontSize;
       } catch (err) {
-        console.warn('Gagal render emoji:', char, err);
-        ctx.fillText(char, x, y); // fallback huruf
-        x += ctx.measureText(char).width;
+        console.warn('Gagal ambil emoji:', err);
+        ctx.fillStyle = 'black';
+        ctx.fillText('❓', x, y);
+        x += fontSize;
       }
     } else {
+      ctx.fillStyle = 'black';
       ctx.fillText(char, x, y);
-      x += charWidth;
+      x += ctx.measureText(char).width;
     }
   }
 

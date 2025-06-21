@@ -1,5 +1,5 @@
 // staticCommand.js
-const { listTopup } = require('../../commands/topup')
+const { lastTopupCommandMap, selectedTopupNominalMap } = require('../../commands/topup')
 const { handlePulsa } = require('../../commands/pulsa')
 const { handlekouta } = require('../../commands/kouta')
 

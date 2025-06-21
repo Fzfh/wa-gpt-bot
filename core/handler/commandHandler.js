@@ -1,5 +1,6 @@
 const { listTopup } = require('../../commands/topup')
 const tambahProduk = require('../../commands/tambahProduk');
+const { sessionMap } = require('./staticCommand')
 const fs = require('fs')
 const path = require('path')
 
@@ -25,7 +26,7 @@ function clearAllInvoices() {
   writeInvoices([])
 }
 
-async function handleCommand(sock, msg, lowerText, userId, sender) {
+async function handleCommand(sock, msg, lowerText, userId, from, body) {
   if (topupGames.includes(lowerText.replace('topup ', ''))) {
     const game = lowerText.replace('topup ', '')
     lastCommandMap.set(userId, game)

@@ -7,6 +7,7 @@ const { v4: uuidv4 } = require('uuid');
 const { downloadMediaMessage } = require('@whiskeysockets/baileys');
 const { createCanvas, loadImage } = require('@napi-rs/canvas')
 const { Sticker, StickerTypes } = require('wa-sticker-formatter');
+const twemoji = require('twemoji');
 // const { StickerTypes, Sticker } = require('wa-sticker-formatter');
 // const Jimp = require('jimp');
 
@@ -134,10 +135,11 @@ function wrapText(ctx, text, maxWidth) {
   return lines;
 }
 
+
 async function createStickerFromText(text) {
   const width = 512;
   const height = 512;
-  const fontSize = 50;
+  const fontSize = 48;
   const padding = 30;
 
   const canvas = createCanvas(width, height);
@@ -147,17 +149,45 @@ async function createStickerFromText(text) {
   ctx.fillRect(0, 0, width, height);
 
   ctx.fillStyle = 'black';
-  ctx.font = `${fontSize}px "Noto Color Emoji", Arial`;
+  ctx.font = `${fontSize}px Arial`; // jangan emoji di sini
   ctx.textBaseline = 'top';
 
-  const lines = wrapText(ctx, text, width - padding * 2);
-  const lineHeight = fontSize + 16; // jarak antar baris diperlebar
-  const totalHeight = lines.length * lineHeight;
-  const startY = (height - totalHeight) / 2;
+  const lineHeight = fontSize + 10;
+  let x = padding;
+  let y = padding;
 
-  lines.forEach((line, i) => {
-    ctx.fillText(line, padding, startY + i * lineHeight);
+  const segments = twemoji.parse(text, {
+    folder: '72x72',
+    ext: '.png',
+    base: 'https://twemoji.maxcdn.com/v/latest/', // emoji Apple-style PNG
   });
+
+  const parts = twemoji.tokenize(text); // ini akan memisahkan teks & emoji
+
+  for (const part of parts) {
+    if (twemoji.test(part)) {
+      // kalau emoji, render sebagai gambar PNG
+      const emojiUrl = twemoji.parse(part).match(/src="([^"]+)"/)[1];
+      try {
+        const img = await loadImage(emojiUrl);
+        ctx.drawImage(img, x, y, fontSize, fontSize);
+        x += fontSize;
+      } catch (err) {
+        ctx.fillText(part, x, y);
+        x += ctx.measureText(part).width;
+      }
+    } else {
+      for (let char of part) {
+        const w = ctx.measureText(char).width;
+        if (x + w > width - padding) {
+          x = padding;
+          y += lineHeight;
+        }
+        ctx.fillText(char, x, y);
+        x += w;
+      }
+    }
+  }
 
   const buffer = canvas.toBuffer('image/png');
 
@@ -170,6 +200,7 @@ async function createStickerFromText(text) {
 
   return await sticker.toBuffer();
 }
+
 
 
 

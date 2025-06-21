@@ -5,14 +5,13 @@ const {
   fetchLatestBaileysVersion,
   DisconnectReason,
 } = require('@whiskeysockets/baileys');
-
+const { handleResponder, registerGroupUpdateListener } = require('./core/botresponse')
 const express = require('express');
 const fs = require('fs');
 const P = require('pino');
 const qrcode = require('qrcode');
 const chalk = require('chalk');
 
-const { handleResponder } = require('./core/botresponse');
 const tampilkanBanner = require('./core/utils/tampilanbanner');
 
 const app = express();
@@ -78,6 +77,7 @@ if (qr) {
       } else if (connection === 'open') {
         console.log(chalk.greenBright('\n✅ Bot berhasil terhubung ke WhatsApp!'));
         console.log(chalk.cyanBright('✨ Siap menerima perintah, Auraa sayang~ 💬\n'));
+        registerGroupUpdateListener(sock) 
       }
     });
 

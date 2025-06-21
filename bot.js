@@ -1,4 +1,3 @@
-// bot.js
 const {
   default: makeWASocket,
   useMultiFileAuthState,
@@ -13,14 +12,11 @@ const P = require('pino');
 const qrcode = require('qrcode');
 const chalk = require('chalk');
 
-const { handleResponder, registerGroupUpdateListener } = require('./core/botresponse');
+const { handleResponder } = require('./core/botresponse');
 const tampilkanBanner = require('./core/utils/tampilanbanner');
 
 const app = express();
 const PORT = 3000;
-
-// Delay util
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 function extractMessageContent(msg) {
   const isViewOnce = !!msg.message?.viewOnceMessageV2;
@@ -48,27 +44,26 @@ async function startBot() {
       },
     });
 
-    // Simpan kredensial saat berubah
     sock.ev.on('creds.update', saveCreds);
-
-    // Pasang listener group-participants.update sekali per socket instance
-    registerGroupUpdateListener(sock);
 
     sock.ev.on('connection.update', async (update) => {
       const { connection, lastDisconnect, qr } = update;
 
-      if (qr) {
-        console.log(chalk.yellowBright('\n🔌 Scan QR ini untuk login:\n'));
-        qrcode.toDataURL(qr, (err, url) => {
-          if (err) return console.error('❌ Gagal buat QR ke HTML:', err);
-          const html = `
-            <html><body style="text-align:center;font-family:sans-serif;">
-              <h2>Silakan Scan QR WA Kamu</h2>
-              <img src="${url}" style="width:300px;" />
-            </body></html>`;
-          fs.writeFileSync('./qr.html', html);
-        });
-      }
+if (qr) {
+  console.log(chalk.yellowBright('\n🔌 Scan QR ini untuk login:\n'));
+
+  // Simpan QR ke file HTML untuk diakses via web
+  qrcode.toDataURL(qr, (err, url) => {
+    if (err) return console.error('❌ Gagal buat QR ke HTML:', err);
+    const html = `
+      <html><body style="text-align:center;font-family:sans-serif;">
+        <h2>Silakan Scan QR WA Kamu</h2>
+        <img src="${url}" style="width:300px;" />
+      </body></html>`;
+    fs.writeFileSync('./qr.html', html);
+  });
+}
+
 
       if (connection === 'close') {
         const reason = lastDisconnect?.error?.output?.statusCode;
@@ -91,28 +86,15 @@ async function startBot() {
       const msg = messages[0];
       if (!msg.message) return;
 
-      // Skip pesan dari bot sendiri
-      if (msg.key.fromMe) return;
-
+      const sender = msg.key.remoteJid;
       const { text, realMsg } = extractMessageContent(msg);
-
-      if (!text || text.trim() === '') return;
-
-      const remoteJid = msg.key.remoteJid;
-      console.log(chalk.magenta(`📩 Pesan masuk dari ${remoteJid}: "${text}"`));
+      console.log(chalk.magenta(`📩 Pesan dari ${sender}: ${text}`));
 
       try {
         msg.message = realMsg;
-        // Delay singkat untuk mengurangi kemungkinan spam loop
-        await delay(300);
         await handleResponder(sock, msg);
       } catch (e) {
-        const errMsg = e?.message || '';
-        if (errMsg.toLowerCase().includes('stale open session')) {
-          console.warn(chalk.yellow(`⚠️ Detected stale session untuk ${remoteJid}, skip balasan.`));
-        } else {
-          console.error(chalk.red('❌ Error di handleResponder:'), e);
-        }
+        console.error(chalk.red('❌ Error di handleResponder:'), e);
       }
     });
   } catch (err) {
@@ -120,7 +102,17 @@ async function startBot() {
   }
 }
 
-// Hanya satu route /qr
+// Start Web Server
+app.get('/qr', (req, res) => {
+  if (fs.existsSync('./qr.html')) {
+    const qrHtml = fs.readFileSync('./qr.html', 'utf8');
+    res.send(qrHtml);
+  } else {
+    res.send('⚠️ QR belum tersedia. Tunggu sebentar...');
+  }
+});
+
+
 app.get('/qr', (req, res) => {
   if (fs.existsSync('./qr.html')) {
     const qrHtml = fs.readFileSync('./qr.html', 'utf8');
@@ -133,6 +125,7 @@ app.get('/qr', (req, res) => {
 app.listen(PORT, '0.0.0.0', () =>
   console.log(chalk.cyanBright(`🌐 Web server aktif di http://localhost:${PORT} dan /qr untuk scan`))
 );
+
 
 tampilkanBanner();
 startBot();

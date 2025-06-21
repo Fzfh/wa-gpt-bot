@@ -24,30 +24,33 @@ function saveToJson(filePath, kategori, dataBaru) {
 module.exports = async function tambahProduk(sock, msg, from, body) {
   const chat = msg.key.remoteJid;
   const lower = body.toLowerCase().trim();
-  const sesi = sessionMap.get(from);
 
-  // Step 1: Awal - /tambah
-  if (!sesi && lower === '/tambah') {
+  // Jika belum ada sesi
+  if (!sessionMap.has(from) && lower === '/tambah') {
     sessionMap.set(from, { stage: 'pilih_jenis' });
     return sock.sendMessage(chat, {
       text: `📦 *Tambah Produk*\n1. Topup Game\n2. Pulsa\n3. Kuota\n\n✏️ Ketik angka *1*, *2*, atau *3* untuk memilih.`,
     }, { quoted: msg });
   }
 
-  // Step 2: Pilih Jenis Produk
-  if (sesi?.stage === 'pilih_jenis') {
+  // Ambil sesi user
+  const sesi = sessionMap.get(from);
+  if (!sesi) return;
+
+  // === Step 1: Pilih Jenis Produk ===
+  if (sesi.stage === 'pilih_jenis') {
     const jenisMap = { '1': 'topup', '2': 'pulsa', '3': 'kuota' };
     const jenis = jenisMap[lower];
 
     if (!jenis) {
       if (!sesi.notified) {
-        sesi.notified = true; // Agar tidak spam
+        sesi.notified = true;
         sessionMap.set(from, sesi);
         return sock.sendMessage(chat, {
-          text: `❌ Pilih angka *1*, *2*, atau *3* saja yaa~`
+          text: `❌ Pilih angka *1*, *2*, atau *3* ya sayang~ 😘`
         }, { quoted: msg });
       }
-      return true;
+      return;
     }
 
     sesi.jenis = jenis;
@@ -59,8 +62,8 @@ module.exports = async function tambahProduk(sock, msg, from, body) {
     }, { quoted: msg });
   }
 
-  // Step 3: Pilih Kategori
-  if (sesi?.stage === 'pilih_kategori') {
+  // === Step 2: Pilih Kategori ===
+  if (sesi.stage === 'pilih_kategori') {
     sesi.kategori = lower;
     sesi.stage = 'isi_data';
     sessionMap.set(from, sesi);
@@ -74,8 +77,8 @@ module.exports = async function tambahProduk(sock, msg, from, body) {
     }, { quoted: msg });
   }
 
-  // Step 4: Isi Data
-  if (sesi?.stage === 'isi_data') {
+  // === Step 3: Input Data Produk ===
+  if (sesi.stage === 'isi_data') {
     const bagian = body.split(',').map(p => p.trim());
 
     let data = {};
@@ -109,4 +112,4 @@ module.exports = async function tambahProduk(sock, msg, from, body) {
       }, { quoted: msg });
     }
   }
-}
+};

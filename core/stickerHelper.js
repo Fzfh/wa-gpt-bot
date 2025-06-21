@@ -149,43 +149,47 @@ async function createStickerFromText(text) {
   ctx.fillRect(0, 0, width, height);
 
   ctx.fillStyle = 'black';
-  ctx.font = `${fontSize}px Arial`; // jangan emoji di sini
+  ctx.font = `${fontSize}px Arial`;
   ctx.textBaseline = 'top';
 
-  const lineHeight = fontSize + 10;
+  const emojiRegex = twemoji.regex;
+  const words = text.split(/(\s+)/); // pisah berdasarkan spasi, tapi tetap simpan spasi
+
   let x = padding;
   let y = padding;
+  const lineHeight = fontSize + 10;
 
-  const segments = twemoji.parse(text, {
-    folder: '72x72',
-    ext: '.png',
-    base: 'https://twemoji.maxcdn.com/v/latest/', // emoji Apple-style PNG
-  });
+  for (let word of words) {
+    const match = emojiRegex.exec(word);
+    emojiRegex.lastIndex = 0;
 
-  const parts = twemoji.tokenize(text); // ini akan memisahkan teks & emoji
+    if (match) {
+      const codePoint = twemoji.convert.toCodePoint(match[0]);
+      const emojiUrl = `https://twemoji.maxcdn.com/v/latest/72x72/${codePoint}.png`;
 
-  for (const part of parts) {
-    if (twemoji.test(part)) {
-      // kalau emoji, render sebagai gambar PNG
-      const emojiUrl = twemoji.parse(part).match(/src="([^"]+)"/)[1];
       try {
-        const img = await loadImage(emojiUrl);
-        ctx.drawImage(img, x, y, fontSize, fontSize);
-        x += fontSize;
-      } catch (err) {
-        ctx.fillText(part, x, y);
-        x += ctx.measureText(part).width;
-      }
-    } else {
-      for (let char of part) {
-        const w = ctx.measureText(char).width;
-        if (x + w > width - padding) {
+        const res = await fetch(emojiUrl);
+        const arrayBuffer = await res.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const img = await loadImage(buffer);
+        if (x + fontSize > width - padding) {
           x = padding;
           y += lineHeight;
         }
-        ctx.fillText(char, x, y);
-        x += w;
+        ctx.drawImage(img, x, y, fontSize, fontSize);
+        x += fontSize;
+      } catch (err) {
+        ctx.fillText(word, x, y);
+        x += ctx.measureText(word).width;
       }
+    } else {
+      const wordWidth = ctx.measureText(word).width;
+      if (x + wordWidth > width - padding) {
+        x = padding;
+        y += lineHeight;
+      }
+      ctx.fillText(word, x, y);
+      x += wordWidth;
     }
   }
 

@@ -1,7 +1,8 @@
 // staticCommand.js
-const { lastTopupCommandMap, selectedTopupNominalMap } = require('../../commands/topup')
-const { selectedNominalMap: pulsaNominalMap, lastCommandMap: pulsaLastMap } = require('../../commands/pulsa')
-const { selectedNominalMap: koutaNominalMap, lastCommandMap: koutaLastMap } = require('../../commands/kouta')
+const { listTopup, lastTopupCommandMap, selectedTopupNominalMap } = require('../../commands/topup')
+const { handlePulsa, selectedNominalMap: pulsaNominalMap, lastCommandMap: pulsaLastMap } = require('../../commands/pulsa')
+const { handlekouta, selectedNominalMap: koutaNominalMap, lastCommandMap: koutaLastMap } = require('../../commands/kouta')
+
 
 const sessionMap = new Map()
 

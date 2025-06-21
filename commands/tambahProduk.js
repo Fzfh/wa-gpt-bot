@@ -23,6 +23,7 @@ function saveToJson(filePath, kategori, dataBaru) {
 
 module.exports = async function tambahProduk(sock, msg, from, body) {
   const chat = msg.key.remoteJid;
+  const textAsli = msg.message.conversation || body; // 🔧 Ambil teks asli, bukan lower
   const lower = body.toLowerCase().trim();
 
   // 👉 Tangani perintah keluar dari sesi tambah
@@ -87,18 +88,18 @@ module.exports = async function tambahProduk(sock, msg, from, body) {
 
   // === Step 3: Input Data Produk ===
   if (sesi.stage === 'isi_data') {
-    const bagian = body.split(',').map(p => p.trim());
+    const bagian = textAsli.split(',').map(p => p.trim()); // 🔧 Pake input asli user
 
     let data = {};
     if (sesi.jenis === 'topup') {
-      if (bagian.length !== 2) {
+      if (bagian.length !== 2 || isNaN(parseInt(bagian[1]))) { // 🔧 Tambah validasi angka
         return sock.sendMessage(chat, {
           text: `❌ Format salah!\nContoh: 199dm, 50000`
         }, { quoted: msg });
       }
       data = { nama: bagian[0], harga: parseInt(bagian[1]) };
     } else {
-      if (bagian.length !== 3) {
+      if (bagian.length !== 3 || isNaN(parseInt(bagian[2]))) { // 🔧 Validasi angka
         return sock.sendMessage(chat, {
           text: `❌ Format salah!\nContoh: Three, 5GB 1hr, 7000`
         }, { quoted: msg });

@@ -116,10 +116,20 @@ Tinggal chat admin yaa, fast respon ✨`
       }, { quoted: msg })
       return true
 
-       case '/keluar':
-      if (!['topup', 'pulsa', 'kouta'].includes(currentSession)) {
-        return false // nggak balas apa-apa
-      }
+     case '/keluar':
+  if (!['topup', 'pulsa', 'kouta'].includes(currentSession)) {
+    return false // Diam aja kalau gak dalam sesi
+  }
+
+  clearSession(userId)
+  lastTopupCommandMap.delete(userId) // <- ini penting!
+  selectedTopupNominalMap.delete(userId) // <- ini juga
+
+  await sock.sendMessage(sender, {
+    text: `✅ Sesi *${currentSession}* kamu sudah diakhiri.`
+  }, { quoted: msg })
+  return true
+
 
       clearSession(userId)
       await sock.sendMessage(sender, {

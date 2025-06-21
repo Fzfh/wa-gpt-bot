@@ -1,8 +1,8 @@
-// staticCommand.js
 const { listTopup, lastTopupCommandMap, selectedTopupNominalMap } = require('../../commands/topup')
 const { handlePulsa, selectedNominalMap: pulsaNominalMap, lastCommandMap: pulsaLastMap } = require('../../commands/pulsa')
 const { handlekouta, selectedNominalMap: koutaNominalMap, lastCommandMap: koutaLastMap } = require('../../commands/kouta')
 const tambahProduk = require('../../commands/tambahProduk');
+
 const sessionMap = new Map()
 
 function setSession(userId, sessionName) {
@@ -17,7 +17,6 @@ function getSession(userId) {
   return sessionMap.get(userId)
 }
 
-// Tambahkan game baru
 const topupGames = ['ff', 'ml', 'genshin', 'pubg', 'valo']
 
 async function handleStaticCommand(sock, msg, lowerText, userId, body) {
@@ -30,6 +29,19 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 
   // Handle Kuota
   if (await handlekouta(sock, msg)) return true
+
+  // Khusus menangani input "Topup Game"
+  if (lowerText === 'topup game') {
+    await sock.sendMessage(sender, {
+      text: `🎮 *Game Tersedia:*\n• topup ff\n• topup ml\n• topup genshin\n• topup pubg\n• topup valo\n\n📌 Ketik contoh: *topup ff* untuk mulai.`
+    }, { quoted: msg })
+    return true
+  }
+
+  // Command Admin untuk tambah produk
+  if (sessionMap.has(from) || body.toLowerCase().startsWith('/tambah')) {
+    return await tambahProduk(sock, msg, from, body)
+  }
 
   switch (lowerText) {
     case '/menu':
@@ -124,15 +136,13 @@ Tinggal chat admin yaa, fast respon ✨`
       }, { quoted: msg })
       return true
 
-     case '/keluar':
+    case '/keluar':
       if (!['topup', 'pulsa', 'kouta'].includes(currentSession)) {
-        return false // Diam aja kalau gak dalam sesi
+        return false
       }
-    
       clearSession(userId)
-      lastTopupCommandMap.delete(userId) // <- ini penting!
-      selectedTopupNominalMap.delete(userId) // <- ini juga
-    
+      lastTopupCommandMap.delete(userId)
+      selectedTopupNominalMap.delete(userId)
       await sock.sendMessage(sender, {
         text: `✅ Sesi *${currentSession}* kamu sudah diakhiri.`
       }, { quoted: msg })
@@ -144,10 +154,8 @@ Tinggal chat admin yaa, fast respon ✨`
       }, { quoted: msg })
       return true
   }
-  if (sessionMap.has(from) || body.toLowerCase().startsWith('/tambah')) {
-      return await tambahProduk(sock, msg, from, body);
-    }
-  // Topup Game - Cek jika mulai dengan "topup namaGame"
+
+  // Topup Game - Deteksi topup [namaGame]
   if (lowerText.startsWith('topup ')) {
     const game = lowerText.split(' ')[1]
     if (topupGames.includes(game)) {
@@ -159,7 +167,7 @@ Tinggal chat admin yaa, fast respon ✨`
       }
 
       setSession(userId, 'topup')
-      await listTopup(sock, msg, game) // listTopup akan handle file list game (pakai json/manual)
+      await listTopup(sock, msg, game)
       return true
     } else {
       await sock.sendMessage(sender, {

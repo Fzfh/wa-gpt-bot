@@ -1,3 +1,4 @@
+// bot.js
 const {
   default: makeWASocket,
   useMultiFileAuthState,
@@ -12,13 +13,13 @@ const P = require('pino');
 const qrcode = require('qrcode');
 const chalk = require('chalk');
 
-const { handleResponder } = require('./core/botresponse');
+const { handleResponder, registerGroupUpdateListener } = require('./core/botresponse');
 const tampilkanBanner = require('./core/utils/tampilanbanner');
 
 const app = express();
 const PORT = 3000;
 
-// Fungsi delay untuk menghindari spam terlalu cepat
+// Delay util
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 function extractMessageContent(msg) {
@@ -47,7 +48,11 @@ async function startBot() {
       },
     });
 
+    // Simpan kredensial saat berubah
     sock.ev.on('creds.update', saveCreds);
+
+    // Pasang listener group-participants.update sekali per socket instance
+    registerGroupUpdateListener(sock);
 
     sock.ev.on('connection.update', async (update) => {
       const { connection, lastDisconnect, qr } = update;
@@ -86,36 +91,25 @@ async function startBot() {
       const msg = messages[0];
       if (!msg.message) return;
 
-      // Jangan proses pesan dari diri sendiri
-      if (msg.key.fromMe) {
-        // Kita skip memproses pesan ini, tapi tidak merubah kontennya
-        return;
-      }
+      // Skip pesan dari bot sendiri
+      if (msg.key.fromMe) return;
 
       const { text, realMsg } = extractMessageContent(msg);
 
-      // Skip pesan kosong atau hanya media tanpa caption
-      if (!text || text.trim() === '') {
-        return;
-      }
+      if (!text || text.trim() === '') return;
 
       const remoteJid = msg.key.remoteJid;
       console.log(chalk.magenta(`📩 Pesan masuk dari ${remoteJid}: "${text}"`));
 
       try {
-        // Update pesan ke bentuk realMsg sebelum diteruskan
         msg.message = realMsg;
-
-        // Delay singkat untuk menghindari spam loop
+        // Delay singkat untuk mengurangi kemungkinan spam loop
         await delay(300);
-
-        // Panggil handler utama
         await handleResponder(sock, msg);
       } catch (e) {
         const errMsg = e?.message || '';
         if (errMsg.toLowerCase().includes('stale open session')) {
-          console.warn(chalk.yellow(`⚠️ Detected stale session for ${remoteJid}, skip mengirim balasan.`));
-          // Bisa simpan ke struktur skip list jika perlu
+          console.warn(chalk.yellow(`⚠️ Detected stale session untuk ${remoteJid}, skip balasan.`));
         } else {
           console.error(chalk.red('❌ Error di handleResponder:'), e);
         }
@@ -126,7 +120,7 @@ async function startBot() {
   }
 }
 
-// Start Web Server dengan satu route /qr saja
+// Hanya satu route /qr
 app.get('/qr', (req, res) => {
   if (fs.existsSync('./qr.html')) {
     const qrHtml = fs.readFileSync('./qr.html', 'utf8');

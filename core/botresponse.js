@@ -222,5 +222,6 @@ module.exports = {
   handlePulsa,
   handlekouta,
   selectedNominalMap: selectedKoutaNominalMap,
-  lastCommandMap: lastKoutaCommandMap
+  lastCommandMap: lastKoutaCommandMap,
+  registerGroupUpdateListener
 }

@@ -1,6 +1,7 @@
 const { listTopup, lastTopupCommandMap, selectedTopupNominalMap } = require('../../commands/topup')
 const { handlePulsa, selectedNominalMap: pulsaNominalMap, lastCommandMap: pulsaLastMap } = require('../../commands/pulsa')
 const { handlekouta, selectedNominalMap: koutaNominalMap, lastCommandMap: koutaLastMap } = require('../../commands/kouta')
+const hapusProduk = require('../commands/hapusProduk');
 const tambahProduk = require('../../commands/tambahProduk');
 
 const sessionMap = require('../../core/sessionStore');
@@ -41,6 +42,9 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   // Command Admin untuk tambah produk
   if (sessionMap.has(from) || body.toLowerCase().startsWith('/tambah')) {
     return await tambahProduk(sock, msg, from, body)
+  }
+  if (sessionMap.has(from) || body.toLowerCase().startsWith('/hapus')) {
+    return await hapusProduk(sock, msg, from, body)
   }
 
   switch (lowerText) {

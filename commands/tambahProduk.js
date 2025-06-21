@@ -24,6 +24,13 @@ function saveToJson(filePath, kategori, dataBaru) {
 module.exports = async function tambahProduk(sock, msg, from, body) {
   const chat = msg.key.remoteJid;
   const lower = body.toLowerCase().trim();
+  // Tangani jika user ingin keluar dari sesi tambah
+  if (sessionMap.has(from) && lower === '/keluar') {
+    sessionMap.delete(from)
+    return sock.sendMessage(chat, {
+      text: `✅ Sesi *tambah produk* telah dibatalkan. Kamu bisa ketik /tambah lagi kalau mau mulai ulang.`
+    }, { quoted: msg })
+  }
 
   // Jika belum ada sesi
   if (!sessionMap.has(from) && lower === '/tambah') {

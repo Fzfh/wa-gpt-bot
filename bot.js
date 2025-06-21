@@ -122,8 +122,8 @@ app.get('/qr', (req, res) => {
   }
 });
 
-app.listen(PORT, () =>
-  console.log(chalk.cyanBright(`🌐 Web server aktif di http://localhost:${PORT} dan /qr untuk scan`))
+app.listen(PORT, '0.0.0.0', () =>
+  console.log(chalk.cyanBright(`🌐 Web server aktif di http://0.0.0.0:${PORT} dan /qr untuk scan`))
 );
 
 tampilkanBanner();

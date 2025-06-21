@@ -59,12 +59,11 @@ if (lowerText === 'beli kuota') {
 
   // Command Admin untuk tambah produk
   if (body.toLowerCase().startsWith('/tambah')) {
-    return await tambahProduk(sock, msg, from, body)
+    return await tambahProduk(sock, msg, from, body,userId)
   }
   if (body.toLowerCase().startsWith('/hapus')) {
-    return await hapusProduk(sock, msg, from, body)
+    return await hapusProduk(sock, msg, from, body, userId)
   }
-return false
 
   switch (lowerText) {
     case '/menu':

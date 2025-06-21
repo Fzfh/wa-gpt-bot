@@ -39,18 +39,18 @@ module.exports = async function hapusProduk(sock, msg, from, body) {
     }, { quoted: msg });
   }
 
-  const sesi = sessionMap.get(sender);
-
-  if (!sesi && lower === '/hapus') {
+  // Reset sesi jika /hapus diketik ulang
+  if (lower === '/hapus') {
     sessionMap.set(sender, { stage: 'pilih_jenis', type: 'hapus' });
     return sock.sendMessage(chat, {
       text: `🗑️ *Hapus Produk*\n\n1. Topup Game\n2. Pulsa\n3. Kouta\n\nKetik angka: *1*, *2*, atau *3*`,
     }, { quoted: msg });
   }
 
+  const sesi = sessionMap.get(sender);
   if (!sesi || sesi.type !== 'hapus') return;
 
-  // Pilih jenis
+  // Step 1: Pilih jenis
   if (sesi.stage === 'pilih_jenis') {
     const jenisMap = { '1': 'topup', '2': 'pulsa', '3': 'kouta' };
     const jenis = jenisMap[lower];
@@ -60,79 +60,94 @@ module.exports = async function hapusProduk(sock, msg, from, body) {
     sessionMap.set(sender, sesi);
 
     return sock.sendMessage(chat, {
-      text: `📌 Ketik nama *${jenis === 'topup' ? 'game' : 'provider'}* yang ingin kamu hapus produknya.\nContoh: *ML* atau *Three*`,
+      text: `📌 Ketik nama *${jenis === 'topup' ? 'game' : 'provider'}*.\nContoh: *ML*, *Three*`,
     }, { quoted: msg });
   }
 
-  // Pilih kategori game/provider
+  // Step 2: Pilih kategori
   if (sesi.stage === 'pilih_kategori') {
     const jenis = sesi.jenis;
-    sesi.kategori = lower;
+    const kategori = lower;
+    const data = JSON.parse(fs.readFileSync(DATA_PATHS[jenis], 'utf-8'));
+
+    sesi.kategori = kategori;
     sesi.stage = 'pilih_produk';
 
-    const data = JSON.parse(fs.readFileSync(DATA_PATHS[jenis]));
-
     if (jenis === 'topup') {
-      const gameIndex = data.findIndex(g => g.game.toLowerCase() === lower);
+      const gameIndex = data.findIndex(g => g.game.toLowerCase() === kategori);
       const game = data[gameIndex];
       if (!game) {
         sessionMap.delete(sender);
-        return sock.sendMessage(chat, { text: `❌ Game *${lower}* tidak ditemukan.` }, { quoted: msg });
+        return sock.sendMessage(chat, { text: `❌ Game *${kategori}* tidak ditemukan.` }, { quoted: msg });
       }
+
       sesi.indexGame = gameIndex;
-      const list = game.items.map((p, i) => `${i + 1}. ${p.nominal} - Rp${p.harga}`).join('\n');
-      sesi.listProduk = game.items;
+      sesi.produkList = game.items;
       sessionMap.set(sender, sesi);
+
+      const list = game.items.map((item, i) => `${i + 1}. ${item.nominal} - Rp${item.harga.toLocaleString('id-ID')}`).join('\n');
+
       return sock.sendMessage(chat, {
-        text: `🎮 *${game.game}*\n\nPilih produk yang ingin dihapus:\n${list}\n\nKetik angkanya, misal: *2*`,
+        text: `🎮 *${game.game}*\n\nPilih produk yang ingin dihapus:\n${list}\n\nKetik nomornya, misal: *2*`,
       }, { quoted: msg });
     } else {
-      const filtered = data.filter(p => p.provider.toLowerCase() === lower);
+      const filtered = data.filter(p => p.provider.toLowerCase() === kategori);
       if (filtered.length === 0) {
         sessionMap.delete(sender);
         return sock.sendMessage(chat, {
-          text: `❌ Tidak ada produk dengan provider *${lower}*`,
+          text: `❌ Tidak ada produk dengan provider *${kategori}*`,
         }, { quoted: msg });
       }
+
       sesi.filteredProduk = filtered;
       sessionMap.set(sender, sesi);
-      const list = filtered.map((p, i) => `${i + 1}. ${p.produk} - Rp${p.harga} (ID: ${p.id})`).join('\n');
+
+      const list = filtered.map((p, i) => `${i + 1}. ${p.produk} - Rp${p.harga.toLocaleString('id-ID')} (ID: ${p.id})`).join('\n');
+
       return sock.sendMessage(chat, {
-        text: `📱 *${lower.toUpperCase()}*\n\nPilih produk untuk dihapus:\n${list}\n\nKetik angkanya, misal: *1*`,
+        text: `📱 *${kategori.toUpperCase()}*\n\nPilih produk untuk dihapus:\n${list}\n\nKetik angka, misal: *1*`,
       }, { quoted: msg });
     }
   }
 
-  // Pilih produk yang ingin dihapus
+  // Step 3: Pilih produk
   if (sesi.stage === 'pilih_produk') {
     const jenis = sesi.jenis;
     const index = parseInt(lower) - 1;
     if (isNaN(index) || index < 0) {
-      return sock.sendMessage(chat, { text: `❌ Input tidak valid.` }, { quoted: msg });
+      return sock.sendMessage(chat, { text: `❌ Pilihan tidak valid.` }, { quoted: msg });
     }
 
     if (jenis === 'topup') {
       const data = JSON.parse(fs.readFileSync(DATA_PATHS.topup));
       const game = data[sesi.indexGame];
       const produkList = game.items;
-      if (!produkList[index]) return sock.sendMessage(chat, { text: `❌ Nomor tidak valid.` }, { quoted: msg });
+
+      if (!produkList[index]) {
+        return sock.sendMessage(chat, { text: `❌ Nomor produk tidak valid.` }, { quoted: msg });
+      }
 
       const removed = produkList.splice(index, 1);
       fs.writeFileSync(DATA_PATHS.topup, JSON.stringify(data, null, 2));
       sessionMap.delete(sender);
+
       return sock.sendMessage(chat, {
         text: `✅ Produk *${removed[0].nominal}* dari *${game.game}* berhasil dihapus.`,
       }, { quoted: msg });
     } else {
       const produkList = sesi.filteredProduk;
-      if (!produkList[index]) return sock.sendMessage(chat, { text: `❌ Nomor tidak valid.` }, { quoted: msg });
+      if (!produkList[index]) {
+        return sock.sendMessage(chat, { text: `❌ Nomor tidak valid.` }, { quoted: msg });
+      }
 
       const idTarget = produkList[index].id;
-      let data = JSON.parse(fs.readFileSync(DATA_PATHS[jenis]));
+      const data = JSON.parse(fs.readFileSync(DATA_PATHS[jenis]));
       const indexData = data.findIndex(p => p.id === idTarget);
+
       const removed = data.splice(indexData, 1);
       fs.writeFileSync(DATA_PATHS[jenis], JSON.stringify(data, null, 2));
       sessionMap.delete(sender);
+
       return sock.sendMessage(chat, {
         text: `✅ Produk *${removed[0].produk}* dari *${removed[0].provider}* berhasil dihapus.`,
       }, { quoted: msg });

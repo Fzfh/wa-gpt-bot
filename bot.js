@@ -49,20 +49,21 @@ async function startBot() {
     sock.ev.on('connection.update', async (update) => {
       const { connection, lastDisconnect, qr } = update;
 
-      if (qr) {
-        console.log(chalk.yellowBright('\n🔌 Scan QR ini untuk login:\n'));
+if (qr) {
+  console.log(chalk.yellowBright('\n🔌 Scan QR ini untuk login:\n'));
 
-        // Simpan QR ke file HTML untuk diakses via web
-        qrcode.toDataURL(qr, (err, url) => {
-          if (err) return console.error('❌ Gagal buat QR ke HTML:', err);
-          const html = `
-            <html><body style="text-align:center;font-family:sans-serif;">
-              <h2>Silakan Scan QR WA Kamu</h2>
-              <img src="${url}" style="width:300px;" />
-            </body></html>`;
-          fs.writeFileSync('./qr.html', html);
-        });
-      }
+  // Simpan QR ke file HTML untuk diakses via web
+  qrcode.toDataURL(qr, (err, url) => {
+    if (err) return console.error('❌ Gagal buat QR ke HTML:', err);
+    const html = `
+      <html><body style="text-align:center;font-family:sans-serif;">
+        <h2>Silakan Scan QR WA Kamu</h2>
+        <img src="${url}" style="width:300px;" />
+      </body></html>`;
+    fs.writeFileSync('./qr.html', html);
+  });
+}
+
 
       if (connection === 'close') {
         const reason = lastDisconnect?.error?.output?.statusCode;
@@ -102,9 +103,15 @@ async function startBot() {
 }
 
 // Start Web Server
-app.get('/', (req, res) => {
-  res.send('✅ Bot Auraa aktif dan seksi 😘');
+app.get('/qr', (req, res) => {
+  if (fs.existsSync('./qr.html')) {
+    const qrHtml = fs.readFileSync('./qr.html', 'utf8');
+    res.send(qrHtml);
+  } else {
+    res.send('⚠️ QR belum tersedia. Tunggu sebentar...');
+  }
 });
+
 
 app.get('/qr', (req, res) => {
   if (fs.existsSync('./qr.html')) {

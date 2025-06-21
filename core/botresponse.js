@@ -41,6 +41,7 @@ async function handleResponder(sock, msg) {
     if (!msg.message) return
     const sender = msg.key.remoteJid
     const userId = sender
+    const from = sender
     const actualUserId =
     msg.key.participant ||
     msg.participant ||
@@ -62,10 +63,10 @@ async function handleResponder(sock, msg) {
 
     if (!text) return;
 
-     const handledStatic = await handleStaticCommand(sock, msg, lowerText, userId)
+     const handledStatic = await handleStaticCommand(sock, msg, lowerText, userId, from, body)
       if (handledStatic) return
 
-      const handledCommand = await handleCommand(sock, msg, lowerText, userId, sender)
+      const handledCommand = await handleCommand(sock, msg, lowerText, userId,from, sender)
        if (handledCommand) return
        
     // Anti-spam

@@ -10,38 +10,49 @@ const {
 const blessingKeywords = ['blessing', 'welkin', 'moon', 'blessingofthewelkinmoon']
 const { qrisImagePath, paymentList } = require('../payment/payment')
 
+const validGames = [
+  'Mobile Legends',
+  'Free Fire',
+  'Genshin Impact',
+  'PUBG Mobile',
+  'Valorant'
+]
+
 async function handleTopupInput(sock, msg, lowerText, actualUserId, sender) {
-  // Step 1: Pilih Game
+  // 🌟 STEP 1: PILIH GAME
   if (lowerText.startsWith('topup ')) {
     const inputGame = lowerText.replace('topup ', '').trim().toLowerCase()
     const aliasMap = {
-      ml: 'ml',
-      mobilelegends: 'ml',
-      ff: 'ff',
-      freefire: 'ff',
-      genshin: 'genshin',
-      pubg: 'pubg',
-      valorant: 'valorant',
-      valo: 'valorant'
+      ml: 'Mobile Legends',
+      mobilelegend: 'Mobile Legends',
+      mobilelegends: 'Mobile Legends',
+      ff: 'Free Fire',
+      freefire: 'Free Fire',
+      genshin: 'Genshin Impact',
+      gc: 'Genshin Impact',
+      pubg: 'PUBG Mobile',
+      valorant: 'Valorant',
+      valo: 'Valorant',
+      radianite: 'Valorant'
     }
 
-    const normalizedGame = aliasMap[inputGame] || inputGame
+    const normalizedGame = aliasMap[inputGame] || capitalizeWords(inputGame)
     lastTopupCommandMap.set(actualUserId, normalizedGame)
 
     await sock.sendMessage(sender, {
-      text: `✅ Game *${normalizedGame.toUpperCase()}* dipilih.\nSekarang ketik nominal, misal: *86dm*, *diamond 344*, *gc 60*`
+      text: `✅ Game *${normalizedGame.toUpperCase()}* dipilih.\nKetik nominalnya, contoh: *86dm*, *963 diamond*, *gc 60*`
     }, { quoted: msg })
 
     return true
   }
 
-  // Step 2: Blessing Genshin
-  const cleanedText = lowerText.replace(/\s+/g, '').toLowerCase()
+  // 🌙 STEP 2: WELKIN / BLESSING GENSHIN
+  const cleanedText = lowerText.replace(/\s+/g, '')
   if (blessingKeywords.includes(cleanedText)) {
-    lastTopupCommandMap.set(actualUserId, 'genshin')
+    lastTopupCommandMap.set(actualUserId, 'Genshin Impact')
     selectedTopupNominalMap.set(actualUserId, 60000)
 
-    const teks = formatInvoice('Blessing of the Welkin Moon', 60000, 'genshin')
+    const teks = formatInvoice('Blessing of the Welkin Moon', 60000, 'Genshin Impact')
     await sock.sendMessage(sender, { text: teks }, { quoted: msg })
 
     const buffer = fs.readFileSync(qrisImagePath)
@@ -50,22 +61,16 @@ async function handleTopupInput(sock, msg, lowerText, actualUserId, sender) {
       caption: '🔻 Scan QRIS ini untuk semua metode pembayaran 🔻\nMendukung Dana, Gopay, OVO, ShopeePay, dll'
     }, { quoted: msg })
 
-    // Hapus sesi setelah blessing
     lastTopupCommandMap.delete(actualUserId)
     return true
   }
 
-  // Step 3: Cek nominal (pakai engine dari topup.js)
-  const gameKey = (lastTopupCommandMap.get(actualUserId) || '').toLowerCase()
-  const validGames = ['ml', 'ff', 'genshin', 'pubg', 'valorant']
-  if (!gameKey || !validGames.includes(gameKey)) {
-    return false // ❌ Biar gak spam balasan kalau user ngetik sembarang
-  }
+  // 🧾 STEP 3: PILIH NOMINAL
+  const gameKey = lastTopupCommandMap.get(actualUserId || '')
+  if (!gameKey || !validGames.includes(gameKey)) return false
 
   const harga = await getHargaFromJSON(lowerText, gameKey)
-  if (!harga) {
-    return false // ❌ Biarkan handler lain yang proses kalau gagal cocok
-  }
+  if (!harga) return false
 
   selectedTopupNominalMap.set(actualUserId, harga)
 
@@ -78,31 +83,29 @@ async function handleTopupInput(sock, msg, lowerText, actualUserId, sender) {
     caption: '🔻 Scan QRIS ini untuk semua metode pembayaran 🔻\nMendukung Dana, Gopay, OVO, ShopeePay, dll'
   }, { quoted: msg })
 
-  // 🧹 Selesai topup, hapus sesi
   lastTopupCommandMap.delete(actualUserId)
-
   return true
 }
 
 function formatInvoice(namaProduk, harga, game) {
   const instruksiMap = {
-    genshin: {
+    'Genshin Impact': {
       instruksi: `- ID Game\n- Server (Asia/America/etc)\n- Bukti transfer`,
       contoh: `ID: 812345678\nServer: Asia\nBukti TF: (foto transfer)`
     },
-    ml: {
+    'Mobile Legends': {
       instruksi: `- ID Game\n- Zone ID\n- Bukti transfer`,
       contoh: `ID: 812345678\nZone: 1234\nBukti TF: (foto transfer)`
     },
-    pubg: {
+    'PUBG Mobile': {
       instruksi: `- ID Game\n- Bukti transfer`,
       contoh: `ID: 812345678\nBukti TF: (foto transfer)`
     },
-    ff: {
+    'Free Fire': {
       instruksi: `- ID Game\n- Bukti transfer`,
       contoh: `ID: 812345678\nBukti TF: (foto transfer)`
     },
-    valorant: {
+    'Valorant': {
       instruksi: `- ID Game\n- Bukti transfer`,
       contoh: `ID: 812345678\nBukti TF: (foto transfer)`
     }
@@ -127,5 +130,11 @@ ${instruksi}
 ${contoh}`
 }
 
+function capitalizeWords(str) {
+  return str
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
+}
 
 module.exports = { handleTopupInput }

@@ -33,10 +33,7 @@ async function handleMarkPaid(sock, msg, lowerText, userId, sender) {
 
   const targetMsgId = msg.message?.extendedTextMessage?.contextInfo?.stanzaId
   if (!targetMsgId) {
-    await sock.sendMessage(sender, {
-      text: '⚠️ Balas pesan invoice yang ingin di-mark sebagai *PAID* lalu ketik *done*.'
-    }, { quoted: msg })
-    return true
+    return true // diem aja kalau gak reply pesan
   }
 
   const invoice = await getInvoiceByMsgIdAsync(targetMsgId)

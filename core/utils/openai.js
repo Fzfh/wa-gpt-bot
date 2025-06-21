@@ -35,7 +35,7 @@ async function askOpenAI(userHistory = []) {
         max_tokens: 900
       }, {
         headers: {
-          'Authorization': `Bearer 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`,
+          'Authorization': `Bearer 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`,
           'Content-Type': 'application/json',
           'HTTP-Referer': 'https://aurabot.netlify.app',
           'X-Title': 'Wa-GPT-Bot'

@@ -191,7 +191,7 @@ Tinggal chat admin yaa, fast respon ✨`
   }
   // ✅ Tambahkan ini di paling akhir!
 if (sessionMap.get(userId)?.type === 'hapus') {
-  return await hapusProduk(sock, msg, from, body)
+  return await hapusProduk(sock, msg, from, body,  userId)
 }
 
   // Topup Game - Deteksi topup [namaGame]

@@ -27,16 +27,14 @@ async function askOpenAI(userHistory = []) {
         max_tokens: 900
       }, {
         headers: {
-          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://aurabot.netlify.app',
-          'X-Title': 'Wa-GPT-Bot'
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+          'Content-Type': 'application/json'
         },
         timeout: 10000
       })
 
-      return `🤖 *${model.split("/")[1].replace(":free", "")}*:\n${res.data.choices[0].message.content}`
-
+     return `🤖 *${model}*:\n${res.data.choices[0].message.content}`
+      
     } catch (err) {
       console.warn(`❌ Model gagal: ${model} | Alasan:`, err.response?.data?.error?.message || err.message)
       if (i === models.length - 1) {

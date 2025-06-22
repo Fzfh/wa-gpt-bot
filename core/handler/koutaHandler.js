@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 
-const { produkMap, selectedNominalMap, lastCommandMap } = require('../core/state')
+const { produkMap, selectedKoutaNominalMap, lastKoutaCommandMap } = require('../core/state')
 
 async function handleKouta(sock, msg) {
   const from = msg.key.remoteJid
@@ -41,8 +41,8 @@ async function handleKouta(sock, msg) {
   if (text === '/keluar') {
   if (produkMap.has(userId)) {
     produkMap.delete(userId)
-    selectedNominalMap.delete(userId)
-    lastCommandMap.delete(userId)
+    selectedKoutaNominalMap.delete(userId)
+    lastKoutaCommandMap.delete(userId)
     await sock.sendMessage(from, { text: '❌ Kamu telah keluar dari sesi pembelian pulsa.' }, { quoted: msg })
   }
   return true // Tetap return true supaya command dianggap selesai
@@ -57,8 +57,8 @@ async function handleKouta(sock, msg) {
   if (!item) return false
 
   // Simpan produk pilihan user
-  selectedNominalMap.set(userId, item.harga)
-  lastCommandMap.set(userId, `${item.provider} ${item.nominal}`)
+  selectedKoutaNominalMap.set(userId, item.harga)
+  lastKoutaCommandMap.set(userId, `${item.provider} ${item.nominal}`)
   produkMap.delete(userId)
 
   const teks = `✅ Kamu memilih *${item.provider.toUpperCase()} - ${item.nominal}*

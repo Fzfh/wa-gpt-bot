@@ -38,6 +38,16 @@ async function handleKouta(sock, msg) {
     return true
   }
 
+  if (text === '/keluar') {
+  if (produkMap.has(userId)) {
+    produkMap.delete(userId)
+    selectedNominalMap.delete(userId)
+    lastCommandMap.delete(userId)
+    await sock.sendMessage(from, { text: '❌ Kamu telah keluar dari sesi pembelian pulsa.' }, { quoted: msg })
+  }
+  return true // Tetap return true supaya command dianggap selesai
+}
+
   // STEP 2: Jika user mengetik angka untuk memilih kuota
   const list = produkMap.get(userId)
   if (!Array.isArray(list) || list.length === 0) return false

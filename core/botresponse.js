@@ -119,6 +119,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
         pulsa: 'Pembelian Pulsa',
         kouta: 'Pembelian Kuota'
       }[sesi.type] || sesi.type
+      console.log('DEBUG: Sesi aktif user:', sender, sesi);
     
       sessionMap.delete(sender)
       await sock.sendMessage(sender, {

@@ -1,34 +1,34 @@
 const fs = require('fs');
 const path = require('path');
-const { produkMap, selectedKoutaNominalMap, lastKoutaCommandMap } = require('../core/state');
+const { produkKoutaMap, selectedKoutaMap, lastKoutaMap } = require('../core/state');
 
 async function handleKouta(sock, msg, lowerText, userId, from) {
   // 1. Exit session
   if (lowerText === '/keluar') {
-    if (produkMap.has(userId)) {
-      produkMap.delete(userId);
-      selectedKoutaNominalMap.delete(userId);
-      lastKoutaCommandMap.delete(userId);
+    if (produkKoutaMap.has(userId)) {
+      produkKoutaMap.delete(userId);
+      selectedKoutaMap.delete(userId);
+      lastKoutaMap.delete(userId);
       await sock.sendMessage(from, { text: '❌ Kamu telah keluar dari sesi pembelian kuota.' }, { quoted: msg });
     }
     return true;
   }
 
   // 2. Kalau masih di sesi, cegah buka list lagi & proses angka
-  if (produkMap.has(userId)) {
+  if (produkKoutaMap.has(userId)) {
     if (lowerText === '.kouta' || lowerText === 'beli kouta') {
       await sock.sendMessage(from, { text: '⚠️ Kamu sedang dalam sesi pembelian kuota.\nKetik */keluar* untuk keluar dari sesi ini.' }, { quoted: msg });
       return true;
     }
     const pilihIndex = parseInt(lowerText);
     if (!isNaN(pilihIndex)) {
-      const list = produkMap.get(userId);
+      const list = produkKoutaMap.get(userId);
       const item = list.find(i => i.nomor === pilihIndex);
       if (item) {
         const harga = parseInt(item.harga) || 0;
-        selectedKoutaNominalMap.set(userId, harga);
-        lastKoutaCommandMap.set(userId, `${item.provider} ${item.nominal}`);
-        produkMap.delete(userId);
+        selectedKoutaMap.set(userId, harga);
+        lastKoutaMap.set(userId, `${item.provider} ${item.nominal}`);
+        produkKoutaMap.delete(userId);
         const info = `✅ Kamu memilih *${item.provider} - ${item.nominal}*\n💰 Harga: Rp${harga.toLocaleString('id-ID')}\n\n💳 Silakan transfer ke metode berikut:\n• Dana: 08xxxxxxxxxx\n• Gopay: 08xxxxxxxxxx\n• BCA: 1234567890 a.n. AURA SHOP\n\n📸 Kirim:\n- Nomor HP tujuan\n- Bukti transfer\n\n======= *CONTOH* =======\nNomor: 08123456789\nBukti TF: (foto transfer)`;
         await sock.sendMessage(from, { text: info }, { quoted: msg });
         await sock.sendMessage(from, {
@@ -67,7 +67,7 @@ async function handleKouta(sock, msg, lowerText, userId, from) {
       return true;
     }
     output += `Ketik angka (contoh: 3) untuk memilih kuota.\nAtau ketik */keluar* untuk membatalkan.`;
-    produkMap.set(userId, flatList);
+    produkKoutaMap.set(userId, flatList);
     await sock.sendMessage(from, { text: output }, { quoted: msg });
     return true;
   }
@@ -77,6 +77,6 @@ async function handleKouta(sock, msg, lowerText, userId, from) {
 
 module.exports = {
   handleKouta,
-  selectedKoutaNominalMap,
-  lastKoutaCommandMap
+  selectedKoutaMap,
+  lastKoutaMap
 };

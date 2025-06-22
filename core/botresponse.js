@@ -110,7 +110,10 @@ if (text.startsWith('/') || text.startsWith('.')) {
     const handledInvoice = await handleInvoiceTopupWrapper(sock, msg, lowerText, userId, sender)
     if (handledInvoice) return
 
+    console.log('DEBUG: sender:', sender);
     const sesi = sessionMap.get(sender);
+    console.log('DEBUG: sesi:', sesi);
+
     
     if (lowerText === '/keluar' && sesi) {
       const sesiNama = {

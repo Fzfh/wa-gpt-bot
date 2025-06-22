@@ -38,8 +38,8 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
         const info = `✅ Kamu memilih *${item.provider} - ${item.nominal}*\n` +
           `💰 Harga: Rp${harga.toLocaleString('id-ID')}\n\n` +
           `💳 Silakan transfer ke metode berikut:\n` +
-          `• Dana: 08xxxxxxxxxx\n` +
-          `• Gopay: 08xxxxxxxxxx\n` +
+          `• Dana: *0895326679840*\n` +
+          `• Gopay: *0895326679840*\n` +
           `• BCA: 1234567890 a.n. AURA SHOP\n\n` +
           `📸 Kirim:\n- Nomor HP tujuan\n- Bukti transfer\n\n` +
           `======= *CONTOH* =======\n` +

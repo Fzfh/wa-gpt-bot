@@ -4,6 +4,22 @@ const { produkKoutaMap, selectedKoutaMap, lastKoutaMap } = require('../core/stat
 const sessionMap = require('../core/sessionStore'); // ✅ Tambahan!
 
 async function handleKouta(sock, msg, lowerText, userId, from) {
+    // ✅ 1. Tangani perintah /keluar
+  if (lowerText === '/keluar') {
+    const sesi = sessionMap.get(userId);
+    if (sesi?.type === 'pulsa') {
+      sessionKoutaMap.delete(userId);
+      produkKoutaMap.delete(userId);
+      selectedKoutaMap.delete(userId);
+      lastKoutaMap.delete(userId);
+
+      await sock.sendMessage(from, {
+        text: '✅ Sesi pulsa kamu sudah diakhiri.'
+      }, { quoted: msg });
+      return true;
+    }
+  }
+
   // ✅ 2. Kalau masih dalam sesi kouta
   if (sessionMap.has(userId) && sessionMap.get(userId).type === 'kouta') {
     if (lowerText === 'beli kouta' || lowerText === '.kouta') {

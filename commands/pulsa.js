@@ -6,7 +6,7 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
   // 1. Exit session
   if (lowerText === '/keluar') {
     if (produkPulsaMap.has(userId)) {
-      produPulsaMap.delete(userId);
+      produkPulsaMap.delete(userId);
       selectedPulsaMap.delete(userId);
       lastPulsaMap.delete(userId);
       await sock.sendMessage(from, {

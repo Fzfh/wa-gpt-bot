@@ -126,7 +126,15 @@ if (text.startsWith('/') || text.startsWith('.')) {
 
     const handledPulsa = await handlePulsa(sock, msg, lowerText, userId, sender)
       if (handledPulsa) return
-
+    const sesi = sessionMap.get(sender);
+    
+    if (sesi && sesi.type === 'hapus') {
+      return await hapusProduk(sock, msg, from, body);
+    }
+        
+    if (sesi && sesi.type === 'tambah') {
+      return await tambahProduk(sock, msg, from, body);
+    }
     if (text.startsWith('.kick')) {
       return await kick(sock, msg, text, isGroup)
     }
@@ -206,14 +214,7 @@ if (text === '.reset') {
       return sock.sendMessage(sender, { text: 'Maaf, aku gak ngerti perintah itu 😵. Coba ketik /menu yaa!' }, { quoted: msg })
     }
     }
-    if (sesi && sesi.type === 'hapus') {
-  return await hapusProduk(sock, msg, from, body);
-}
-const sesi = sessionMap.get(sender);
     
-if (sesi && sesi.type === 'tambah') {
-  return await tambahProduk(sock, msg, from, body);
-}
   } catch (error) {
     console.error('❌ Error di handleResponder:', error)
   }

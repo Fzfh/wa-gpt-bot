@@ -1,14 +1,14 @@
 const fs = require('fs');
 const path = require('path');
-const { produkMap, selectedNominalMap, lastCommandMap } = require('../core/state');
+const { produkPulsaMap, selectedPulsaMap, lastPulsaMap } = require('../core/state');
 
 async function handlePulsa(sock, msg, lowerText, userId, from) {
   // 1. Exit session
   if (lowerText === '/keluar') {
-    if (produkMap.has(userId)) {
-      produkMap.delete(userId);
-      selectedNominalMap.delete(userId);
-      lastCommandMap.delete(userId);
+    if (produkPulsaMap.has(userId)) {
+      produPulsaMap.delete(userId);
+      selectedPulsaMap.delete(userId);
+      lastPulsaMap.delete(userId);
       await sock.sendMessage(from, {
         text: '❌ Kamu telah keluar dari sesi pembelian pulsa.'
       }, { quoted: msg });
@@ -17,7 +17,7 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
   }
 
   // 2. Jika masih dalam sesi, cegah buka ulang list dan proses angka
-  if (produkMap.has(userId)) {
+  if (produkPulsaMap.has(userId)) {
     if (lowerText === '.pulsa' || lowerText === 'beli pulsa') {
       await sock.sendMessage(from, {
         text: '⚠️ Kamu sedang dalam sesi pembelian pulsa.\nKetik */keluar* untuk keluar dari sesi ini.'
@@ -27,13 +27,13 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
     // Proses pilihan angka
     const pilihIndex = parseInt(lowerText);
     if (!isNaN(pilihIndex)) {
-      const list = produkMap.get(userId);
+      const list = produkPulsaMap.get(userId);
       const item = list.find(i => i.nomor === pilihIndex);
       if (item) {
         const harga = parseInt(item.harga) || 0;
-        selectedNominalMap.set(userId, harga);
-        lastCommandMap.set(userId, `${item.provider} ${item.nominal}`);
-        produkMap.delete(userId);
+        selectedPulsaMap.set(userId, harga);
+        lastPulsaMap.set(userId, `${item.provider} ${item.nominal}`);
+        produkPulsaMap.delete(userId);
 
         const info = `✅ Kamu memilih *${item.provider} - ${item.nominal}*\n` +
           `💰 Harga: Rp${harga.toLocaleString('id-ID')}\n\n` +
@@ -100,7 +100,7 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
       output += '\n';
     }
     output += `Ketik angka (contoh: 3) untuk memilih pulsa.\nAtau ketik */keluar* untuk membatalkan.`;
-    produkMap.set(userId, flatList);
+    produkPulsaMap.set(userId, flatList);
     await sock.sendMessage(from, { text: output }, { quoted: msg });
     return true;
   }
@@ -110,6 +110,6 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
 
 module.exports = {
   handlePulsa,
-  selectedNominalMap,
-  lastCommandMap
+  selectedPulsaMap,
+  lastPulsaMap
 };

@@ -113,15 +113,6 @@ app.get('/qr', (req, res) => {
 });
 
 
-app.get('/qr', (req, res) => {
-  if (fs.existsSync('./qr.html')) {
-    const qrHtml = fs.readFileSync('./qr.html', 'utf8');
-    res.send(qrHtml);
-  } else {
-    res.send('⚠️ QR belum tersedia. Tunggu sebentar...');
-  }
-});
-
 app.listen(PORT, '0.0.0.0', () =>
   console.log(chalk.cyanBright(`🌐 Web server aktif di http://localhost:${PORT} dan /qr untuk scan`))
 );

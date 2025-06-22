@@ -110,6 +110,15 @@ if (text.startsWith('/') || text.startsWith('.')) {
     const handledInvoice = await handleInvoiceTopupWrapper(sock, msg, lowerText, userId, sender)
     if (handledInvoice) return
 
+    const sesi = sessionMap.get(sender);
+    
+    if (lowerText === '/keluar' && sesi) {
+      sessionMap.delete(sender)
+      await sock.sendMessage(sender, {
+        text: `✅ Sesi *${sesi.type}* telah dibatalkan.`
+      }, { quoted: msg })
+      return
+    }
     // await handleAutoKick(sock, msg)
 
     sock.ev.on('group-participants.update', async (update) => {
@@ -121,7 +130,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     
     if (!text.startsWith('/')) {
     const sesi = sessionMap.get(sender);
-    
+      
     if (sesi && sesi.type === 'hapus') {
       return await hapusProduk(sock, msg, from, body);
     }

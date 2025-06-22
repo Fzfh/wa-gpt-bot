@@ -20,7 +20,7 @@ const { addInvoice, getInvoiceByMsgId, setPaidByMsgId, getAllInvoices, generateI
 const { listTopup, getHargaFromDB, selectedTopupMap, lastTopupCommandMap } = require('../commands/topup')
 const { getProdukDariTabel } = require('../commands/produk')
 const { handlePulsa, selectedNominalMap: pulsaNominalMap, lastCommandMap: pulsaCommandMap } = require('../commands/pulsa')
-const { handlekouta, selectedKoutaNominalMap, lastKoutaCommandMap } = require('../commands/kouta')
+const { handleKouta, selectedKoutaNominalMap, lastKoutaCommandMap } = require('../commands/kouta')
 const sessionMap = require('../core/sessionStore');
 const hapusProduk = require('../commands/hapusProduk');
 const tambahProduk = require('../commands/tambahProduk');
@@ -120,7 +120,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     if (handledMenfess) return
     
     if (!text.startsWith('/')) {
-      const handledKouta = await handlekouta(sock, msg)
+      const handledKouta = await handleKouta(sock, msg)
       if (handledKouta) return
 
     const handledPulsa = await handlePulsa(sock, msg, lowerText, userId, sender)

@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 
-const { produkMap, selectedKoutaNominalMap, lastKoutaCommandMap } = require('../core/state')
+const { produkMap, selectedKoutaNominalMap, lastKoutaCommandMap } = require('../../core/state')
 
 async function handleKouta(sock, msg) {
   const from = msg.key.remoteJid

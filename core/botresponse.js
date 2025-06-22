@@ -124,7 +124,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
       await sock.sendMessage(sender, {
         text: `✅ Sesi *${sesiNama}* telah dibatalkan.`
       }, { quoted: msg })
-      return
+      return true
     }
 
     // await handleAutoKick(sock, msg)

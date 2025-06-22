@@ -1,42 +1,45 @@
 const fs = require('fs');
 const path = require('path');
 const { produkKoutaMap, selectedKoutaMap, lastKoutaMap } = require('../core/state');
+const sessionMap = require('../core/sessionStore'); // ✅ Tambahan!
 
 async function handleKouta(sock, msg, lowerText, userId, from) {
-  // 1. Exit session
+  // ✅ 1. Keluar dari sesi kuota
   if (lowerText === '/keluar') {
-    if (produkKoutaMap.has(userId)) {
+    if (sessionMap.has(userId) && sessionMap.get(userId).type === 'kouta') {
       produkKoutaMap.delete(userId);
       selectedKoutaMap.delete(userId);
       lastKoutaMap.delete(userId);
+      sessionMap.delete(userId);
       await sock.sendMessage(from, {
-        text: '❌ Kamu telah keluar dari sesi pembelian kuota.'
+        text: '❌ Sesi pembelian kuota kamu telah diakhiri.'
       }, { quoted: msg });
+      return true;
     }
-    return true;
+    return false;
   }
 
-  // 2. Jika masih dalam sesi
-  if (produkKoutaMap.has(userId)) {
-    if (lowerText === '.kouta' || lowerText === 'beli kouta') {
+  // ✅ 2. Kalau masih dalam sesi kouta
+  if (sessionMap.has(userId) && sessionMap.get(userId).type === 'kouta') {
+    if (lowerText === 'beli kouta' || lowerText === '.kouta') {
       await sock.sendMessage(from, {
         text: '⚠️ Kamu sedang dalam sesi pembelian kuota.\nKetik */keluar* untuk keluar dari sesi ini.'
       }, { quoted: msg });
       return true;
     }
 
-    const pilihIndex = parseInt(lowerText);
-    if (!isNaN(pilihIndex)) {
+    const pilih = parseInt(lowerText);
+    if (!isNaN(pilih)) {
       const list = produkKoutaMap.get(userId);
-      const item = list.find(i => i.nomor === pilihIndex);
+      const item = list.find(i => i.nomor === pilih);
       if (item) {
-        const harga = parseInt(item.harga) || 0;
-        selectedKoutaMap.set(userId, harga);
+        selectedKoutaMap.set(userId, parseInt(item.harga));
         lastKoutaMap.set(userId, `${item.provider} ${item.produk}`);
         produkKoutaMap.delete(userId);
+        sessionMap.delete(userId); // ✅ Sesi selesai
 
         const info = `✅ Kamu memilih *${item.provider} - ${item.produk}*\n` +
-          `💰 Harga: Rp${harga.toLocaleString('id-ID')}\n\n` +
+          `💰 Harga: Rp${item.harga.toLocaleString('id-ID')}\n\n` +
           `💳 Silakan transfer ke metode berikut:\n` +
           `• Dana: *0895326679840*\n` +
           `• Gopay: *0895326679840*\n` +
@@ -48,7 +51,7 @@ async function handleKouta(sock, msg, lowerText, userId, from) {
         await sock.sendMessage(from, { text: info }, { quoted: msg });
         await sock.sendMessage(from, {
           image: { url: './media/q.jpg' },
-          caption: `💳 Total: Rp${harga.toLocaleString('id-ID')}`
+          caption: `💳 Total: Rp${item.harga.toLocaleString('id-ID')}`
         }, { quoted: msg });
         return true;
       }
@@ -57,15 +60,13 @@ async function handleKouta(sock, msg, lowerText, userId, from) {
     return false;
   }
 
-  // 3. Trigger menu kuota
-  if (lowerText === '.kouta' || lowerText === 'beli kouta') {
-    let dataArr;
+  // ✅ 3. Memulai sesi kouta baru
+  if (lowerText === 'beli kouta' || lowerText === '.kouta') {
+    let dataArr = [];
     try {
       const raw = fs.readFileSync(path.join(__dirname, '../data/kouta.json'), 'utf-8');
       dataArr = JSON.parse(raw);
-    } catch {
-      dataArr = [];
-    }
+    } catch {}
 
     if (!Array.isArray(dataArr) || dataArr.length === 0) {
       await sock.sendMessage(from, {
@@ -103,6 +104,7 @@ async function handleKouta(sock, msg, lowerText, userId, from) {
 
     output += `Ketik angka (contoh: 3) untuk memilih kuota.\nAtau ketik */keluar* untuk membatalkan.`;
     produkKoutaMap.set(userId, flatList);
+    sessionMap.set(userId, { type: 'kouta' }); // ✅ Simpan sesi kouta
     await sock.sendMessage(from, { text: output }, { quoted: msg });
     return true;
   }

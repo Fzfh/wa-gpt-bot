@@ -41,6 +41,7 @@ async function botFirstResponse({ sock, sender, msg }, options = {}) {
 async function handleResponder(sock, msg) {
   try {
     if (!msg.message) return
+    const sesi = sessionMap.get(sender);
     const sender = msg.key.remoteJid
     const userId = sender
     const from = sender
@@ -111,7 +112,6 @@ if (text.startsWith('/') || text.startsWith('.')) {
     if (handledInvoice) return
 
     console.log('DEBUG: sender:', sender);
-    const sesi = sessionMap.get(sender);
     console.log('DEBUG: sesi:', sesi);
 
     

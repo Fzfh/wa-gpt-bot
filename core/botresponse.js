@@ -129,7 +129,6 @@ if (text.startsWith('/') || text.startsWith('.')) {
     if (handledMenfess) return
     
     if (!text.startsWith('/')) {
-    const sesi = sessionMap.get(sender);
       
     if (sesi && sesi.type === 'hapus') {
       return await hapusProduk(sock, msg, from, body);

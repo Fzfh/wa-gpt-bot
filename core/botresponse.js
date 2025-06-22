@@ -19,8 +19,8 @@ const { createStickerFromMessage, createStickerFromText } = require('../core/sti
 const { addInvoice, getInvoiceByMsgId, setPaidByMsgId, getAllInvoices, generateInvoiceId, clearAllInvoices } = require('../core/invoices')
 const { listTopup, getHargaFromDB, selectedTopupMap, lastTopupCommandMap } = require('../commands/topup')
 const { getProdukDariTabel } = require('../commands/produk')
-const { handlePulsa, selectedNominalMap: pulsaNominalMap, lastCommandMap: pulsaCommandMap } = require('../commands/pulsa')
-const { handleKouta, selectedKoutaNominalMap, lastKoutaCommandMap } = require('../commands/kouta')
+const { handlePulsa, selectedPulsaMap, lastPulsaMap } = require('../commands/pulsa')
+const { handleKouta, selectedKoutaMap, lastKoutaMap } = require('../commands/kouta')
 const sessionMap = require('../core/sessionStore');
 const hapusProduk = require('../commands/hapusProduk');
 const tambahProduk = require('../commands/tambahProduk');
@@ -231,8 +231,8 @@ module.exports = {
   greetedUsers,
   botFirstResponse,
   handlePulsa,
-  handlekouta,
-  selectedNominalMap: selectedKoutaNominalMap,
-  lastCommandMap: lastKoutaCommandMap,
+  handleKouta,
+  selectedKoutaMap,
+  lastKoutaMap,
   registerGroupUpdateListener
 }

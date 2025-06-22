@@ -1,7 +1,7 @@
 const { getProdukDariTabel } = require('./produk')
 const produkMap = new Map()
-const selectedNominalMap = new Map()
-const lastCommandMap = new Map()
+const { produkMap, selectedNominalMap, lastCommandMap } = require('../../core/state') // atau sesuaikan path
+
 
 async function handlePulsa(sock, msg, lowerText, userId, from) {
   // Keluar dari sesi

@@ -120,11 +120,6 @@ if (text.startsWith('/') || text.startsWith('.')) {
     if (handledMenfess) return
     
     if (!text.startsWith('/')) {
-      const handledKouta = await handleKouta(sock, msg, lowerText, userId, sender)
-      if (handledKouta) return
-
-    const handledPulsa = await handlePulsa(sock, msg, lowerText, userId, sender)
-      if (handledPulsa) return
     const sesi = sessionMap.get(sender);
     
     if (sesi && sesi.type === 'hapus') {
@@ -134,6 +129,13 @@ if (text.startsWith('/') || text.startsWith('.')) {
     if (sesi && sesi.type === 'tambah') {
       return await tambahProduk(sock, msg, from, body);
     }
+      
+    const handledKouta = await handleKouta(sock, msg, lowerText, userId, sender)
+      if (handledKouta) return
+
+    const handledPulsa = await handlePulsa(sock, msg, lowerText, userId, sender)
+      if (handledPulsa) return
+      
     if (text.startsWith('.kick')) {
       return await kick(sock, msg, text, isGroup)
     }

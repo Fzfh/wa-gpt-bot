@@ -113,12 +113,20 @@ if (text.startsWith('/') || text.startsWith('.')) {
     const sesi = sessionMap.get(sender);
     
     if (lowerText === '/keluar' && sesi) {
+      const sesiNama = {
+        tambah: 'Tambah Produk',
+        hapus: 'Hapus Produk',
+        pulsa: 'Pembelian Pulsa',
+        kouta: 'Pembelian Kuota'
+      }[sesi.type] || sesi.type
+    
       sessionMap.delete(sender)
       await sock.sendMessage(sender, {
-        text: `✅ Sesi *${sesi.type}* telah dibatalkan.`
+        text: `✅ Sesi *${sesiNama}* telah dibatalkan.`
       }, { quoted: msg })
       return
     }
+
     // await handleAutoKick(sock, msg)
 
     sock.ev.on('group-participants.update', async (update) => {

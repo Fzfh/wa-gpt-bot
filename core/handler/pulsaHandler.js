@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 
-const { produkMap, selectedNominalMap, lastCommandMap } = require('../core/state')
+const { produkMap, selectedNominalMap, lastCommandMap } = require('../../core/state')
 
 async function handlePulsa(sock, msg) {
   const from = msg.key.remoteJid

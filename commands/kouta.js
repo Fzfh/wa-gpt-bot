@@ -8,7 +8,7 @@ async function handleKouta(sock, msg, lowerText, userId, from) {
   if (lowerText === '/keluar') {
     const sesi = sessionMap.get(userId);
     if (sesi?.type === 'pulsa') {
-      sessionKoutaMap.delete(userId);
+      sessionMap.delete(userId);
       produkKoutaMap.delete(userId);
       selectedKoutaMap.delete(userId);
       lastKoutaMap.delete(userId);

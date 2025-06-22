@@ -7,6 +7,7 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
   // ✅ 2. Kalau masih dalam sesi, proses input angka
   if (sessionMap.has(userId) && sessionMap.get(userId).type === 'pulsa') {
     if (lowerText === 'beli pulsa' || lowerText === '.pulsa') {
+      
       await sock.sendMessage(from, {
         text: '⚠️ Kamu sedang dalam sesi pembelian pulsa.\nKetik */keluar* untuk keluar dari sesi ini.'
       }, { quoted: msg });

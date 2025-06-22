@@ -4,21 +4,6 @@ const { produkPulsaMap, selectedPulsaMap, lastPulsaMap } = require('../core/stat
 const sessionMap = require('../core/sessionStore'); // ✅ Tambahan penting!
 
 async function handlePulsa(sock, msg, lowerText, userId, from) {
-  // ✅ 1. Keluar dari sesi
-  if (lowerText === '/keluar') {
-    if (sessionMap.has(userId) && sessionMap.get(userId).type === 'pulsa') {
-      produkPulsaMap.delete(userId);
-      selectedPulsaMap.delete(userId);
-      lastPulsaMap.delete(userId);
-      sessionMap.delete(userId);
-      await sock.sendMessage(from, {
-        text: '❌ Sesi pembelian pulsa kamu telah diakhiri.'
-      }, { quoted: msg });
-      return true;
-    }
-    return false;
-  }
-
   // ✅ 2. Kalau masih dalam sesi, proses input angka
   if (sessionMap.has(userId) && sessionMap.get(userId).type === 'pulsa') {
     if (lowerText === 'beli pulsa' || lowerText === '.pulsa') {

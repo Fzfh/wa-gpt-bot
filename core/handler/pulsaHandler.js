@@ -37,18 +37,16 @@ async function handlePulsa(sock, msg) {
     await sock.sendMessage(from, { text: output }, { quoted: msg })
     return true
   }
-  if (text === '/keluar') {
+if (text === '/keluar') {
   if (produkMap.has(userId)) {
     produkMap.delete(userId)
     selectedNominalMap.delete(userId)
     lastCommandMap.delete(userId)
     await sock.sendMessage(from, { text: '❌ Kamu telah keluar dari sesi pembelian pulsa.' }, { quoted: msg })
-    return true
-  } else {
-    await sock.sendMessage(from, { text: '⚠️ Kamu tidak sedang dalam sesi pembelian pulsa.' }, { quoted: msg })
-    return true
   }
+  return true // Tetap return true supaya command dianggap selesai
 }
+
 
   // STEP 2: Jika user mengetik angka untuk memilih pulsa
   const list = produkMap.get(userId)

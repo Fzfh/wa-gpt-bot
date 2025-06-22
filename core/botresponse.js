@@ -6,7 +6,6 @@ const add = require('../commands/add');
 // const { handleAutoKick } = require('../commands/auto_kick')
 const { handleTopupInput } = require('../core/handler/topupHandler')
 const {  handleInvoiceTopupWrapper } = require('../core/handler/invoiceHandler')
-const { handlePulsaKuotaInvoice } = require('../core/handler/pulsaHandler')
 const { handleMarkPaid } = require('../core/handler/paid')
 const { handleStaticCommand } = require('../core/handler/staticCommand')
 const { handleCommand } = require('../core/handler/commandHandler')

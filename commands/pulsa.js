@@ -11,6 +11,7 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
       selectedPulsaMap.delete(userId);
       lastPulsaMap.delete(userId);
       sessionMap.delete(userId);
+      sessionMap.set(userId, { type: 'pulsa' });
       await sock.sendMessage(from, {
         text: '❌ Sesi pembelian pulsa kamu telah diakhiri.'
       }, { quoted: msg });

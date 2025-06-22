@@ -1,10 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 
-// Maps untuk simpan session user
-const produkMap = new Map()
-const selectedNominalMap = new Map()
-const lastCommandMap = new Map()
+const { produkMap, selectedNominalMap, lastCommandMap } = require('../core/state')
 
 async function handlePulsa(sock, msg) {
   const from = msg.key.remoteJid
@@ -14,7 +11,7 @@ async function handlePulsa(sock, msg) {
     msg.message?.extendedTextMessage?.text ||
     ''
   ).toLowerCase().trim()
-
+  
   // STEP 1: Jika user ketik `.pulsa` atau `beli pulsa`
   if (text === '.pulsa' || text === 'beli pulsa') {
     const rawData = fs.readFileSync(path.join(__dirname, '../../data/pulsa.json'), 'utf-8')
@@ -40,6 +37,18 @@ async function handlePulsa(sock, msg) {
     await sock.sendMessage(from, { text: output }, { quoted: msg })
     return true
   }
+  if (text === '/keluar') {
+  if (produkMap.has(userId)) {
+    produkMap.delete(userId)
+    selectedNominalMap.delete(userId)
+    lastCommandMap.delete(userId)
+    await sock.sendMessage(from, { text: '❌ Kamu telah keluar dari sesi pembelian pulsa.' }, { quoted: msg })
+    return true
+  } else {
+    await sock.sendMessage(from, { text: '⚠️ Kamu tidak sedang dalam sesi pembelian pulsa.' }, { quoted: msg })
+    return true
+  }
+}
 
   // STEP 2: Jika user mengetik angka untuk memilih pulsa
   const list = produkMap.get(userId)

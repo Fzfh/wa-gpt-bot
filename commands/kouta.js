@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 
-const { produkMap, selectedNominalMap, lastCommandMap } = require('../core/state')
+const { produkMap, selectedKoutaNominalMap, lastKoutaCommandMap } = require('../core/state')
 
 //  Load data kouta dari file JSON ada di data bang
 function getKoutaList() {

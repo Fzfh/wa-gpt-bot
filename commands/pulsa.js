@@ -1,6 +1,5 @@
 const { getProdukDariTabel } = require('./produk')
-const produkMap = new Map()
-const { produkMap, selectedNominalMap, lastCommandMap } = require('../core/state') // atau sesuaikan path
+const { produkMap, selectedNominalMap, lastCommandMap } = require('../core/state')
 
 
 async function handlePulsa(sock, msg, lowerText, userId, from) {

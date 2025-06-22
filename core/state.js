@@ -1,11 +1,16 @@
-const produkMap = new Map()
-const selectedNominalMap = new Map()
-const lastCommandMap = new Map()
-const selectedKoutaNominalMap = new Map()
-const lastKoutaCommandMap = new Map()
+const produkPulsaMap = new Map();
+const selectedPulsaMap = new Map();
+const lastPulsaMap = new Map();
+
+const produkKoutaMap = new Map();
+const selectedKoutaMap = new Map();
+const lastKoutaMap = new Map();
 
 module.exports = {
-  produkMap,
-  selectedNominalMap,
-  lastCommandMap
-}
+  produkPulsaMap,
+  selectedPulsaMap,
+  lastPulsaMap,
+  produkKoutaMap,
+  selectedKoutaMap,
+  lastKoutaMap
+};

@@ -4,21 +4,6 @@ const { produkKoutaMap, selectedKoutaMap, lastKoutaMap } = require('../core/stat
 const sessionMap = require('../core/sessionStore'); // ✅ Tambahan!
 
 async function handleKouta(sock, msg, lowerText, userId, from) {
-  // ✅ 1. Keluar dari sesi kuota
-  if (lowerText === '/keluar') {
-    if (sessionMap.has(userId) && sessionMap.get(userId).type === 'kouta') {
-      produkKoutaMap.delete(userId);
-      selectedKoutaMap.delete(userId);
-      lastKoutaMap.delete(userId);
-      sessionMap.delete(userId);
-      await sock.sendMessage(from, {
-        text: '❌ Sesi pembelian kuota kamu telah diakhiri.'
-      }, { quoted: msg });
-      return true;
-    }
-    return false;
-  }
-
   // ✅ 2. Kalau masih dalam sesi kouta
   if (sessionMap.has(userId) && sessionMap.get(userId).type === 'kouta') {
     if (lowerText === 'beli kouta' || lowerText === '.kouta') {

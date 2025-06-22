@@ -1,10 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 
-// Maps untuk simpan session user
-const produkMap = new Map()
-const selectedNominalMap = new Map()
-const lastCommandMap = new Map()
+const { produkMap, selectedNominalMap, lastCommandMap } = require('../core/state')
 
 async function handleKouta(sock, msg) {
   const from = msg.key.remoteJid

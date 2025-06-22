@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const { produkPulsaMap, selectedPulsaMap, lastPulsaMap } = require('../core/state');
-const sessionMap = require('../core/sessionStore'); // ✅ Tambahan penting!
+const { clearPulsaSession } = require('../core/clearhelper')
+const sessionMap = require('../core/sessionStore');
 
 async function handlePulsa(sock, msg, lowerText, userId, from) {
     // ✅ 1. Tangani perintah /keluar
@@ -9,9 +10,7 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
     const sesi = sessionMap.get(userId);
     if (sesi?.type === 'pulsa') {
       sessionMap.delete(userId);
-      produkPulsaMap.delete(userId);
-      selectedPulsaMap.delete(userId);
-      lastPulsaMap.delete(userId);
+      clearPulsaSession(userId);
 
       await sock.sendMessage(from, {
         text: '✅ Sesi pulsa kamu sudah diakhiri.'

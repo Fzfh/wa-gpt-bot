@@ -48,6 +48,12 @@ async function handlePulsa(sock, msg, lowerText, from) {
 
   if (produkPulsaMap.has(userId)) {
     const list = produkPulsaMap.get(userId)
+    console.log('[DEBUG MAPS]', {
+  produkPulsaMap,
+  hasProduk: produkPulsaMap?.has(userId),
+  type: typeof produkPulsaMap
+})
+
     if (Array.isArray(list) && /^\d+$/.test(text)) {
       const pilihIndex = parseInt(text)
       const item = list.find(i => i.nomor === pilihIndex)

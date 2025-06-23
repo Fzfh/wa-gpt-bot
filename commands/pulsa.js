@@ -1,19 +1,15 @@
 const fs = require('fs')
 const path = require('path')
 
-const produkPulsaMap = globalThis.produkPulsaMap
-const selectedPulsaMap = globalThis.selectedPulsaMap
-const lastPulsaMap = globalThis.lastPulsaMap
+const {
+  produkPulsaMap,
+  selectedPulsaMap,
+  lastPulsaMap
+} = require('../core/state')
 
+const { clearPulsaSession } = require('../core/clearhelper')
 
-// Clear langsung, tanpa import helper
-function clearPulsaSession(userId) {
-  produkPulsaMap.delete(userId)
-  selectedPulsaMap.delete(userId)
-  lastPulsaMap.delete(userId)
-  console.log('🧹 [CLEAR_LOCAL] clearPulsaSession for:', userId)
-}
-
+// Load data pulsa dari file JSON
 function getPulsaList() {
   const filePath = path.join(__dirname, '../data/pulsa.json')
   try {
@@ -25,44 +21,37 @@ function getPulsaList() {
   }
 }
 
-async function handlePulsa(sock, msg, lowerText, from) {
-  const isGroup = msg.key.remoteJid.endsWith('@g.us')
-  const userId = isGroup ? msg.key.participant : msg.key.remoteJid
+async function handlePulsa(sock, msg, lowerText, userId, from) {
   const text = (
     msg.message?.conversation ||
     msg.message?.extendedTextMessage?.text ||
     ''
   ).toLowerCase().trim()
 
-  console.log('[Pulsa] userId:', userId)
-  console.log('[Pulsa] Session exists:', produkPulsaMap.has(userId))
-
+  // ❌ Keluar dari sesi
   if (text === '/keluar') {
-    clearPulsaSession(userId)
-    console.log('[CHECK] After /keluar -> produkPulsaMap.has:', produkPulsaMap.has(userId))
+    produkPulsaMap.delete(userId)
+    selectedPulsaMap.delete(userId)
+    lastPulsaMap.delete(userId)
     await sock.sendMessage(from, {
       text: '❌ Kamu telah keluar dari sesi pembelian pulsa.'
     }, { quoted: msg })
     return true
   }
 
+  // ✅ Tangani input angka jika masih dalam sesi
   if (produkPulsaMap.has(userId)) {
     const list = produkPulsaMap.get(userId)
-    console.log('[DEBUG MAPS]', {
-  produkPulsaMap,
-  hasProduk: produkPulsaMap?.has(userId),
-  type: typeof produkPulsaMap
-})
-
     if (Array.isArray(list) && /^\d+$/.test(text)) {
       const pilihIndex = parseInt(text)
       const item = list.find(i => i.nomor === pilihIndex)
+
       if (!item) return false
 
       const harga = parseInt(item.harga) || 0
       selectedPulsaMap.set(userId, harga)
       lastPulsaMap.set(userId, `${item.provider} ${item.produk}`)
-      clearPulsaSession(userId)
+      produkPulsaMap.delete(userId)
 
       const info = `✅ Kamu memilih *${item.provider} - ${item.produk}*
 💰 Harga: Rp${harga.toLocaleString('id-ID')}
@@ -85,19 +74,21 @@ Bukti TF: (foto)`
       await sock.sendMessage(from, { text: info }, { quoted: msg })
       await sock.sendMessage(from, {
         image: { url: './media/q.jpg' },
-        caption: `💳 Total: Rp${harga.toLocaleString('id-ID')}`
+        caption: `💳 Total: Rp${harga.toLocaleString('id-ID')}`,
       }, { quoted: msg })
 
       return true
     }
 
+    // ⛔ User dalam sesi tapi bukan angka
     await sock.sendMessage(from, {
-      text: '⚠️ Kamu masih dalam sesi pembelian pulsa. Ketik angka atau */keluar*.',
+      text: '⚠️ Kamu masih dalam sesi pembelian pulsa. Ketik angka untuk memilih atau */keluar* untuk keluar.',
       quoted: msg
     })
     return true
   }
 
+  // 🟢 Mulai sesi baru
   if (text === '.pulsa' || text === 'beli pulsa') {
     clearPulsaSession(userId)
 
@@ -110,31 +101,32 @@ Bukti TF: (foto)`
     }
 
     const grouped = {}
-    let flatList = []
-    let output = '🔋 *Daftar Pulsa Tersedia:*\n\n'
-    let nomor = 1
-
     list.forEach(item => {
       const provider = (item.provider || 'Lainnya').toUpperCase()
       if (!grouped[provider]) grouped[provider] = []
       grouped[provider].push(item)
     })
 
+    let output = `🔋 *Daftar Pulsa Tersedia:*\n\n`
+    let flatList = []
+    let counter = 1
+
     for (const provider in grouped) {
       output += `📡 *${provider}*\n`
       grouped[provider].forEach(item => {
+        const produk = item.produk || ''
         const harga = parseInt(item.harga) || 0
-        output += `${nomor}. ${item.produk} - Rp${harga.toLocaleString('id-ID')}\n`
-        flatList.push({ ...item, nomor })
-        nomor++
+        output += `${counter}. ${produk} - Rp${harga.toLocaleString('id-ID')}\n`
+        flatList.push({ ...item, nomor: counter })
+        counter++
       })
       output += '\n'
     }
 
-    output += `Ketik angka (contoh: 2) untuk memilih pulsa.\nKetik */keluar* untuk membatalkan sesi.`
+    output += `Ketik angka (contoh: 3) untuk memilih pulsa.`
+    output += `\nKetik */keluar* untuk membatalkan sesi ini.`
 
     produkPulsaMap.set(userId, flatList)
-    console.log('[Pulsa] Sesi baru set:', userId)
     await sock.sendMessage(from, { text: output }, { quoted: msg })
     return true
   }
@@ -142,4 +134,8 @@ Bukti TF: (foto)`
   return false
 }
 
-module.exports = { handlePulsa }
+module.exports = {
+  handlePulsa,
+  selectedPulsaMap,
+  lastPulsaMap
+}

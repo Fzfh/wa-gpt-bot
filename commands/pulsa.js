@@ -21,14 +21,14 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
   }
 
   // Jika user masih dalam sesi
-  if (produkPulsaMap.has(userId)) {
-    if (lowerText === '.pulsa' || lowerText === 'beli pulsa') {
-      clearKoutaSession(userId)
-      await sock.sendMessage(from, { text: '⚠️ Kamu sedang dalam sesi pembelian pulsa.\nKetik */keluar* untuk keluar dari sesi ini.' }, { quoted: msg })
+    if (produkPulsaMap.has(userId)) {
+      await sock.sendMessage(from, { text: '⚠️ Kamu masih dalam sesi pembelian pulsa.\nKetik */keluar* untuk keluar dari sesi ini.' }, { quoted: msg })
       return true
     }
 
+
     const list = produkPulsaMap.get(userId)
+    if (!/^\d+$/.test(lowerText)) return false
     const pilihIndex = parseInt(lowerText)
     const item = list.find(i => i.nomor === pilihIndex)
 

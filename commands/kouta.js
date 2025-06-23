@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-
+const sessionMap = require('../core/sessionStore');
 const { produkKoutaMap, selectedKoutaMap, lastKoutaMap } = require('../core/state')
 //  Load data kouta dari file JSON ada di data bang
 function getKoutaList() {
@@ -22,11 +22,12 @@ async function handlekouta(sock, msg) {
     msg.message?.extendedTextMessage?.text ||
     ''
   ).toLowerCase().trim()
-   if (lowerText === '/keluar') {
+  if (text === '/keluar') {
     if (produkKoutaMap.has(userId)) {
       produkKoutaMap.delete(userId)
       selectedKoutaMap.delete(userId)
       lastKoutaMap.delete(userId)
+      sessionMap.delete(userId) // Tambahkan ini untuk hapus sesi juga
       await sock.sendMessage(from, { text: '❌ Kamu telah keluar dari sesi pembelian pulsa.' }, { quoted: msg })
       return true
     }
@@ -34,6 +35,7 @@ async function handlekouta(sock, msg) {
   }
   // STEP 1: Tampilkan daftar kuota
   if (text === '.kouta' || text === 'beli kouta') {
+    sessionMap.set(userId, { type: 'kouta' })
     console.log('🔥 KOUTA command diterima:', text)
     console.log('📁 Isi kouta.json:', getKoutaList())
 
@@ -111,8 +113,9 @@ Bukti TF: (foto)`
     image: { url: './media/q.jpg' },
     caption: `💳 Total: Rp${harga.toLocaleString('id-ID')}`,
   }, { quoted: msg })
+sessionMap.delete(userId) 
 
-  return true
+return true
 }
 
 module.exports = {

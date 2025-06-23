@@ -38,6 +38,7 @@ async function handlePulsa(sock, msg, lowerText, from) {
   if (text === '/keluar') {
     clearPulsaSession(userId)
     console.log('[Pulsa] clearPulsaSession triggered via /keluar for:', userId)
+    console.log('[Pulsa] Map check after clear:', produkPulsaMap.has(userId))
     await sock.sendMessage(from, {
       text: '❌ Kamu telah keluar dari sesi pembelian pulsa.'
     }, { quoted: msg })
@@ -47,10 +48,9 @@ async function handlePulsa(sock, msg, lowerText, from) {
   // Kalau user dalam sesi dan kirim angka
   if (produkPulsaMap.has(userId)) {
     const list = produkPulsaMap.get(userId)
-    console.log('[Session Check] userId:', `"${userId}"`)
-console.log('[Session Check] Keys:', Array.from(produkPulsaMap.keys()))
-console.log('[Session Check] Exists:', produkPulsaMap.has(userId))
-
+    console.log('[Session Check] userId:', userId)
+    console.log('[Session Check] Keys:', Array.from(produkPulsaMap.keys()))
+    console.log('[Session Check] Exists:', produkPulsaMap.has(userId))
 
     if (Array.isArray(list) && /^\d+$/.test(text)) {
       const pilihIndex = parseInt(text)
@@ -61,7 +61,7 @@ console.log('[Session Check] Exists:', produkPulsaMap.has(userId))
       const harga = parseInt(item.harga) || 0
       selectedPulsaMap.set(userId, harga)
       lastPulsaMap.set(userId, `${item.provider} ${item.produk}`)
-      clearPulsaSession(userId) // Hapus sesi setelah milih
+      clearPulsaSession(userId)
 
       const info = `✅ Kamu memilih *${item.provider} - ${item.produk}*
 💰 Harga: Rp${harga.toLocaleString('id-ID')}
@@ -100,8 +100,8 @@ Bukti TF: (foto)`
 
   // Mulai sesi baru
   if (text === '.pulsa' || text === 'beli pulsa') {
-    clearKoutaSession(userId)  // Biar gak tumpang tindih
-    clearPulsaSession(userId)  // Pastikan sesi baru bersih
+    clearKoutaSession(userId)
+    clearPulsaSession(userId)
 
     const list = getPulsaList()
     if (!Array.isArray(list) || list.length === 0) {
@@ -118,7 +118,8 @@ Bukti TF: (foto)`
       grouped[provider].push(item)
     })
 
-    let output = `🔋 *Daftar Pulsa Tersedia:*\n\n`
+    let output = `🔋 *Daftar Pulsa Tersedia:*
+\n`
     let flatList = []
     let counter = 1
 
@@ -136,6 +137,11 @@ Bukti TF: (foto)`
 
     output += `Ketik angka (contoh: 3) untuk memilih pulsa.\n`
     output += `Ketik */keluar* untuk membatalkan sesi ini.`
+
+    if (produkPulsaMap.has(userId)) {
+      console.log('[Pulsa] ⛔ Sesi lama belum bersih. Stop set ulang.')
+      return true
+    }
 
     produkPulsaMap.set(userId, flatList)
     console.log('[Pulsa] Mulai sesi pulsa, set produkPulsaMap:', userId)

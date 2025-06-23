@@ -33,7 +33,10 @@ async function handlekouta(sock, msg, lowerText, userId, from) {
     await sock.sendMessage(from, { text: '❌ Kamu telah keluar dari sesi pembelian kouta.' }, { quoted: msg })
     return true
   }
-  
+   if (produkKoutaMap.has(userId)) {
+    await sock.sendMessage(from, { text: '⚠️ Kamu masih dalam sesi pembelian kuota. Ketik */keluar* untuk keluar.' }, { quoted: msg })
+    return true
+  }
   if (text === '.kouta' || text === 'beli kouta') {
     clearPulsaSession(userId)
     console.log('🔥 KOUTA command diterima:', text)
@@ -75,11 +78,11 @@ async function handlekouta(sock, msg, lowerText, userId, from) {
     await sock.sendMessage(from, { text: output }, { quoted: msg })
     return true
   }
-
   // STEP 2: Tangani input pilihan angka
   const list = produkKoutaMap.get(userId)
   if (!Array.isArray(list) || list.length === 0) return false
-
+  
+  if (!/^\d+$/.test(text)) return false
   const pilihIndex = parseInt(text)
   const item = list.find(i => i.nomor === pilihIndex)
 

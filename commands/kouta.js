@@ -1,9 +1,12 @@
 const fs = require('fs')
 const path = require('path')
 
-const produkMap = new Map()
-const selectedKoutaNominalMap = new Map()
-const lastKoutaCommandMap = new Map()
+const {
+  produkKoutaMap,
+  selectedKoutaMap,
+  lastKoutaMap
+} = require('../core/state')
+const { clearPulsaSession } = require('../core/clearhelper')
 
 //  Load data kouta dari file JSON ada di data bang
 function getKoutaList() {
@@ -26,14 +29,15 @@ async function handlekouta(sock, msg) {
     ''
   ).toLowerCase().trim()
   if (text === '/keluar') {
-    produkMap.delete(userId)
-    selectedKoutaNominalMap.delete(userId)
-    lastKoutaCommandMap.delete(userId)
+    produkKoutaMap.delete(userId)
+    selectedKoutaMap.delete(userId)
+    lastKoutaMap.delete(userId)
     await sock.sendMessage(from, { text: '❌ Kamu telah keluar dari sesi pembelian kouta.' }, { quoted: msg })
     return true
   }
   
   if (text === '.kouta' || text === 'beli kouta') {
+    clearPulsaSession(userId)
     console.log('🔥 KOUTA command diterima:', text)
     console.log('📁 Isi kouta.json:', getKoutaList())
 
@@ -66,14 +70,16 @@ async function handlekouta(sock, msg) {
     }
 
     output += `Ketik angka (contoh: 3) untuk memilih kuota.`
+    output += `\nKetik */keluar* untuk membatalkan sesi ini.`
 
-    produkMap.set(userId, flatList)
+
+    produkKoutaMap.set(userId, flatList)
     await sock.sendMessage(from, { text: output }, { quoted: msg })
     return true
   }
 
   // STEP 2: Tangani input pilihan angka
-  const list = produkMap.get(userId)
+  const list = produkKoutaMap.get(userId)
   if (!Array.isArray(list) || list.length === 0) return false
 
   const pilihIndex = parseInt(text)
@@ -81,9 +87,9 @@ async function handlekouta(sock, msg) {
 
   if (!item) return false
 
-  selectedKoutaNominalMap.set(userId, parseInt(item.harga) || 0)
-  lastKoutaCommandMap.set(userId, `${item.provider} ${item.produk}`)
-  produkMap.delete(userId)
+  selectedKoutaMap.set(userId, parseInt(item.harga) || 0)
+  lastKoutaMap.set(userId, `${item.provider} ${item.produk}`)
+  produkKoutaMap.delete(userId)
 
   const harga = parseInt(item.harga) || 0
 
@@ -117,6 +123,6 @@ Bukti TF: (foto)`
 
 module.exports = {
   handlekouta,
-  selectedKoutaNominalMap,
-  lastKoutaCommandMap
+  selectedKoutaMap,
+  lastKoutaMap
 }

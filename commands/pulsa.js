@@ -1,6 +1,4 @@
-const produkMap = new Map()
-const selectedNominalMap = new Map()
-const lastCommandMap = new Map()
+const { produkPulsaMap, selectedPulsaMap, lastPulsaMap } = require('../core/state')
 
 async function handlePulsa(sock, msg, lowerText, userId, from) {
   // Keluar dari sesi

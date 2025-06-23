@@ -25,8 +25,14 @@ async function handlekouta(sock, msg) {
     msg.message?.extendedTextMessage?.text ||
     ''
   ).toLowerCase().trim()
-
-  // STEP 1: Tampilkan daftar kuota
+  if (text === '/keluar') {
+    produkMap.delete(userId)
+    selectedKoutaNominalMap.delete(userId)
+    lastKoutaCommandMap.delete(userId)
+    await sock.sendMessage(from, { text: '❌ Kamu telah keluar dari sesi pembelian kouta.' }, { quoted: msg })
+    return true
+  }
+  
   if (text === '.kouta' || text === 'beli kouta') {
     console.log('🔥 KOUTA command diterima:', text)
     console.log('📁 Isi kouta.json:', getKoutaList())

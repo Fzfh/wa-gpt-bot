@@ -8,7 +8,6 @@ const {
 } = require('../core/state')
 const { clearKoutaSession, clearPulsaSession } = require('../core/clearhelper')
 
-// Ambil data pulsa dari JSON lokal
 function getPulsaList() {
   const filePath = path.join(__dirname, '../data/pulsa.json')
   try {
@@ -23,39 +22,38 @@ function getPulsaList() {
 async function handlePulsa(sock, msg, lowerText, from) {
   const isGroup = msg.key.remoteJid.endsWith('@g.us')
   const userId = isGroup ? msg.key.participant : msg.key.remoteJid
-  console.log('[Pulsa] userId:', userId)
-  console.log('[Pulsa] Session exists:', produkPulsaMap.has(userId))
-  console.log('[Debug] remoteJid:', msg.key.remoteJid)
-  console.log('[Debug] participant:', msg.key.participant)
-
   const text = (
     msg.message?.conversation ||
     msg.message?.extendedTextMessage?.text ||
     ''
   ).toLowerCase().trim()
 
+  console.log('[Pulsa] userId:', userId)
+  console.log('[Pulsa] Session exists:', produkPulsaMap.has(userId))
+  console.log('[Debug] remoteJid:', msg.key.remoteJid)
+  console.log('[Debug] participant:', msg.key.participant)
+
   // Keluar dari sesi
   if (text === '/keluar') {
     clearPulsaSession(userId)
-    console.log('[Pulsa] clearPulsaSession triggered via /keluar for:', userId)
-    console.log('[Pulsa] Map check after clear:', produkPulsaMap.has(userId))
+    console.log('[DEBUG] Setelah clear: produkPulsaMap.has(userId):', produkPulsaMap.has(userId))
     await sock.sendMessage(from, {
       text: '❌ Kamu telah keluar dari sesi pembelian pulsa.'
     }, { quoted: msg })
     return true
   }
 
-  // Kalau user dalam sesi dan kirim angka
+  // User masih dalam sesi
   if (produkPulsaMap.has(userId)) {
     const list = produkPulsaMap.get(userId)
     console.log('[Session Check] userId:', userId)
     console.log('[Session Check] Keys:', Array.from(produkPulsaMap.keys()))
     console.log('[Session Check] Exists:', produkPulsaMap.has(userId))
 
+    // Jika input angka valid
     if (Array.isArray(list) && /^\d+$/.test(text)) {
       const pilihIndex = parseInt(text)
       const item = list.find(i => i.nomor === pilihIndex)
-
       if (!item) return false
 
       const harga = parseInt(item.harga) || 0
@@ -84,15 +82,15 @@ Bukti TF: (foto)`
       await sock.sendMessage(from, { text: info }, { quoted: msg })
       await sock.sendMessage(from, {
         image: { url: './media/q.jpg' },
-        caption: `💳 Total: Rp${harga.toLocaleString('id-ID')}`,
+        caption: `💳 Total: Rp${harga.toLocaleString('id-ID')}`
       }, { quoted: msg })
 
       return true
     }
 
-    // User dalam sesi tapi bukan angka valid
+    // Dalam sesi tapi input bukan angka
     await sock.sendMessage(from, {
-      text: '⚠️ Kamu masih dalam sesi pembelian pulsa. Ketik angka untuk memilih atau */keluar* untuk keluar.',
+      text: '⚠️ Kamu masih dalam sesi pembelian pulsa. Ketik angka untuk memilih atau *ketik /keluar* untuk membatalkan.',
       quoted: msg
     })
     return true
@@ -118,8 +116,7 @@ Bukti TF: (foto)`
       grouped[provider].push(item)
     })
 
-    let output = `🔋 *Daftar Pulsa Tersedia:*
-\n`
+    let output = `🔋 *Daftar Pulsa Tersedia:*\n\n`
     let flatList = []
     let counter = 1
 
@@ -137,11 +134,6 @@ Bukti TF: (foto)`
 
     output += `Ketik angka (contoh: 3) untuk memilih pulsa.\n`
     output += `Ketik */keluar* untuk membatalkan sesi ini.`
-
-    if (produkPulsaMap.has(userId)) {
-      console.log('[Pulsa] ⛔ Sesi lama belum bersih. Stop set ulang.')
-      return true
-    }
 
     produkPulsaMap.set(userId, flatList)
     console.log('[Pulsa] Mulai sesi pulsa, set produkPulsaMap:', userId)

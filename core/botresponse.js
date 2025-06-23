@@ -253,7 +253,7 @@ module.exports = {
   greetedUsers,
   botFirstResponse,
   handlePulsa,
-  handleKouta,
+  handlekouta,
   selectedKoutaMap,
   lastKoutaMap,
   registerGroupUpdateListener

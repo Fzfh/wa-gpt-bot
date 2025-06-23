@@ -1,121 +1,110 @@
-const fs = require('fs');
-const path = require('path');
-const { produkPulsaMap, selectedPulsaMap, lastPulsaMap } = require('../core/state');
-const { clearPulsaSession } = require('../core/clearhelper')
-const sessionMap = require('../core/sessionStore');
+const { getProdukDariTabel } = require('./produk')
+const produkMap = new Map()
+const selectedNominalMap = new Map()
+const lastCommandMap = new Map()
 
 async function handlePulsa(sock, msg, lowerText, userId, from) {
-    // ✅ 1. Tangani perintah /keluar
+  // Keluar dari sesi
   if (lowerText === '/keluar') {
-    const sesi = sessionMap.get(userId);
-    if (sesi?.type === 'pulsa') {
-      sessionMap.delete(userId);
-      clearPulsaSession(userId);
-
-      await sock.sendMessage(from, {
-        text: '✅ Sesi pulsa kamu sudah diakhiri.'
-      }, { quoted: msg });
-      return true;
+    if (produkMap.has(userId)) {
+      produkMap.delete(userId)
+      selectedNominalMap.delete(userId)
+      lastCommandMap.delete(userId)
+      await sock.sendMessage(from, { text: '❌ Kamu telah keluar dari sesi pembelian pulsa.' }, { quoted: msg })
+      return true
     }
+    return false
   }
 
-  // ✅ 2. Kalau masih dalam sesi, proses input angka
-  if (sessionMap.has(userId) && sessionMap.get(userId).type === 'pulsa') {
-    if (lowerText === 'beli pulsa' || lowerText === '.pulsa') {
-      
-      await sock.sendMessage(from, {
-        text: '⚠️ Kamu sedang dalam sesi pembelian pulsa.\nKetik */keluar* untuk keluar dari sesi ini.'
-      }, { quoted: msg });
-      return true;
+  // Jika user masih dalam sesi
+  if (produkMap.has(userId)) {
+    if (lowerText === '.pulsa' || lowerText === 'beli pulsa') {
+      await sock.sendMessage(from, { text: '⚠️ Kamu sedang dalam sesi pembelian pulsa.\nKetik */keluar* untuk keluar dari sesi ini.' }, { quoted: msg })
+      return true
     }
 
-    const pilih = parseInt(lowerText);
-    if (!isNaN(pilih)) {
-      const list = produkPulsaMap.get(userId) || [];
-      const item = list.find(i => i.nomor === pilih);
-      if (item) {
-        selectedPulsaMap.set(userId, parseInt(item.harga));
-        lastPulsaMap.set(userId, `${item.provider} ${item.nominal}`);
-        produkPulsaMap.delete(userId);
-        sessionMap.delete(userId); // ✅ Hapus sesi setelah selesai
+    const list = produkMap.get(userId)
+    const pilihIndex = parseInt(lowerText)
+    const item = list.find(i => i.nomor === pilihIndex)
 
-        const info = `✅ Kamu memilih *${item.provider} - ${item.nominal}*\n` +
-          `💰 Harga: Rp${item.harga.toLocaleString('id-ID')}\n\n` +
-          `💳 Silakan transfer ke metode berikut:\n` +
-          `• Dana: *0895326679840*\n` +
-          `• Gopay: *0895326679840*\n` +
-          `• BCA: 1234567890 a.n. AURA SHOP\n\n` +
-          `📸 Kirim:\n- Nomor HP tujuan\n- Bukti transfer\n\n` +
-          `======= *CONTOH* =======\n` +
-          `Nomor: 08123456789\nBukti TF: (foto transfer)`;
+    if (!item) return false
 
-        await sock.sendMessage(from, { text: info }, { quoted: msg });
-        await sock.sendMessage(from, {
-          image: { url: './media/q.jpg' },
-          caption: `💳 Total: Rp${item.harga.toLocaleString('id-ID')}`
-        }, { quoted: msg });
-        return true;
-      }
-    }
-    return false;
+    selectedNominalMap.set(userId, parseInt(item.harga) || 0)
+    lastCommandMap.set(userId, `${item.provider} ${item.produk}`)
+    produkMap.delete(userId)
+
+    const harga = parseInt(item.harga) || 0
+
+    const info = `✅ Kamu memilih *${item.provider} - ${item.produk}*
+💰 Harga: Rp${harga.toLocaleString('id-ID')}
+
+Silakan transfer ke metode berikut:
+• Dana: 08xxxxxxxxxx
+• Gopay: 08xxxxxxxxxx
+• BCA: 1234567890 a.n. AURA SHOP
+
+📷 QRIS Allpay tersedia di bawah ini!
+
+Setelah transfer, kirim:
+- Nomor HP tujuan
+- Bukti transfer
+
+======= CONTOH =======
+Nomor: 08123456789
+Bukti TF: (foto)`
+
+    await sock.sendMessage(from, { text: info }, { quoted: msg })
+
+    await sock.sendMessage(from, {
+      image: { url: './media/q.jpg' },
+      caption: `💳 Total: Rp${harga.toLocaleString('id-ID')}`,
+    }, { quoted: msg })
+
+    return true
   }
 
-  // ✅ 3. Memulai sesi baru
-  if (lowerText === 'beli pulsa' || lowerText === '.pulsa') {
-    let dataArr = [];
-    try {
-      const raw = fs.readFileSync(path.join(__dirname, '../data/pulsa.json'), 'utf-8');
-      dataArr = JSON.parse(raw);
-    } catch {}
-
-    if (!Array.isArray(dataArr) || dataArr.length === 0) {
-      await sock.sendMessage(from, {
-        text: '❌ Tidak ada produk pulsa tersedia.'
-      }, { quoted: msg });
-      return true;
+  if (lowerText === '.pulsa' || lowerText === 'beli pulsa') {
+    const list = await getProdukDariTabel('pulsa')
+    if (!Array.isArray(list) || list.length === 0) {
+      await sock.sendMessage(from, { text: '❌ Tidak ada produk pulsa tersedia.' }, { quoted: msg })
+      return true
     }
 
-    const grouped = {};
-    dataArr.forEach(item => {
-      const prov = (item.provider || 'Lainnya').toUpperCase();
-      if (!grouped[prov]) grouped[prov] = [];
-      grouped[prov].push(item);
-    });
+    const grouped = {}
+    list.forEach(item => {
+      const provider = (item.provider || 'Lainnya').toUpperCase()
+      if (!grouped[provider]) grouped[provider] = []
+      grouped[provider].push(item)
+    })
 
-    const flatList = [];
-    let output = '📱 *Daftar Pulsa Tersedia:*\n\n';
-    let count = 1;
+    let output = `🔋 *Daftar Pulsa Tersedia:*\n\n`
+    let flatList = []
+    let counter = 1
 
-    for (const prov in grouped) {
-      output += `📡 *${prov}*\n`;
-      grouped[prov].forEach(item => {
-        const nama = item.produk || item.nominal || '';
-        const hargaNum = parseInt(item.harga) || 0;
-        output += `${count}. ${nama} - Rp${hargaNum.toLocaleString('id-ID')}\n`;
-        flatList.push({
-          provider: item.provider,
-          nominal: nama,
-          harga: hargaNum,
-          nomor: count
-        });
-        count++;
-      });
-      output += '\n';
+    for (const provider in grouped) {
+      output += `📡 *${provider}*\n`
+      grouped[provider].forEach(item => {
+        const produk = item.produk
+        const harga = parseInt(item.harga) || 0
+        output += `${counter}: ${produk} - Rp${harga.toLocaleString('id-ID')}\n`
+        flatList.push({ ...item, nomor: counter })
+        counter++
+      })
+      output += '\n'
     }
 
-    output += `Ketik angka (contoh: 3) untuk memilih pulsa.\nAtau ketik */keluar* untuk membatalkan.`;
-    produkPulsaMap.set(userId, flatList);
-    sessionMap.set(userId, { type: 'pulsa' }); // ✅ Simpan sesi baru
+    output += `Ketik angka (contoh: 2) untuk memilih nominal pulsa.\nAtau ketik */keluar* untuk membatalkan.`
 
-    await sock.sendMessage(from, { text: output }, { quoted: msg });
-    return true;
+    produkMap.set(userId, flatList)
+    await sock.sendMessage(from, { text: output }, { quoted: msg })
+    return true
   }
 
-  return false;
+  return false
 }
 
 module.exports = {
   handlePulsa,
-  selectedPulsaMap,
-  lastPulsaMap
-};
+  selectedNominalMap,
+  lastCommandMap
+}

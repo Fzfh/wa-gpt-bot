@@ -120,12 +120,13 @@ if (text.startsWith('/') || text.startsWith('.')) {
      const handledMenfess = await menfess(sock, msg, text)
     if (handledMenfess) return
 
-    if (!text.startsWith('/')) {
-      const handledKouta = await handlekouta(sock, msg)
-      if (handledKouta) return
+      const handledkouta = await handlekouta(sock, msg, , lowerText, userId, sender)
+      if (handledkouta) return
 
     const handledPulsa = await handlePulsa(sock, msg, lowerText, userId, sender)
       if (handledPulsa) return
+    
+    if (!text.startsWith('/')) {
     const sesi = sessionMap.get(sender);
 
     if (sesi && sesi.type === 'hapus') {

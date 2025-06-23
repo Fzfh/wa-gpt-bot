@@ -21,7 +21,8 @@ function getPulsaList() {
 }
 
 async function handlePulsa(sock, msg, lowerText, from) {
-  const userId = msg.key.participant || msg.key.remoteJid
+  const isGroup = msg.key.remoteJid.endsWith('@g.us')
+  const userId = isGroup ? msg.key.participant : msg.key.remoteJid
   console.log('[Pulsa] userId:', userId)
   console.log('[Pulsa] Session exists:', produkPulsaMap.has(userId))
   console.log('[Debug] remoteJid:', msg.key.remoteJid)

@@ -120,7 +120,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
      const handledMenfess = await menfess(sock, msg, text)
     if (handledMenfess) return
 
-      const handledkouta = await handlekouta(sock, msg, , lowerText, userId, sender)
+      const handledkouta = await handlekouta(sock, msg, lowerText, userId, sender)
       if (handledkouta) return
 
     const handledPulsa = await handlePulsa(sock, msg, lowerText, userId, sender)

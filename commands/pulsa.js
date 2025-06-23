@@ -1,12 +1,14 @@
 const { produkPulsaMap, selectedPulsaMap, lastPulsaMap } = require('../core/state')
+const sessionMap = require('../core/sessionStore');
 
 async function handlePulsa(sock, msg, lowerText, userId, from) {
   // Keluar dari sesi
-  if (lowerText === '/keluar') {
+  if (text === '/keluar') {
     if (produkPulsaMap.has(userId)) {
       produkPulsaMap.delete(userId)
       selectedPulsaMap.delete(userId)
       lastPulsaMap.delete(userId)
+      sessionMap.delete(userId)
       await sock.sendMessage(from, { text: '❌ Kamu telah keluar dari sesi pembelian pulsa.' }, { quoted: msg })
       return true
     }
@@ -56,12 +58,13 @@ Bukti TF: (foto)`
       image: { url: './media/q.jpg' },
       caption: `💳 Total: Rp${harga.toLocaleString('id-ID')}`,
     }, { quoted: msg })
-
+    sessionMap.delete(userId)
+    
     return true
   }
 
   if (lowerText === '.pulsa' || lowerText === 'beli pulsa') {
-    const list = await getProdukDariTabel('pulsa')
+    sessionMap.set(userId, { type: 'pulsa' })
     if (!Array.isArray(list) || list.length === 0) {
       await sock.sendMessage(from, { text: '❌ Tidak ada produk pulsa tersedia.' }, { quoted: msg })
       return true

@@ -20,7 +20,7 @@ function getKoutaList() {
   }
 }
 
-async function handlekouta(sock, msg) {
+async function handlekouta(sock, msg, lowerText, userId, from) {
   const from = msg.key.remoteJid
   const userId = msg.key.participant || msg.key.remoteJid
   const text = (

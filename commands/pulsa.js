@@ -1,10 +1,10 @@
 const fs = require('fs')
 const path = require('path')
 
-// Akses map langsung dari globalThis (tidak import dari state.js)
-const produkPulsaMap = globalThis.produkPulsaMap || new Map()
-const selectedPulsaMap = globalThis.selectedPulsaMap || new Map()
-const lastPulsaMap = globalThis.lastPulsaMap || new Map()
+const produkPulsaMap = globalThis.produkPulsaMap
+const selectedPulsaMap = globalThis.selectedPulsaMap
+const lastPulsaMap = globalThis.lastPulsaMap
+
 
 // Clear langsung, tanpa import helper
 function clearPulsaSession(userId) {

@@ -1,7 +1,10 @@
 const fs = require('fs')
 const path = require('path')
-const sessionMap = require('../core/sessionStore');
-const { produkKoutaMap, selectedKoutaMap, lastKoutaMap } = require('../core/state')
+
+const produkMap = new Map()
+const selectedKoutaNominalMap = new Map()
+const lastKoutaCommandMap = new Map()
+
 //  Load data kouta dari file JSON ada di data bang
 function getKoutaList() {
   const filePath = path.join(__dirname, '../data/kouta.json')
@@ -22,20 +25,9 @@ async function handlekouta(sock, msg) {
     msg.message?.extendedTextMessage?.text ||
     ''
   ).toLowerCase().trim()
-  if (text === '/keluar') {
-    if (produkKoutaMap.has(userId)) {
-      produkKoutaMap.delete(userId)
-      selectedKoutaMap.delete(userId)
-      lastKoutaMap.delete(userId)
-      sessionMap.delete(userId) // Tambahkan ini untuk hapus sesi juga
-      await sock.sendMessage(from, { text: '❌ Kamu telah keluar dari sesi pembelian pulsa.' }, { quoted: msg })
-      return true
-    }
-    return false
-  }
+
   // STEP 1: Tampilkan daftar kuota
   if (text === '.kouta' || text === 'beli kouta') {
-    sessionMap.set(userId, { type: 'kouta' })
     console.log('🔥 KOUTA command diterima:', text)
     console.log('📁 Isi kouta.json:', getKoutaList())
 
@@ -69,13 +61,13 @@ async function handlekouta(sock, msg) {
 
     output += `Ketik angka (contoh: 3) untuk memilih kuota.`
 
-    produkKoutaMap.set(userId, flatList)
+    produkMap.set(userId, flatList)
     await sock.sendMessage(from, { text: output }, { quoted: msg })
     return true
   }
 
   // STEP 2: Tangani input pilihan angka
-  const list = produkKoutaMap.get(userId)
+  const list = produkMap.get(userId)
   if (!Array.isArray(list) || list.length === 0) return false
 
   const pilihIndex = parseInt(text)
@@ -83,9 +75,9 @@ async function handlekouta(sock, msg) {
 
   if (!item) return false
 
-  selectedKoutaMap.set(userId, parseInt(item.harga) || 0)
-  lastKoutaMap.set(userId, `${item.provider} ${item.produk}`)
-  produkKoutaMap.delete(userId)
+  selectedKoutaNominalMap.set(userId, parseInt(item.harga) || 0)
+  lastKoutaCommandMap.set(userId, `${item.provider} ${item.produk}`)
+  produkMap.delete(userId)
 
   const harga = parseInt(item.harga) || 0
 
@@ -113,13 +105,12 @@ Bukti TF: (foto)`
     image: { url: './media/q.jpg' },
     caption: `💳 Total: Rp${harga.toLocaleString('id-ID')}`,
   }, { quoted: msg })
-sessionMap.delete(userId) 
 
-return true
+  return true
 }
 
 module.exports = {
   handlekouta,
-  selectedKoutaMap,
-  lastKoutaMap
+  selectedKoutaNominalMap,
+  lastKoutaCommandMap
 }

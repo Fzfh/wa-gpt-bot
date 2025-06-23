@@ -41,8 +41,8 @@ async function botFirstResponse({ sock, sender, msg }, options = {}) {
 async function handleResponder(sock, msg) {
   try {
     if (!msg.message) return
-    const sesi = sessionMap.get(sender);
     const sender = msg.key.remoteJid
+    const sesi = sessionMap.get(sender);
     const userId = sender
     const from = sender
     const actualUserId =

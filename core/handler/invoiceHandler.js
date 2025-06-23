@@ -1,5 +1,5 @@
-const { handlePulsa, selectedNominalMap: pulsaNominalMap, lastCommandMap: pulsaCommandMap } = require('../../commands/pulsa')
-const { handleKouta, selectedKoutaNominalMap: koutaNominalMap, lastKoutaCommandMap: koutaCommandMap } = require('../../commands/kouta')
+const { handlePulsa, selectedPulsaMap, lastPulsaMap } = require('../../commands/pulsa')
+const { handlekouta, selectedKoutaMap, lastKoutaMap } = require('../../commands/kouta')
 const { listTopup, getHargaFromDB, selectedTopupNominalMap: topupNominalMap, lastTopupCommandMap: topupCommandMap } = require('../../commands/topup')
 
 const { 
@@ -10,10 +10,10 @@ const {
 // Wrapper untuk handle invoice
 async function handleInvoiceTopupWrapper(sock, msg, lowerText, userId, sender) {
   return await handleInvoiceTopup(sock, msg, lowerText, userId, sender, {
-    pulsaNominalMap,
-    koutaNominalMap,
-    pulsaCommandMap,
-    koutaCommandMap,
+    selectedPulsaMap,
+    selectedKoutaMap,
+    lastPulsaMap,
+    lastKoutaMap,
     topupNominalMap,
     topupCommandMap
   })
@@ -21,13 +21,13 @@ async function handleInvoiceTopupWrapper(sock, msg, lowerText, userId, sender) {
 
 // Ambil nominal dan produk
 const getUserNominal = (userId) =>
-  pulsaNominalMap.get(userId) ||
-  koutaNominalMap.get(userId) ||
+  selectedPulsaMap.get(userId) ||
+  selectedKoutaMap.get(userId) ||
   topupNominalMap.get(userId)
 
 const getUserProduk = (userId) =>
-  pulsaCommandMap.get(userId) ||
-  koutaCommandMap.get(userId) ||
+  lastPulsaMap.get(userId) ||
+  lastKoutaMap.get(userId) ||
   topupCommandMap.get(userId)
 
 // Handler utama invoice
@@ -76,12 +76,12 @@ async function handleInvoiceTopup(sock, msg, text, userId, sender) {
   })
 
   // Hapus sesi
-  pulsaNominalMap.delete(actualUserId)
-  koutaNominalMap.delete(actualUserId)
+  selectedPulsaMap.delete(actualUserId)
+  selectedKoutaMap.delete(actualUserId)
   topupNominalMap.delete(actualUserId)
 
-  pulsaCommandMap.delete(actualUserId)
-  koutaCommandMap.delete(actualUserId)
+  lastPulsaMap.delete(actualUserId)
+  lastKoutaMap.delete(actualUserId)
   topupCommandMap.delete(actualUserId)
 
   return true

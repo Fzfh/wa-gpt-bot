@@ -1,16 +1,16 @@
-const produkPulsaMap = new Map();
-const selectedPulsaMap = new Map();
-const lastPulsaMap = new Map();
+global.produkPulsaMap = global.produkPulsaMap || new Map()
+global.selectedPulsaMap = global.selectedPulsaMap || new Map()
+global.lastPulsaMap = global.lastPulsaMap || new Map()
 
-const produkKoutaMap = new Map();
-const selectedKoutaMap = new Map();
-const lastKoutaMap = new Map();
+const produkKoutaMap = new Map()
+const selectedKoutaMap = new Map()
+const lastKoutaMap = new Map()
 
 module.exports = {
-  produkPulsaMap,
-  selectedPulsaMap,
-  lastPulsaMap,
+  produkPulsaMap: global.produkPulsaMap,
+  selectedPulsaMap: global.selectedPulsaMap,
+  lastPulsaMap: global.lastPulsaMap,
   produkKoutaMap,
   selectedKoutaMap,
   lastKoutaMap
-};
+}

@@ -25,7 +25,16 @@ async function handlekouta(sock, msg) {
     msg.message?.extendedTextMessage?.text ||
     ''
   ).toLowerCase().trim()
-
+   if (lowerText === '/keluar') {
+    if (produkMap.has(userId)) {
+      produkMap.delete(userId)
+      selectedKoutaNominalMap.delete(userId)
+      lastKoutaCommandMap.delete(userId)
+      await sock.sendMessage(from, { text: '❌ Kamu telah keluar dari sesi pembelian pulsa.' }, { quoted: msg })
+      return true
+    }
+    return false
+  }
   // STEP 1: Tampilkan daftar kuota
   if (text === '.kouta' || text === 'beli kouta') {
     console.log('🔥 KOUTA command diterima:', text)

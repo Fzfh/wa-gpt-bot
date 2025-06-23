@@ -47,6 +47,10 @@ async function handlePulsa(sock, msg, lowerText, from) {
   // Kalau user dalam sesi dan kirim angka
   if (produkPulsaMap.has(userId)) {
     const list = produkPulsaMap.get(userId)
+    console.log('[Session Check] userId:', `"${userId}"`)
+console.log('[Session Check] Keys:', Array.from(produkPulsaMap.keys()))
+console.log('[Session Check] Exists:', produkPulsaMap.has(userId))
+
 
     if (Array.isArray(list) && /^\d+$/.test(text)) {
       const pilihIndex = parseInt(text)

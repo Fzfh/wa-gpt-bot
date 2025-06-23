@@ -1,14 +1,15 @@
-const { produkPulsaMap, selectedPulsaMap, lastPulsaMap } = require('../core/state')
-const sessionMap = require('../core/sessionStore');
+const { getProdukDariTabel } = require('./produk')
+const produkMap = new Map()
+const selectedNominalMap = new Map()
+const lastCommandMap = new Map()
 
 async function handlePulsa(sock, msg, lowerText, userId, from) {
   // Keluar dari sesi
-  if (text === '/keluar') {
-    if (produkPulsaMap.has(userId)) {
-      produkPulsaMap.delete(userId)
-      selectedPulsaMap.delete(userId)
-      lastPulsaMap.delete(userId)
-      sessionMap.delete(userId)
+  if (lowerText === '/keluar') {
+    if (produkMap.has(userId)) {
+      produkMap.delete(userId)
+      selectedNominalMap.delete(userId)
+      lastCommandMap.delete(userId)
       await sock.sendMessage(from, { text: '❌ Kamu telah keluar dari sesi pembelian pulsa.' }, { quoted: msg })
       return true
     }
@@ -16,21 +17,21 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
   }
 
   // Jika user masih dalam sesi
-  if (produkPulsaMap.has(userId)) {
+  if (produkMap.has(userId)) {
     if (lowerText === '.pulsa' || lowerText === 'beli pulsa') {
       await sock.sendMessage(from, { text: '⚠️ Kamu sedang dalam sesi pembelian pulsa.\nKetik */keluar* untuk keluar dari sesi ini.' }, { quoted: msg })
       return true
     }
 
-    const list = produkPulsaMap.get(userId)
+    const list = produkMap.get(userId)
     const pilihIndex = parseInt(lowerText)
     const item = list.find(i => i.nomor === pilihIndex)
 
     if (!item) return false
 
-    selectedPulsaMap.set(userId, parseInt(item.harga) || 0)
-    lastPulsaMap.set(userId, `${item.provider} ${item.produk}`)
-    produkPulsaMap.delete(userId)
+    selectedNominalMap.set(userId, parseInt(item.harga) || 0)
+    lastCommandMap.set(userId, `${item.provider} ${item.produk}`)
+    produkMap.delete(userId)
 
     const harga = parseInt(item.harga) || 0
 
@@ -58,13 +59,12 @@ Bukti TF: (foto)`
       image: { url: './media/q.jpg' },
       caption: `💳 Total: Rp${harga.toLocaleString('id-ID')}`,
     }, { quoted: msg })
-    sessionMap.delete(userId)
-    
+
     return true
   }
 
   if (lowerText === '.pulsa' || lowerText === 'beli pulsa') {
-    sessionMap.set(userId, { type: 'pulsa' })
+    const list = await getProdukDariTabel('pulsa')
     if (!Array.isArray(list) || list.length === 0) {
       await sock.sendMessage(from, { text: '❌ Tidak ada produk pulsa tersedia.' }, { quoted: msg })
       return true
@@ -95,7 +95,7 @@ Bukti TF: (foto)`
 
     output += `Ketik angka (contoh: 2) untuk memilih nominal pulsa.\nAtau ketik */keluar* untuk membatalkan.`
 
-    produkPulsaMap.set(userId, flatList)
+    produkMap.set(userId, flatList)
     await sock.sendMessage(from, { text: output }, { quoted: msg })
     return true
   }
@@ -105,6 +105,6 @@ Bukti TF: (foto)`
 
 module.exports = {
   handlePulsa,
-  selectedPulsaMap,
-  lastPulsaMap
+  selectedNominalMap,
+  lastCommandMap
 }

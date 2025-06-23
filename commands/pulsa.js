@@ -24,6 +24,9 @@ async function handlePulsa(sock, msg, lowerText, from) {
   const userId = msg.key.participant || msg.key.remoteJid
   console.log('[Pulsa] userId:', userId)
   console.log('[Pulsa] Session exists:', produkPulsaMap.has(userId))
+  console.log('[Debug] remoteJid:', msg.key.remoteJid)
+  console.log('[Debug] participant:', msg.key.participant)
+
   const text = (
     msg.message?.conversation ||
     msg.message?.extendedTextMessage?.text ||
@@ -33,6 +36,7 @@ async function handlePulsa(sock, msg, lowerText, from) {
   // Keluar dari sesi
   if (text === '/keluar') {
     clearPulsaSession(userId)
+    console.log('[Pulsa] clearPulsaSession triggered via /keluar for:', userId)
     await sock.sendMessage(from, {
       text: '❌ Kamu telah keluar dari sesi pembelian pulsa.'
     }, { quoted: msg })
@@ -129,6 +133,7 @@ Bukti TF: (foto)`
     output += `Ketik */keluar* untuk membatalkan sesi ini.`
 
     produkPulsaMap.set(userId, flatList)
+    console.log('[Pulsa] Mulai sesi pulsa, set produkPulsaMap:', userId)
     await sock.sendMessage(from, { text: output }, { quoted: msg })
     return true
   }

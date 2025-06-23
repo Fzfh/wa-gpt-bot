@@ -20,7 +20,10 @@ function getPulsaList() {
   }
 }
 
-async function handlePulsa(sock, msg, lowerText, userId, from) {
+async function handlePulsa(sock, msg, lowerText, from) {
+  const userId = msg.key.participant || msg.key.remoteJid
+  console.log('[Pulsa] userId:', userId)
+  console.log('[Pulsa] Session exists:', produkPulsaMap.has(userId))
   const text = (
     msg.message?.conversation ||
     msg.message?.extendedTextMessage?.text ||

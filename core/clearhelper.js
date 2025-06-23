@@ -1,4 +1,12 @@
-// core/state.js (tambahkan)
+const {
+  produkPulsaMap,
+  selectedPulsaMap,
+  lastPulsaMap,
+  produkKoutaMap,
+  selectedKoutaMap,
+  lastKoutaMap
+} = require('./state');
+
 function clearPulsaSession(userId) {
   produkPulsaMap.delete(userId);
   selectedPulsaMap.delete(userId);

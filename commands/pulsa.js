@@ -29,7 +29,7 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
       if (!item) return false
 
       selectedPulsaMap.set(userId, parseInt(item.harga) || 0)
-      lastPulsaMap.set(userId, ${item.provider} ${item.produk})
+      lastPulsaMap.set(userId, '${item.provider} ${item.produk}')
       produkPulsaMap.delete(userId)
 
       const harga = parseInt(item.harga) || 0

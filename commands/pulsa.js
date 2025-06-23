@@ -29,7 +29,7 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
       if (!item) return false
 
       selectedPulsaMap.set(userId, parseInt(item.harga) || 0)
-      lastPulsaMap.set(userId, '${item.provider} ${item.produk}')
+      lastPulsaMap.set(userId, `${item.provider} ${item.produk}`)
       produkPulsaMap.delete(userId)
 
       const harga = parseInt(item.harga) || 0
@@ -56,7 +56,7 @@ Bukti TF: (foto)`
 
       await sock.sendMessage(from, {
         image: { url: './media/q.jpg' },
-        caption: "💳 Total: Rp${harga.toLocaleString('id-ID')}",
+        caption: `💳 Total: Rp${harga.toLocaleString('id-ID')}`,
       }, { quoted: msg })
 
       return true
@@ -83,23 +83,23 @@ Bukti TF: (foto)`
       grouped[provider].push(item)
     })
 
-    let output = 🔋 *Daftar Pulsa Tersedia:*\n\n
+    let output = `🔋 *Daftar Pulsa Tersedia:*\n\n`
     let flatList = []
     let counter = 1
 
     for (const provider in grouped) {
-      output += 📡 *${provider}*\n
+      output += `📡 *${provider}*\n`
       grouped[provider].forEach(item => {
         const produk = item.produk
         const harga = parseInt(item.harga) || 0
-        output += ${counter}: ${produk} - Rp${harga.toLocaleString('id-ID')}\n
+        output += `${counter}: ${produk} - Rp${harga.toLocaleString('id-ID')}\n`
         flatList.push({ ...item, nomor: counter })
         counter++
       })
       output += '\n'
     }
 
-    output += Ketik angka (contoh: 2) untuk memilih nominal pulsa.\nAtau ketik */keluar* untuk membatalkan.
+    output += "Ketik angka (contoh: 2) untuk memilih nominal pulsa.\nAtau ketik */keluar* untuk membatalkan."
 
     produkPulsaMap.set(userId, flatList)
     await sock.sendMessage(from, { text: output }, { quoted: msg })

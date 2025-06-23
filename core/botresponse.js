@@ -6,6 +6,7 @@ const add = require('../commands/add');
 // const { handleAutoKick } = require('../commands/auto_kick')
 const { handleTopupInput } = require('../core/handler/topupHandler')
 const {  handleInvoiceTopupWrapper } = require('../core/handler/invoiceHandler')
+const { handlePulsaKuotaInvoice } = require('../core/handler/pulsaHandler')
 const { handleMarkPaid } = require('../core/handler/paid')
 const { handleStaticCommand } = require('../core/handler/staticCommand')
 const { handleCommand } = require('../core/handler/commandHandler')
@@ -19,8 +20,8 @@ const { createStickerFromMessage, createStickerFromText } = require('../core/sti
 const { addInvoice, getInvoiceByMsgId, setPaidByMsgId, getAllInvoices, generateInvoiceId, clearAllInvoices } = require('../core/invoices')
 const { listTopup, getHargaFromDB, selectedTopupMap, lastTopupCommandMap } = require('../commands/topup')
 const { getProdukDariTabel } = require('../commands/produk')
-const { handlePulsa, selectedPulsaMap, lastPulsaMap } = require('../commands/pulsa')
-const { handlekouta, selectedKoutaMap, lastKoutaMap } = require('../commands/kouta')
+const { handlePulsa, selectedNominalMap: pulsaNominalMap, lastCommandMap: pulsaCommandMap } = require('../commands/pulsa')
+const { handlekouta, selectedKoutaNominalMap, lastKoutaCommandMap } = require('../commands/kouta')
 const sessionMap = require('../core/sessionStore');
 const hapusProduk = require('../commands/hapusProduk');
 const tambahProduk = require('../commands/tambahProduk');
@@ -42,7 +43,6 @@ async function handleResponder(sock, msg) {
   try {
     if (!msg.message) return
     const sender = msg.key.remoteJid
-    const sesi = sessionMap.get(sender);
     const userId = sender
     const from = sender
     const actualUserId =
@@ -71,7 +71,7 @@ async function handleResponder(sock, msg) {
 
       const handledCommand = await handleCommand(sock, msg, lowerText, userId, from, body, sender)
        if (handledCommand) return
-       
+
     // Anti-spam
    // Hanya hitung spam jika dia mengirim command (pakai / atau . di awal)
 if (text.startsWith('/') || text.startsWith('.')) {
@@ -101,35 +101,15 @@ if (text.startsWith('/') || text.startsWith('.')) {
         botBehavior: { botName: 'AuraBot', botMenu: '/menu' }
       })
     }
-    
+
     const handledPaid = await handleMarkPaid(sock, msg, lowerText, userId, sender, adminList)
     if (handledPaid) return
 
     const handledTopup = await handleTopupInput(sock, msg, lowerText, userId, sender)
     if (handledTopup) return
-    
+
     const handledInvoice = await handleInvoiceTopupWrapper(sock, msg, lowerText, userId, sender)
     if (handledInvoice) return
-
-    console.log('DEBUG: sender:', sender);
-    console.log('DEBUG: sesi:', sesi);
-
-    
-    if (lowerText === '/keluar' && sesi) {
-      const sesiNama = {
-        tambah: 'Tambah Produk',
-        hapus: 'Hapus Produk',
-        pulsa: 'Pembelian Pulsa',
-        kouta: 'Pembelian Kuota'
-      }[sesi.type] || sesi.type
-      console.log('DEBUG: Sesi aktif user:', sender, sesi);
-    
-      sessionMap.delete(sender)
-      await sock.sendMessage(sender, {
-        text: `✅ Sesi *${sesiNama}* telah dibatalkan.`
-      }, { quoted: msg })
-      return true
-    }
 
     // await handleAutoKick(sock, msg)
 
@@ -139,23 +119,22 @@ if (text.startsWith('/') || text.startsWith('.')) {
 
      const handledMenfess = await menfess(sock, msg, text)
     if (handledMenfess) return
-    
+
     if (!text.startsWith('/')) {
-      
-    if (sesi && sesi.type === 'hapus') {
-      return await hapusProduk(sock, msg, from, body);
-    }
-        
-    if (sesi && sesi.type === 'tambah') {
-      return await tambahProduk(sock, msg, from, body);
-    }
-      
-    const handledkouta = await handlekouta(sock, msg, lowerText, userId, sender)
-      if (handledkouta) return
+      const handledKouta = await handlekouta(sock, msg)
+      if (handledKouta) return
 
     const handledPulsa = await handlePulsa(sock, msg, lowerText, userId, sender)
       if (handledPulsa) return
-      
+    const sesi = sessionMap.get(sender);
+
+    if (sesi && sesi.type === 'hapus') {
+      return await hapusProduk(sock, msg, from, body);
+    }
+
+    if (sesi && sesi.type === 'tambah') {
+      return await tambahProduk(sock, msg, from, body);
+    }
     if (text.startsWith('.kick')) {
       return await kick(sock, msg, text, isGroup)
     }
@@ -235,7 +214,7 @@ if (text === '.reset') {
       return sock.sendMessage(sender, { text: 'Maaf, aku gak ngerti perintah itu 😵. Coba ketik /menu yaa!' }, { quoted: msg })
     }
     }
-    
+
   } catch (error) {
     console.error('❌ Error di handleResponder:', error)
   }
@@ -254,7 +233,7 @@ module.exports = {
   botFirstResponse,
   handlePulsa,
   handlekouta,
-  selectedKoutaMap,
-  lastKoutaMap,
+  selectedNominalMap: selectedKoutaNominalMap,
+  lastCommandMap: lastKoutaCommandMap,
   registerGroupUpdateListener
 }

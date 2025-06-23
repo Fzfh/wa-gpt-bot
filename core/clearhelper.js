@@ -8,6 +8,7 @@ const {
 } = require('./state');
 
 function clearPulsaSession(userId) {
+  console.log('🧹 clearPulsaSession for:', userId)
   produkPulsaMap.delete(userId);
   selectedPulsaMap.delete(userId);
   lastPulsaMap.delete(userId);

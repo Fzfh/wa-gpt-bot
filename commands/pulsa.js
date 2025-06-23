@@ -1,12 +1,18 @@
 const fs = require('fs')
 const path = require('path')
 
-const {
-  produkPulsaMap,
-  selectedPulsaMap,
-  lastPulsaMap
-} = require('../core/state')
-const { clearKoutaSession, clearPulsaSession } = require('../core/clearhelper')
+// Akses map langsung dari globalThis (tidak import dari state.js)
+const produkPulsaMap = globalThis.produkPulsaMap || new Map()
+const selectedPulsaMap = globalThis.selectedPulsaMap || new Map()
+const lastPulsaMap = globalThis.lastPulsaMap || new Map()
+
+// Clear langsung, tanpa import helper
+function clearPulsaSession(userId) {
+  produkPulsaMap.delete(userId)
+  selectedPulsaMap.delete(userId)
+  lastPulsaMap.delete(userId)
+  console.log('🧹 [CLEAR_LOCAL] clearPulsaSession for:', userId)
+}
 
 function getPulsaList() {
   const filePath = path.join(__dirname, '../data/pulsa.json')
@@ -30,27 +36,18 @@ async function handlePulsa(sock, msg, lowerText, from) {
 
   console.log('[Pulsa] userId:', userId)
   console.log('[Pulsa] Session exists:', produkPulsaMap.has(userId))
-  console.log('[Debug] remoteJid:', msg.key.remoteJid)
-  console.log('[Debug] participant:', msg.key.participant)
 
-  // Keluar dari sesi
   if (text === '/keluar') {
     clearPulsaSession(userId)
-    console.log('[DEBUG] Setelah clear: produkPulsaMap.has(userId):', produkPulsaMap.has(userId))
+    console.log('[CHECK] After /keluar -> produkPulsaMap.has:', produkPulsaMap.has(userId))
     await sock.sendMessage(from, {
       text: '❌ Kamu telah keluar dari sesi pembelian pulsa.'
     }, { quoted: msg })
     return true
   }
 
-  // User masih dalam sesi
   if (produkPulsaMap.has(userId)) {
     const list = produkPulsaMap.get(userId)
-    console.log('[Session Check] userId:', userId)
-    console.log('[Session Check] Keys:', Array.from(produkPulsaMap.keys()))
-    console.log('[Session Check] Exists:', produkPulsaMap.has(userId))
-
-    // Jika input angka valid
     if (Array.isArray(list) && /^\d+$/.test(text)) {
       const pilihIndex = parseInt(text)
       const item = list.find(i => i.nomor === pilihIndex)
@@ -88,17 +85,14 @@ Bukti TF: (foto)`
       return true
     }
 
-    // Dalam sesi tapi input bukan angka
     await sock.sendMessage(from, {
-      text: '⚠️ Kamu masih dalam sesi pembelian pulsa. Ketik angka untuk memilih atau *ketik /keluar* untuk membatalkan.',
+      text: '⚠️ Kamu masih dalam sesi pembelian pulsa. Ketik angka atau */keluar*.',
       quoted: msg
     })
     return true
   }
 
-  // Mulai sesi baru
   if (text === '.pulsa' || text === 'beli pulsa') {
-    clearKoutaSession(userId)
     clearPulsaSession(userId)
 
     const list = getPulsaList()
@@ -110,33 +104,31 @@ Bukti TF: (foto)`
     }
 
     const grouped = {}
+    let flatList = []
+    let output = '🔋 *Daftar Pulsa Tersedia:*\n\n'
+    let nomor = 1
+
     list.forEach(item => {
       const provider = (item.provider || 'Lainnya').toUpperCase()
       if (!grouped[provider]) grouped[provider] = []
       grouped[provider].push(item)
     })
 
-    let output = `🔋 *Daftar Pulsa Tersedia:*\n\n`
-    let flatList = []
-    let counter = 1
-
     for (const provider in grouped) {
       output += `📡 *${provider}*\n`
       grouped[provider].forEach(item => {
-        const produk = item.produk || ''
         const harga = parseInt(item.harga) || 0
-        output += `${counter}. ${produk} - Rp${harga.toLocaleString('id-ID')}\n`
-        flatList.push({ ...item, nomor: counter })
-        counter++
+        output += `${nomor}. ${item.produk} - Rp${harga.toLocaleString('id-ID')}\n`
+        flatList.push({ ...item, nomor })
+        nomor++
       })
       output += '\n'
     }
 
-    output += `Ketik angka (contoh: 3) untuk memilih pulsa.\n`
-    output += `Ketik */keluar* untuk membatalkan sesi ini.`
+    output += `Ketik angka (contoh: 2) untuk memilih pulsa.\nKetik */keluar* untuk membatalkan sesi.`
 
     produkPulsaMap.set(userId, flatList)
-    console.log('[Pulsa] Mulai sesi pulsa, set produkPulsaMap:', userId)
+    console.log('[Pulsa] Sesi baru set:', userId)
     await sock.sendMessage(from, { text: output }, { quoted: msg })
     return true
   }
@@ -144,8 +136,4 @@ Bukti TF: (foto)`
   return false
 }
 
-module.exports = {
-  handlePulsa,
-  selectedPulsaMap,
-  lastPulsaMap
-}
+module.exports = { handlePulsa }

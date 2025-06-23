@@ -6,6 +6,7 @@ const {
   DisconnectReason,
 } = require('@whiskeysockets/baileys');
 const { handleResponder, registerGroupUpdateListener } = require('./core/botresponse')
+require('./core/globals')
 const express = require('express');
 const fs = require('fs');
 const P = require('pino');

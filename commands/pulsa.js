@@ -56,7 +56,7 @@ Bukti TF: (foto)`
 
       await sock.sendMessage(from, {
         image: { url: './media/q.jpg' },
-        caption: 💳 Total: Rp${harga.toLocaleString('id-ID')},
+        caption: "💳 Total: Rp${harga.toLocaleString('id-ID')}",
       }, { quoted: msg })
 
       return true

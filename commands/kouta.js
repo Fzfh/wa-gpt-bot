@@ -1,17 +1,16 @@
 const fs = require('fs');
 const path = require('path');
 const { produkKoutaMap, selectedKoutaMap, lastKoutaMap } = require('../core/state');
+const { clearKoutaSession } = require('../core/clearhelper')
 const sessionMap = require('../core/sessionStore'); // ✅ Tambahan!
 
 async function handleKouta(sock, msg, lowerText, userId, from) {
     // ✅ 1. Tangani perintah /keluar
   if (lowerText === '/keluar') {
     const sesi = sessionMap.get(userId);
-    if (sesi?.type === 'pulsa') {
+    if (sesi?.type === 'kouta') {
       sessionMap.delete(userId);
-      produkKoutaMap.delete(userId);
-      selectedKoutaMap.delete(userId);
-      lastKoutaMap.delete(userId);
+     clearKoutaSession(userId);
 
       await sock.sendMessage(from, {
         text: '✅ Sesi pulsa kamu sudah diakhiri.'

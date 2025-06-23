@@ -20,7 +20,6 @@ function clearKoutaSession(userId) {
 }
 
 module.exports = {
-  ...,
   clearPulsaSession,
   clearKoutaSession
 };

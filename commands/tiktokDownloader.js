@@ -8,7 +8,7 @@ async function downloadTiktok(url) {
     if (data && data.play) {
       return {
         videoUrl: data.play,
-        musicUrl: data.music, // ✅ perbaikan di sini
+        musicUrl: data.music,
         title: data.title,
         cover: data.cover
       };

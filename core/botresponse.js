@@ -131,28 +131,37 @@ if (text.startsWith('/') || text.startsWith('.')) {
     const handledPulsa = await handlePulsa(sock, msg, lowerText, userId, sender)
       if (handledPulsa) return
 
-      if (body.startsWith('.dyt ')) {
-        const url = body.split(' ')[1];
-        if (!url) return sock.sendMessage(from, { text: '❌ Masukkan link YouTube.' });
-    
-        const res = await downloadYoutubeMedia(url);
-        if (!res) return sock.sendMessage(from, { text: '❌ Gagal download video.' });
-    
-        await sock.sendMessage(from, { video: fs.readFileSync(res.videoPath), caption: res.title }, { quoted: message });
-        fs.unlinkSync(res.videoPath);
-      }
+        if (body.startsWith('.dyt ')) {
+            try {
+              const url = body.split(' ')[1];
+              if (!url) return sock.sendMessage(from, { text: '❌ Masukkan link YouTube.' });
+          
+              const res = await downloadYoutubeMedia(url);
+              if (!res) return sock.sendMessage(from, { text: '❌ Gagal download video.' });
+          
+              await sock.sendMessage(from, { video: fs.readFileSync(res.videoPath), caption: res.title }, { quoted: msg });
+              fs.unlinkSync(res.videoPath);
+            } catch (e) {
+              console.error('❌ Gagal proses video YouTube:', e);
+              sock.sendMessage(from, { text: '⚠️ Error saat download video.' }, { quoted: msg });
+            }
+          }
 
-      if (body.startsWith('.dsyt ')) {
-          const url = body.split(' ')[1];
-          if (!url) return sock.sendMessage(from, { text: '❌ Masukkan link YouTube.' });
-      
-          const res = await downloadYoutubeMedia(url);
-          if (!res) return sock.sendMessage(from, { text: '❌ Gagal download audio.' });
-      
-          await sock.sendMessage(from, { audio: fs.readFileSync(res.audioPath), mimetype: 'audio/mp4' }, { quoted: message });
-          fs.unlinkSync(res.audioPath);
-        }
-      }
+        if (body.startsWith('.dsyt ')) {
+            try {
+              const url = body.split(' ')[1];
+              if (!url) return sock.sendMessage(from, { text: '❌ Masukkan link YouTube.' });
+          
+              const res = await downloadYoutubeMedia(url);
+              if (!res) return sock.sendMessage(from, { text: '❌ Gagal download audio.' });
+          
+              await sock.sendMessage(from, { audio: fs.readFileSync(res.audioPath), mimetype: 'audio/mp4' }, { quoted: msg });
+              fs.unlinkSync(res.audioPath);
+            } catch (e) {
+              console.error('❌ Gagal proses audio YouTube:', e);
+              sock.sendMessage(from, { text: '⚠️ Error saat download audio.' }, { quoted: msg });
+            }
+          }
 
     
           if (text.startsWith('.d ')) {

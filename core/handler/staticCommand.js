@@ -84,7 +84,7 @@ if (lowerText === 'beli kuota') {
 ┃
 ┃ ⬇ *Download VT Tiktok*
 ┃   ➤ .d link tiktok
-┃   ➤ Contoh: .d -https://www.tiktok.com/videokmu-
+┃   ➤ Contoh: .d https://www.tiktok.com/linkKamu
 ┃
 ┃ 🎮 *Top Up Game*
 ┃   ➤ topup ff

@@ -82,6 +82,10 @@ if (lowerText === 'beli kuota') {
 ┃ 💌 *Menfess Anonim*
 ┃   ➤ /menfess
 ┃
+┃ ⬇ *Download VT Tiktok*
+┃   ➤ .d link tiktok
+┃   ➤ Contoh: .d https://www.tiktok.com/@engzkasa/video/7514353186384252216?is_from_webapp=1&sender_device=pc
+┃
 ┃ 🎮 *Top Up Game*
 ┃   ➤ topup ff
 ┃   ➤ topup ml

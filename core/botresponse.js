@@ -130,29 +130,23 @@ if (text.startsWith('/') || text.startsWith('.')) {
 
     const handledPulsa = await handlePulsa(sock, msg, lowerText, userId, sender)
       if (handledPulsa) return
-
-      if (body.startsWith('.up')) {
-          const caption = body.split(' ').slice(1).join(' ').trim();
-          await uploadStatus(sock, msg, caption);
-        }
-
     
-          if (text.startsWith('.d ')) {
-            const link = text.split(' ')[1]
+    if (text.startsWith('.d ')) {
+       const link = text.split(' ')[1]
           
-            if (!link || !link.includes('tiktok.com')) {
-              await sock.sendMessage(from, { text: '❌ Link TikTok tidak valid!' }, { quoted: msg })
+       if (!link || !link.includes('tiktok.com')) {
+         
+          await sock.sendMessage(from, { text: '❌ Link TikTok tidak valid!' }, { quoted: msg })
+          return
+        }
+          await sock.sendMessage(from, { text: '⏳ Sedang mengunduh video TikTok...' }, { quoted: msg })
+          
+          try {
+           const result = await downloadTiktok(link)
+            if (!result || !result.videoUrl) {
+               await sock.sendMessage(from, { text: '❌ Gagal mengunduh video TikTok.' }, { quoted: msg })
               return
             }
-          
-            await sock.sendMessage(from, { text: '⏳ Sedang mengunduh video TikTok...' }, { quoted: msg })
-          
-            try {
-              const result = await downloadTiktok(link)
-              if (!result || !result.videoUrl) {
-                await sock.sendMessage(from, { text: '❌ Gagal mengunduh video TikTok.' }, { quoted: msg })
-                return
-              }
           
               await sock.sendMessage(from, {
                 video: { url: result.videoUrl }

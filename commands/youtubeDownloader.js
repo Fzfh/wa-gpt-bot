@@ -1,39 +1,40 @@
-const fs = require('fs');
-const path = require('path');
-const ytdl = require('@distube/ytdl-core'); // pakai versi stabil
 const { v4: uuidv4 } = require('uuid');
+const path = require('path');
+const fs = require('fs');
+const youtubedl = require('youtube-dl-exec');
 
 async function downloadYoutubeMedia(url) {
   try {
-    const info = await ytdl.getInfo(url);
-    const title = info.videoDetails.title.replace(/[^\w\s]/gi, '');
-
+    const id = uuidv4();
     const tempDir = path.join(__dirname, '../temp');
-    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
 
-    // Video (360p+audio)
-    const videoPath = path.join(tempDir, `${uuidv4()}.mp4`);
-    await streamToFile(ytdl(url, { quality: '18' }), videoPath);
+    const videoPath = path.join(tempDir, `${id}.mp4`);
+    const audioPath = path.join(tempDir, `${id}.mp3`);
 
-    // Audio (mp3)
-    const audioPath = path.join(tempDir, `${uuidv4()}.mp3`);
-    await streamToFile(ytdl(url, { filter: 'audioonly' }), audioPath);
+    // Download video (resolusi <= 720p)
+    await youtubedl(url, {
+      output: videoPath,
+      format: 'bestvideo[height<=720]+bestaudio/best',
+      mergeOutputFormat: 'mp4'
+    });
 
-    return { title, videoPath, audioPath };
+    // Download audio ke MP3
+    await youtubedl(url, {
+      output: audioPath,
+      extractAudio: true,
+      audioFormat: 'mp3'
+    });
 
+    return {
+      title: `Berhasil diunduh dari YouTube`,
+      videoPath,
+      audioPath
+    };
   } catch (err) {
     console.error('Download Error:', err);
     return null;
   }
-}
-
-function streamToFile(stream, filepath) {
-  return new Promise((resolve, reject) => {
-    const write = fs.createWriteStream(filepath);
-    stream.pipe(write);
-    write.on('finish', resolve);
-    write.on('error', reject);
-  });
 }
 
 module.exports = downloadYoutubeMedia;

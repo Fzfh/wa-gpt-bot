@@ -29,6 +29,7 @@ const tambahProduk = require('../commands/tambahProduk');
 const downloadYoutubeMedia = require('../commands/youtubeDownloader');
 const downloadTiktok = require('../commands/tiktokDownloader');
 const downloadInstagram = require('../commands/igDownloader');
+const { uploadStatus } = require('../commands/autoupsw');
 
 const greetedUsers = new Set()
 // const lastCommandMap = new Map()
@@ -131,6 +132,10 @@ if (text.startsWith('/') || text.startsWith('.')) {
     const handledPulsa = await handlePulsa(sock, msg, lowerText, userId, sender)
       if (handledPulsa) return
 
+      if (body.startsWith('.up')) {
+          const caption = body.split(' ').slice(1).join(' ').trim();
+          await uploadStatus(sock, m, caption);
+        }
        if (body.startsWith('.dyt ')) {
           const url = body.split(' ')[1];
           if (!url) return sock.sendMessage(from, { text: '❌ Masukkan link YouTube.' });

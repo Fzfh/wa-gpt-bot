@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config({ path: './utils/.env' })
 const axios = require('axios')
 
 const models = [

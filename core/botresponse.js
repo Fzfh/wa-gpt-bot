@@ -157,6 +157,35 @@ if (text.startsWith('/') || text.startsWith('.')) {
       return
     }
 
+    if (text.startsWith('.ds ')) {
+  const link = text.split(' ')[1]
+
+  if (!link || !link.includes('tiktok.com')) {
+    await sock.sendMessage(from, { text: '❌ Link TikTok tidak valid!' }, { quoted: msg })
+    return
+  }
+
+  await sock.sendMessage(from, { text: '🎧 Mengunduh sound TikTok...' }, { quoted: msg })
+
+  try {
+    const result = await downloadTiktok(link)
+    if (!result || !result.musicUrl) {
+      await sock.sendMessage(from, { text: '❌ Gagal mengunduh sound.' }, { quoted: msg })
+      return
+    }
+
+    await sock.sendMessage(from, {
+      audio: { url: result.musicUrl },
+      mimetype: 'audio/mp4'
+    }, { quoted: msg })
+  } catch (e) {
+    console.error('❌ Error:', e)
+    await sock.sendMessage(from, { text: '⚠️ Error saat unduh sound.' }, { quoted: msg })
+  }
+
+  return
+}
+
     
     if (!text.startsWith('/')) {
     const sesi = sessionMap.get(sender);

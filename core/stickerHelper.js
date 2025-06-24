@@ -168,7 +168,7 @@ async function createStickerFromText(text) {
     pack: 'AuraBot',
     author: 'AURA',
     type: StickerTypes.DEFAULT,
-    quality: 80,
+    quality: 10,
   });
 
   return await sticker.toBuffer();

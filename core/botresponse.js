@@ -26,6 +26,7 @@ const { handlekouta, selectedKoutaNominalMap, lastKoutaCommandMap } = require('.
 const sessionMap = require('../core/sessionStore');
 const hapusProduk = require('../commands/hapusProduk');
 const tambahProduk = require('../commands/tambahProduk');
+const downloadTiktok = require('../commands/tiktokDownloader');
 const greetedUsers = new Set()
 // const lastCommandMap = new Map()
 // const selectedNominalMap = new Map()
@@ -126,6 +127,36 @@ if (text.startsWith('/') || text.startsWith('.')) {
 
     const handledPulsa = await handlePulsa(sock, msg, lowerText, userId, sender)
       if (handledPulsa) return
+    
+    if (text.startsWith('.d ')) {
+      const link = text.split(' ')[1]
+    
+      if (!link || !link.includes('tiktok.com')) {
+        await sock.sendMessage(from, { text: '❌ Link TikTok tidak valid!' }, { quoted: msg })
+        return
+      }
+    
+      await sock.sendMessage(from, { text: '⏳ Sedang mengunduh video TikTok...' }, { quoted: msg })
+    
+      try {
+        const result = await downloadTiktok(link)
+        if (!result || !result.videoUrl) {
+          await sock.sendMessage(from, { text: '❌ Gagal mengunduh video TikTok.' }, { quoted: msg })
+          return
+        }
+    
+        await sock.sendMessage(from, {
+          video: { url: result.videoUrl },
+          caption: `🎬 *${result.title}*\n👤 ${result.author}`
+        }, { quoted: msg })
+      } catch (e) {
+        console.error('❌ Error TikTok:', e)
+        await sock.sendMessage(from, { text: '⚠️ Terjadi kesalahan saat mengunduh TikTok.' }, { quoted: msg })
+      }
+    
+      return
+    }
+
     
     if (!text.startsWith('/')) {
     const sesi = sessionMap.get(sender);

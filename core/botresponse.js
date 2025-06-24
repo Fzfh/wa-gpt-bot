@@ -131,47 +131,50 @@ if (text.startsWith('/') || text.startsWith('.')) {
     const handledPulsa = await handlePulsa(sock, msg, lowerText, userId, sender)
       if (handledPulsa) return
 
-        if (body.startsWith('.dyt ')) {
-            try {
-              const url = body.split(' ')[1];
-              if (!url) return sock.sendMessage(from, { text: '❌ Masukkan link YouTube.' });
-          
-              const res = await downloadYoutubeMedia(url);
-              if (!res) return sock.sendMessage(from, { text: '❌ Gagal download video.' });
-          
-              await sock.sendMessage(
-                from,
-                { video: fs.readFileSync(res.videoPath), caption: res.title },
-                { quoted: message }
-              );
-          
-              fs.unlinkSync(res.videoPath);
-            } catch (err) {
-              console.error('.dyt Error:', err);
-              await sock.sendMessage(from, { text: '❌ Terjadi kesalahan saat download video.' });
-            }
+       if (body.startsWith('.dyt ')) {
+          const url = body.split(' ')[1];
+          if (!url) return sock.sendMessage(from, { text: '❌ Masukkan link YouTube.' });
+        
+          try {
+            const res = await downloadYoutubeMedia(url);
+            if (!res) throw new Error('Gagal download video.');
+        
+            await sock.sendMessage(from, {
+              video: fs.readFileSync(res.videoPath),
+              caption: res.title
+            }, { quoted: message });
+        
+            fs.unlinkSync(res.videoPath);
+            fs.unlinkSync(res.audioPath);
+        
+          } catch (err) {
+            console.error('Error .dyt:', err.message);
+            sock.sendMessage(from, { text: '❌ Terjadi kesalahan saat download video.' });
           }
+        }
 
-          if (body.startsWith('.dsyt ')) {
-            try {
-              const url = body.split(' ')[1];
-              if (!url) return sock.sendMessage(from, { text: '❌ Masukkan link YouTube.' });
-          
-              const res = await downloadYoutubeMedia(url);
-              if (!res) return sock.sendMessage(from, { text: '❌ Gagal download audio.' });
-          
-              await sock.sendMessage(
-                from,
-                { audio: fs.readFileSync(res.audioPath), mimetype: 'audio/mp4' },
-                { quoted: message }
-              );
-          
-              fs.unlinkSync(res.audioPath);
-            } catch (err) {
-              console.error('.dsyt Error:', err);
-              await sock.sendMessage(from, { text: '❌ Terjadi kesalahan saat download audio.' });
-            }
+        if (body.startsWith('.dsyt ')) {
+          const url = body.split(' ')[1];
+          if (!url) return sock.sendMessage(from, { text: '❌ Masukkan link YouTube.' });
+        
+          try {
+            const res = await downloadYoutubeMedia(url);
+            if (!res) throw new Error('Gagal download audio.');
+        
+            await sock.sendMessage(from, {
+              audio: fs.readFileSync(res.audioPath),
+              mimetype: 'audio/mp4'
+            }, { quoted: message });
+        
+            fs.unlinkSync(res.audioPath);
+            fs.unlinkSync(res.videoPath);
+        
+          } catch (err) {
+            console.error('Error .dsyt:', err.message);
+            sock.sendMessage(from, { text: '❌ Terjadi kesalahan saat download audio.' });
           }
+        }
+
 
 
     

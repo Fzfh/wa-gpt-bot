@@ -52,12 +52,20 @@ async function handleCommand(sock, msg, lowerText, userId, from, body, sender)
 ┃   ➤ Kirim media (foto/video)
 ┃   ➤ Tambahkan caption: *s* atau *sticker*
 ┃
-┃ ✍️ *Sticker dari Teks / Emoji*
-┃   ➤ Ketik: *stickertext teks/emoji*
-┃   ➤ Contoh: stickertext Aura 💖 Pro
+┃ ✍️ *Sticker dari Teks*
+┃   ➤ Ketik: *stickertext teks*
+┃   ➤ Contoh: stickertext AuraBot
 ┃
 ┃ 💌 *Menfess Anonim*
 ┃   ➤ /menfess
+┃
+┃ ⬇ *Download VT Tiktok*
+┃   ➤ .d link tiktok
+┃   ➤ Contoh: .d https://www.tiktok.com/linkKamu
+┃
+┃ ⬇ *Download Sound VT Tiktok*
+┃   ➤ .ds link tiktok
+┃   ➤ Contoh: .d https://www.tiktok.com/linkKamu
 ┃
 ┃ 🎮 *Top Up Game*
 ┃   ➤ topup ff
@@ -87,7 +95,7 @@ async function handleCommand(sock, msg, lowerText, userId, from, body, sender)
 ╰━━━━━━━━━━━━━━━━━━━━━━━╯
 
 🧠 *Ketik sesuai menu ya adik-adik manis!*
-📌 _Hindari typo biar AURA gak overheat 🤖🔥_
+📌 _Hindari typo biar AURA gak Misskom 🤖🔥_
 `
       }, { quoted: msg })
 

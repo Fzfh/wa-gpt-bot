@@ -28,6 +28,7 @@ async function askOpenAI(userHistory = []) {
     const model = models[i]
     try {
       console.log(`🧠 Coba model: ${model}`)
+       console.log('🔑 GROQ API KEY:', process.env.GROQ_API_KEY);
       const res = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
         model,
         messages,

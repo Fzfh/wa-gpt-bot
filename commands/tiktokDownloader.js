@@ -10,8 +10,7 @@ async function downloadTiktok(url) {
         videoUrl: data.play,
         musicUrl: data.music, // ✅ perbaikan di sini
         title: data.title,
-        author: data.author.nickname,
-        cover: data.cover,
+        cover: data.cover
       };
     } else {
       throw new Error('Gagal ambil data');

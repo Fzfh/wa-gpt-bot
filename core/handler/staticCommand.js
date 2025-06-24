@@ -86,6 +86,10 @@ if (lowerText === 'beli kuota') {
 ┃   ➤ .d link tiktok
 ┃   ➤ Contoh: .d https://www.tiktok.com/linkKamu
 ┃
+┃ ⬇ *Download Sound VT Tiktok*
+┃   ➤ .ds link tiktok
+┃   ➤ Contoh: .d https://www.tiktok.com/linkKamu
+┃
 ┃ 🎮 *Top Up Game*
 ┃   ➤ topup ff
 ┃   ➤ topup ml
@@ -114,7 +118,7 @@ if (lowerText === 'beli kuota') {
 ╰━━━━━━━━━━━━━━━━━━━━━━━╯
 
 🧠 *Ketik sesuai menu ya adik-adik manis!*
-📌 _Hindari typo biar AURA gak overheat 🤖🔥_
+📌 _Hindari typo biar AURA gak Misskom 🤖🔥_
 `
       }, { quoted: msg })
       return true

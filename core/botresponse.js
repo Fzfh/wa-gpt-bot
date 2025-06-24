@@ -26,6 +26,7 @@ const { handlekouta, selectedKoutaNominalMap, lastKoutaCommandMap } = require('.
 const sessionMap = require('../core/sessionStore');
 const hapusProduk = require('../commands/hapusProduk');
 const tambahProduk = require('../commands/tambahProduk');
+const downloadYoutubeMedia = require('../commands/youtubeDownloader');
 const downloadTiktok = require('../commands/tiktokDownloader');
 const downloadInstagram = require('../commands/igDownloader');
 
@@ -129,6 +130,30 @@ if (text.startsWith('/') || text.startsWith('.')) {
 
     const handledPulsa = await handlePulsa(sock, msg, lowerText, userId, sender)
       if (handledPulsa) return
+
+      if (body.startsWith('.dyt ')) {
+        const url = body.split(' ')[1];
+        if (!url) return sock.sendMessage(from, { text: '❌ Masukkan link YouTube.' });
+    
+        const res = await downloadYoutubeMedia(url);
+        if (!res) return sock.sendMessage(from, { text: '❌ Gagal download video.' });
+    
+        await sock.sendMessage(from, { video: fs.readFileSync(res.videoPath), caption: res.title }, { quoted: message });
+        fs.unlinkSync(res.videoPath);
+      }
+
+      if (body.startsWith('.dsyt ')) {
+          const url = body.split(' ')[1];
+          if (!url) return sock.sendMessage(from, { text: '❌ Masukkan link YouTube.' });
+      
+          const res = await downloadYoutubeMedia(url);
+          if (!res) return sock.sendMessage(from, { text: '❌ Gagal download audio.' });
+      
+          await sock.sendMessage(from, { audio: fs.readFileSync(res.audioPath), mimetype: 'audio/mp4' }, { quoted: message });
+          fs.unlinkSync(res.audioPath);
+        }
+      }
+
     
           if (text.startsWith('.d ')) {
             const link = text.split(' ')[1]

@@ -1,4 +1,4 @@
-require('./core/globals')
+require('dotenv').config()
 const {
   default: makeWASocket,
   useMultiFileAuthState,

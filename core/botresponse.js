@@ -148,8 +148,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
               }
           
               await sock.sendMessage(from, {
-                video: { url: result.videoUrl },
-                caption: `👤 ${result.author}`
+                video: { url: result.videoUrl }
               }, { quoted: msg })
             } catch (e) {
               console.error('❌ Error TikTok:', e)

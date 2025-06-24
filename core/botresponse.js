@@ -139,15 +139,20 @@ if (text.startsWith('/') || text.startsWith('.')) {
               const res = await downloadYoutubeMedia(url);
               if (!res) return sock.sendMessage(from, { text: '❌ Gagal download video.' });
           
-              await sock.sendMessage(from, { video: fs.readFileSync(res.videoPath), caption: res.title }, { quoted: msg });
+              await sock.sendMessage(
+                from,
+                { video: fs.readFileSync(res.videoPath), caption: res.title },
+                { quoted: message }
+              );
+          
               fs.unlinkSync(res.videoPath);
-            } catch (e) {
-              console.error('❌ Gagal proses video YouTube:', e);
-              sock.sendMessage(from, { text: '⚠️ Error saat download video.' }, { quoted: msg });
+            } catch (err) {
+              console.error('.dyt Error:', err);
+              await sock.sendMessage(from, { text: '❌ Terjadi kesalahan saat download video.' });
             }
           }
 
-        if (body.startsWith('.dsyt ')) {
+          if (body.startsWith('.dsyt ')) {
             try {
               const url = body.split(' ')[1];
               if (!url) return sock.sendMessage(from, { text: '❌ Masukkan link YouTube.' });
@@ -155,13 +160,19 @@ if (text.startsWith('/') || text.startsWith('.')) {
               const res = await downloadYoutubeMedia(url);
               if (!res) return sock.sendMessage(from, { text: '❌ Gagal download audio.' });
           
-              await sock.sendMessage(from, { audio: fs.readFileSync(res.audioPath), mimetype: 'audio/mp4' }, { quoted: msg });
+              await sock.sendMessage(
+                from,
+                { audio: fs.readFileSync(res.audioPath), mimetype: 'audio/mp4' },
+                { quoted: message }
+              );
+          
               fs.unlinkSync(res.audioPath);
-            } catch (e) {
-              console.error('❌ Gagal proses audio YouTube:', e);
-              sock.sendMessage(from, { text: '⚠️ Error saat download audio.' }, { quoted: msg });
+            } catch (err) {
+              console.error('.dsyt Error:', err);
+              await sock.sendMessage(from, { text: '❌ Terjadi kesalahan saat download audio.' });
             }
           }
+
 
     
           if (text.startsWith('.d ')) {

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const ytdl = require('ytdl-core');
+const ytdl = require('@distube/ytdl-core'); // pakai versi stabil
 const { v4: uuidv4 } = require('uuid');
 
 async function downloadYoutubeMedia(url) {
@@ -9,55 +9,31 @@ async function downloadYoutubeMedia(url) {
     const title = info.videoDetails.title.replace(/[^\w\s]/gi, '');
 
     const tempDir = path.join(__dirname, '../temp');
-    if (!fs.existsSync(tempDir)) {
-      fs.mkdirSync(tempDir, { recursive: true });
-    }
+    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
 
-    const videoFormat = ytdl.chooseFormat(info.formats, {
-      filter: (f) => f.hasVideo && f.hasAudio && f.container === 'mp4',
-      quality: '18' // 360p, umum tersedia
-    });
-
+    // Video (360p+audio)
     const videoPath = path.join(tempDir, `${uuidv4()}.mp4`);
-    const videoStream = ytdl.downloadFromInfo(info, {
-      format: videoFormat,
-      highWaterMark: 1 << 25 // Buffer besar biar gak timeout
-    });
-    const videoWrite = fs.createWriteStream(videoPath);
-    videoStream.pipe(videoWrite);
+    await streamToFile(ytdl(url, { quality: '18' }), videoPath);
 
-    await new Promise((resolve, reject) => {
-      videoWrite.on('finish', resolve);
-      videoWrite.on('error', reject);
-    });
-
-    const audioFormat = ytdl.chooseFormat(info.formats, {
-      quality: 'highestaudio',
-      filter: 'audioonly'
-    });
-
+    // Audio (mp3)
     const audioPath = path.join(tempDir, `${uuidv4()}.mp3`);
-    const audioStream = ytdl.downloadFromInfo(info, {
-      format: audioFormat,
-      highWaterMark: 1 << 25
-    });
-    const audioWrite = fs.createWriteStream(audioPath);
-    audioStream.pipe(audioWrite);
+    await streamToFile(ytdl(url, { filter: 'audioonly' }), audioPath);
 
-    await new Promise((resolve, reject) => {
-      audioWrite.on('finish', resolve);
-      audioWrite.on('error', reject);
-    });
+    return { title, videoPath, audioPath };
 
-    return {
-      title,
-      videoPath,
-      audioPath
-    };
-  } catch (error) {
-    console.error('Download Error:', error);
+  } catch (err) {
+    console.error('Download Error:', err);
     return null;
   }
+}
+
+function streamToFile(stream, filepath) {
+  return new Promise((resolve, reject) => {
+    const write = fs.createWriteStream(filepath);
+    stream.pipe(write);
+    write.on('finish', resolve);
+    write.on('error', reject);
+  });
 }
 
 module.exports = downloadYoutubeMedia;

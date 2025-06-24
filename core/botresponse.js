@@ -27,6 +27,8 @@ const sessionMap = require('../core/sessionStore');
 const hapusProduk = require('../commands/hapusProduk');
 const tambahProduk = require('../commands/tambahProduk');
 const downloadTiktok = require('../commands/tiktokDownloader');
+const downloadInstagram = require('../commands/igDownloader');
+
 const greetedUsers = new Set()
 // const lastCommandMap = new Map()
 // const selectedNominalMap = new Map()
@@ -128,63 +130,121 @@ if (text.startsWith('/') || text.startsWith('.')) {
     const handledPulsa = await handlePulsa(sock, msg, lowerText, userId, sender)
       if (handledPulsa) return
     
-    if (text.startsWith('.d ')) {
-      const link = text.split(' ')[1]
-    
-      if (!link || !link.includes('tiktok.com')) {
-        await sock.sendMessage(from, { text: '❌ Link TikTok tidak valid!' }, { quoted: msg })
+          if (text.startsWith('.d ')) {
+            const link = text.split(' ')[1]
+          
+            if (!link || !link.includes('tiktok.com')) {
+              await sock.sendMessage(from, { text: '❌ Link TikTok tidak valid!' }, { quoted: msg })
+              return
+            }
+          
+            await sock.sendMessage(from, { text: '⏳ Sedang mengunduh video TikTok...' }, { quoted: msg })
+          
+            try {
+              const result = await downloadTiktok(link)
+              if (!result || !result.videoUrl) {
+                await sock.sendMessage(from, { text: '❌ Gagal mengunduh video TikTok.' }, { quoted: msg })
+                return
+              }
+          
+              await sock.sendMessage(from, {
+                video: { url: result.videoUrl },
+                caption: `👤 ${result.author}`
+              }, { quoted: msg })
+            } catch (e) {
+              console.error('❌ Error TikTok:', e)
+              await sock.sendMessage(from, { text: '⚠️ Terjadi kesalahan saat mengunduh TikTok.' }, { quoted: msg })
+            }
+          
+            return
+          }
+      
+          if (text.startsWith('.ds ')) {
+        const link = text.split(' ')[1]
+      
+        if (!link || !link.includes('tiktok.com')) {
+          await sock.sendMessage(from, { text: '❌ Link TikTok tidak valid!' }, { quoted: msg })
+          return
+        }
+      
+        await sock.sendMessage(from, { text: '🎧 Mengunduh sound TikTok...' }, { quoted: msg })
+      
+        try {
+          const result = await downloadTiktok(link)
+          if (!result || !result.musicUrl) {
+            await sock.sendMessage(from, { text: '❌ Gagal mengunduh sound.' }, { quoted: msg })
+            return
+          }
+      
+          await sock.sendMessage(from, {
+            audio: { url: result.musicUrl },
+            mimetype: 'audio/mp4'
+          }, { quoted: msg })
+        } catch (e) {
+          console.error('❌ Error:', e)
+          await sock.sendMessage(from, { text: '⚠️ Error saat unduh sound.' }, { quoted: msg })
+        }
+      
         return
       }
+
+        if (text.startsWith('.dig ')) {
+      const link = text.split(' ')[1];
     
-      await sock.sendMessage(from, { text: '⏳ Sedang mengunduh video TikTok...' }, { quoted: msg })
+      if (!link || !link.includes('instagram.com')) {
+        await sock.sendMessage(from, { text: '❌ Link Instagram tidak valid!' }, { quoted: msg });
+        return;
+      }
+    
+      await sock.sendMessage(from, { text: '⏳ Sedang mengunduh video Instagram...' }, { quoted: msg });
     
       try {
-        const result = await downloadTiktok(link)
+        const result = await downloadInstagram(link);
         if (!result || !result.videoUrl) {
-          await sock.sendMessage(from, { text: '❌ Gagal mengunduh video TikTok.' }, { quoted: msg })
-          return
+          await sock.sendMessage(from, { text: '❌ Gagal mengunduh video Instagram.' }, { quoted: msg });
+          return;
         }
     
         await sock.sendMessage(from, {
-          video: { url: result.videoUrl },
-          caption: `👤 ${result.author}`
-        }, { quoted: msg })
+          video: { url: result.videoUrl }
+        }, { quoted: msg });
       } catch (e) {
-        console.error('❌ Error TikTok:', e)
-        await sock.sendMessage(from, { text: '⚠️ Terjadi kesalahan saat mengunduh TikTok.' }, { quoted: msg })
+        console.error('❌ Error IG:', e);
+        await sock.sendMessage(from, { text: '⚠️ Terjadi kesalahan saat mengunduh Instagram.' }, { quoted: msg });
       }
     
-      return
+      return;
+    }
+    
+    if (text.startsWith('.dsig ')) {
+      const link = text.split(' ')[1];
+    
+      if (!link || !link.includes('instagram.com')) {
+        await sock.sendMessage(from, { text: '❌ Link Instagram tidak valid!' }, { quoted: msg });
+        return;
+      }
+    
+      await sock.sendMessage(from, { text: '🎧 Mengunduh audio dari Instagram...' }, { quoted: msg });
+    
+      try {
+        const result = await downloadInstagram(link);
+        if (!result || !result.musicUrl) {
+          await sock.sendMessage(from, { text: '❌ Gagal mengunduh audio Instagram.' }, { quoted: msg });
+          return;
+        }
+    
+        await sock.sendMessage(from, {
+          audio: { url: result.musicUrl },
+          mimetype: 'audio/mp4'
+        }, { quoted: msg });
+      } catch (e) {
+        console.error('❌ Error IG:', e);
+        await sock.sendMessage(from, { text: '⚠️ Terjadi kesalahan saat mengunduh audio IG.' }, { quoted: msg });
+      }
+    
+      return;
     }
 
-    if (text.startsWith('.ds ')) {
-  const link = text.split(' ')[1]
-
-  if (!link || !link.includes('tiktok.com')) {
-    await sock.sendMessage(from, { text: '❌ Link TikTok tidak valid!' }, { quoted: msg })
-    return
-  }
-
-  await sock.sendMessage(from, { text: '🎧 Mengunduh sound TikTok...' }, { quoted: msg })
-
-  try {
-    const result = await downloadTiktok(link)
-    if (!result || !result.musicUrl) {
-      await sock.sendMessage(from, { text: '❌ Gagal mengunduh sound.' }, { quoted: msg })
-      return
-    }
-
-    await sock.sendMessage(from, {
-      audio: { url: result.musicUrl },
-      mimetype: 'audio/mp4'
-    }, { quoted: msg })
-  } catch (e) {
-    console.error('❌ Error:', e)
-    await sock.sendMessage(from, { text: '⚠️ Error saat unduh sound.' }, { quoted: msg })
-  }
-
-  return
-}
 
     
     if (!text.startsWith('/')) {

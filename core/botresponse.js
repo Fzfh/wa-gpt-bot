@@ -26,7 +26,6 @@ const { handlekouta, selectedKoutaNominalMap, lastKoutaCommandMap } = require('.
 const sessionMap = require('../core/sessionStore');
 const hapusProduk = require('../commands/hapusProduk');
 const tambahProduk = require('../commands/tambahProduk');
-const downloadYoutubeMedia = require('../commands/youtubeDownloader');
 const downloadTiktok = require('../commands/tiktokDownloader');
 const downloadInstagram = require('../commands/igDownloader');
 const { uploadStatus } = require('../commands/autoupsw');
@@ -134,53 +133,8 @@ if (text.startsWith('/') || text.startsWith('.')) {
 
       if (body.startsWith('.up')) {
           const caption = body.split(' ').slice(1).join(' ').trim();
-          await uploadStatus(sock, m, caption);
+          await uploadStatus(sock, msg, caption);
         }
-       if (body.startsWith('.dyt ')) {
-          const url = body.split(' ')[1];
-          if (!url) return sock.sendMessage(from, { text: '❌ Masukkan link YouTube.' });
-        
-          try {
-            const res = await downloadYoutubeMedia(url);
-            if (!res) throw new Error('Gagal download video.');
-        
-            await sock.sendMessage(from, {
-              video: fs.readFileSync(res.videoPath),
-              caption: res.title
-            }, { quoted: message });
-        
-            fs.unlinkSync(res.videoPath);
-            fs.unlinkSync(res.audioPath);
-        
-          } catch (err) {
-            console.error('Error .dyt:', err.message);
-            sock.sendMessage(from, { text: '❌ Terjadi kesalahan saat download video.' });
-          }
-        }
-
-        if (body.startsWith('.dsyt ')) {
-          const url = body.split(' ')[1];
-          if (!url) return sock.sendMessage(from, { text: '❌ Masukkan link YouTube.' });
-        
-          try {
-            const res = await downloadYoutubeMedia(url);
-            if (!res) throw new Error('Gagal download audio.');
-        
-            await sock.sendMessage(from, {
-              audio: fs.readFileSync(res.audioPath),
-              mimetype: 'audio/mp4'
-            }, { quoted: message });
-        
-            fs.unlinkSync(res.audioPath);
-            fs.unlinkSync(res.videoPath);
-        
-          } catch (err) {
-            console.error('Error .dsyt:', err.message);
-            sock.sendMessage(from, { text: '❌ Terjadi kesalahan saat download audio.' });
-          }
-        }
-
-
 
     
           if (text.startsWith('.d ')) {

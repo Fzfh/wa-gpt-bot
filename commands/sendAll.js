@@ -1,4 +1,3 @@
-// lib/sendAll.js
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function sendAll(sock, senderJid, text) {

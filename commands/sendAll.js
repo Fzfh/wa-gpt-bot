@@ -1,6 +1,13 @@
+const { adminList } = require('../setting/setting');
+
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function sendAll(sock, senderJid, text) {
+  if (!adminList.includes(senderJid)) {
+    await sock.sendMessage(senderJid, { text: '❌ Kamu tidak punya izin untuk menjalankan perintah ini.' });
+    return;
+  }
+
   const botNumber = sock.user.id;
   const groups = await sock.groupFetchAllParticipating();
   const groupIds = Object.keys(groups);
@@ -24,17 +31,16 @@ async function sendAll(sock, senderJid, text) {
       text: text,
       contextInfo: {
         externalAdReply: {
-          title: "🟢 AURABOT",
-          body: "Automatic Aura Bot",
+          showAdAttribution: true, 
+          title: 'WhatsApp Business',
+          body: 'WA BOT BY AURA BOT',
           mediaType: 1,
-          renderLargerThumbnail: true,
-          thumbnailUrl: 'https://imgur.com/gallery/aura-zr4HtdT',
-          sourceUrl: 'https://wa.me/' + senderJid.split('@')[0]
+          sourceUrl: 'https://wa.me/' + senderJid.split('@')[0],
         }
       }
     });
 
-    await delay(1200); 
+    await delay(1200); // delay biar aman
   }
 }
 

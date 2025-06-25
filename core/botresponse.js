@@ -208,8 +208,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
         // Kirim sebagai album (jika mendukung)
         for (const imageUrl of result.images) {
           await sock.sendMessage(from, {
-            image: { url: imageUrl },
-            caption: result.title
+            image: { url: imageUrl }
           }, { quoted: msg });
         }
       } catch (e) {

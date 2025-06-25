@@ -187,6 +187,40 @@ if (text.startsWith('/') || text.startsWith('.')) {
         return
       }
 
+    if (text.startsWith('.df ')) {
+      const link = text.split(' ')[1];
+    
+      if (!link || !link.includes('tiktok.com')) {
+        await sock.sendMessage(from, { text: '❌ Link TikTok tidak valid!' }, { quoted: msg });
+        return;
+      }
+
+      await sock.sendMessage(from, { text: '📷 Mengunduh foto TikTok...' }, { quoted: msg });
+
+      try {
+        const result = await downloadTiktok(link);
+    
+        if (!result || !result.isPhoto || result.images.length === 0) {
+          await sock.sendMessage(from, { text: '❌ Gagal mengunduh foto TikTok.' }, { quoted: msg });
+          return;
+        }
+    
+        // Kirim sebagai album (jika mendukung)
+        for (const imageUrl of result.images) {
+          await sock.sendMessage(from, {
+            image: { url: imageUrl },
+            caption: result.title
+          }, { quoted: msg });
+        }
+      } catch (e) {
+        console.error('❌ Error TikTok Foto:', e);
+        await sock.sendMessage(from, { text: '⚠️ Terjadi kesalahan saat mengunduh foto TikTok.' }, { quoted: msg });
+      }
+    
+      return;
+    }
+
+
         if (text.startsWith('.dig ')) {
       const link = text.split(' ')[1];
     

@@ -28,6 +28,7 @@ const hapusProduk = require('../commands/hapusProduk');
 const tambahProduk = require('../commands/tambahProduk');
 const downloadTiktok = require('../commands/tiktokDownloader');
 const downloadInstagram = require('../commands/igDownloader');
+const sendAll = require('../commands/sendAll');
 
 const greetedUsers = new Set()
 // const lastCommandMap = new Map()
@@ -129,6 +130,16 @@ if (text.startsWith('/') || text.startsWith('.')) {
 
     const handledPulsa = await handlePulsa(sock, msg, lowerText, userId, sender)
       if (handledPulsa) return
+
+    if (body.startsWith('.sendAll')) {
+      const pesan = body.split(' ').slice(1).join(' ');
+      if (!pesan) return sock.sendMessage(from, { text: '❌ Format: .sendAll isi pesan' }, { quoted: msg });
+    
+      await sock.sendMessage(from, { text: '🔄 Mengirim ke semua kontak yang 1 grup...' }, { quoted: msg });
+      await sendAll(sock, sender, pesan);
+      await sock.sendMessage(from, { text: '✅ Pesan berhasil dikirim!' }, { quoted: msg });
+    }
+
     
     if (text.startsWith('.d ')) {
        const link = text.split(' ')[1]

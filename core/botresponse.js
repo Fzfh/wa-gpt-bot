@@ -359,7 +359,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
 
     if (text === '.reset') {
       memoryMap.delete(sender)
-      return sock.sendMessage(sender, { text: 'Ingatan Serra tentang kamu dihapus... 😢 Tapi kamu tetap spesial di hati aku~' })
+      return sock.sendMessage(sender, { text: 'Ingatan AuraBot Telah Direset, Ayo Buat Obrolan Baru!' })
     }
 
 

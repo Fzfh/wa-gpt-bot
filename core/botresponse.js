@@ -99,6 +99,8 @@ if (text.startsWith('/') || text.startsWith('.')) {
     const contextInfo = content?.extendedTextMessage?.contextInfo || {}
     const mentionedJids = contextInfo.mentionedJid || []
     const isMentioned = mentionedJids.includes(botJid)
+    const isMentionedToBot = msg.message?.extendedTextMessage?.contextInfo?.mentionedJid?.includes(botJid)
+    const isPrivate = !sender.endsWith('@g.us')
 
     if ((!isGroup || isMentioned) && !greetedUsers.has(userId)) {
       greetedUsers.add(userId)
@@ -354,30 +356,35 @@ if (text.startsWith('/') || text.startsWith('.')) {
       await sock.sendMessage(sender, { sticker: stickerBuffer }, { quoted: msg })
     }
 
-
-    if (text.startsWith('.jawab ')) {
-  const query = text.slice(7).trim()
-  const userId = sender
-
-  await sock.sendPresenceUpdate('composing', sender)
-  const history = memoryMap.get(userId) || []
-  history.push({ role: 'user', content: query })
-  const aiReply = await askOpenAI(history)
-  history.push({ role: 'assistant', content: aiReply })
-  memoryMap.set(userId, history.slice(-15)) // max 15 percakapan
-
-  return sock.sendMessage(sender, { text: aiReply }, { quoted: msg })
-}
-
-if (text === '.reset') {
-  memoryMap.delete(sender)
-  return sock.sendMessage(sender, { text: 'Ingatan Serra tentang kamu dihapus... 😢 Tapi kamu tetap spesial di hati aku~' })
-}
+    if (text === '.reset') {
+      memoryMap.delete(sender)
+      return sock.sendMessage(sender, { text: 'Ingatan Serra tentang kamu dihapus... 😢 Tapi kamu tetap spesial di hati aku~' })
+    }
 
 
     if (text.startsWith('/') && !['/menu', '/reset', '/riwayat', '/clear'].includes(lowerText)) {
       return sock.sendMessage(sender, { text: 'Maaf, aku gak ngerti perintah itu 😵. Coba ketik /menu yaa!' }, { quoted: msg })
     }
+  }
+      
+    if (isMentionedToBot || isReplyToBot || isPrivate) {
+      const query =
+        msg.message?.conversation ||
+        msg.message?.extendedTextMessage?.text ||
+        msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.conversation || ''
+    
+      if (query?.trim()) {
+        await sock.sendPresenceUpdate('composing', sender)
+    
+        const history = memoryMap.get(userId) || []
+        history.push({ role: 'user', content: query })
+    
+        const aiReply = await askOpenAI(history)
+        history.push({ role: 'assistant', content: aiReply })
+        memoryMap.set(userId, history.slice(-15))
+    
+        return sock.sendMessage(sender, { text: aiReply }, { quoted: msg })
+      }
     }
 
   } catch (error) {

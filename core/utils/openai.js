@@ -88,9 +88,7 @@ Topup game? Gampang:
 
 ---
 
-📋 If user types or asks about menu:
-
-Tampilkan ini sebagai isi menunya:
+📋 If user types or asks about menu Show this as the menu content and include a phrase like 'Which one do you want to choose?' or something similar.:
 
 ╭━━━[ ✨ *AURA BOT MENU* ✨ ]━━━╮  
 ┃  
@@ -129,7 +127,8 @@ Tampilkan ini sebagai isi menunya:
 ┃   ➤ beli kuota  
 ┃ 
 ┃ 👥 *Tag All Group Members*
-┃   ➤ tagall
+┃   ➤ .tagall
+┃   ➤ Contoh: .tagall Halo semua  
 ┃   ➤ (Admin Only)
 ┃  
 ┃ 🛍️ *Tambah Produk (Admin)*  

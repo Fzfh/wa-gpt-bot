@@ -107,7 +107,8 @@ if (lowerText === 'beli kuota') {
 ┃   ➤ beli kuota  
 ┃ 
 ┃ 👥 *Tag All Group Members*
-┃   ➤ tagall
+┃   ➤ .tagall
+┃   ➤ Contoh: .tagall Halo semua  
 ┃   ➤ (Admin Only)
 ┃  
 ┃ 🛍️ *Tambah Produk (Admin)*  

@@ -100,6 +100,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     const mentionedJids = contextInfo.mentionedJid || []
     const isMentioned = mentionedJids.includes(botJid)
     const isMentionedToBot = msg.message?.extendedTextMessage?.contextInfo?.mentionedJid?.includes(botJid)
+    const isReplyToBot = contextInfo?.quotedMessage && (contextInfo?.participant === botJid || contextInfo?.remoteJid === botJid)
     const isPrivate = !sender.endsWith('@g.us')
 
     if ((!isGroup || isMentioned) && !greetedUsers.has(userId)) {
@@ -367,7 +368,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     }
   }
       
-    if (isMentionedToBot || isReplyToBot || isPrivate) {
+    if (isMentionedToBot || isMentioned || isReplyToBot || isPrivate) {
       const query =
         msg.message?.conversation ||
         msg.message?.extendedTextMessage?.text ||

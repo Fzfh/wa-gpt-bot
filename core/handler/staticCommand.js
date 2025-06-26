@@ -70,60 +70,64 @@ if (lowerText === 'beli kuota') {
     case 'menu':
       await sock.sendMessage(sender, {
         text: 
-`╭━━━[ ✨ *AURA BOT MENU* ✨ ]━━━╮
-┃
-┃ 🖼️ *Sticker dari Gambar/Video*
-┃   ➤ Kirim media (foto/video)
-┃   ➤ Tambahkan caption: *s* atau *sticker*
-┃
-┃ ✍️ *Sticker dari Teks*
-┃   ➤ Ketik: *stickertext teks*
-┃   ➤ Contoh: stickertext AuraBot
-┃
-┃ 💌 *Menfess Anonim*
-┃   ➤ /menfess
-┃
-┃ ⬇ *Download VT Tiktok*
-┃   ➤ .d link tiktok
-┃   ➤ Contoh: .d https://www.tiktok.com/linkKamu
-┃
-┃ ⬇ *Download Sound VT Tiktok*
-┃   ➤ .ds link tiktok
-┃   ➤ Contoh: .ds https://www.tiktok.com/linkKamu
-┃
-┃ ⬇ *Download Foto VT Tiktok*
-┃   ➤ .df link tiktok
-┃   ➤ Contoh: .df https://www.tiktok.com/linkKamu
-┃
-┃ 🎮 *Top Up Game*
-┃   ➤ topup ff
-┃   ➤ topup ml
-┃   ➤ topup genshin
-┃   ➤ topup pubg
-┃   ➤ topup valo
-┃
-┃ 📱 *Isi Pulsa & Kuota*
-┃   ➤ beli pulsa
-┃   ➤ beli kuota
-┃
-┃ 🛍️ *Tambah Produk (Admin)*
-┃   ➤ /tambah
-┃   ➤ Tambah produk: topup / pulsa / kuota
-┃
-┃ 📜 *Riwayat Transaksi*
-┃   ➤ /riwayat — Tampilkan 20 invoice terakhir
-┃   ➤ /clear — Hapus semua invoice (Admin)
-┃
-┃ 🤖 *Beli Bot WA*
-┃   ➤ beli bot — Lihat harga & fitur bot
-┃
-┃ ❓ *BINGUNG?? KETIK COMMAND INI AJA!!*
-┃   ➤ tutorial
-┃   ➤ admin — Hubungi langsung via WA
-╰━━━━━━━━━━━━━━━━━━━━━━━╯
+`╭━━━[ ✨ *AURA BOT MENU* ✨ ]━━━╮  
+┃  
+┃ 🖼️ *Sticker dari Gambar/Video*  
+┃   ➤ Kirim media (foto/video)  
+┃   ➤ Tambahkan caption: *s* atau *sticker*  
+┃  
+┃ ✍️ *Sticker dari Teks*  
+┃   ➤ Ketik: *stickertext teks*  
+┃   ➤ Contoh: stickertext AuraBot  
+┃  
+┃ 💌 *Menfess Anonim*  
+┃   ➤ /menfess  
+┃  
+┃ ⬇ *Download VT Tiktok*  
+┃   ➤ .d link tiktok  
+┃   ➤ Contoh: .d https://www.tiktok.com/linkKamu  
+┃  
+┃ ⬇ *Download Sound VT Tiktok*  
+┃   ➤ .ds link tiktok  
+┃   ➤ Contoh: .ds https://www.tiktok.com/linkKamu  
+┃  
+┃ ⬇ *Download Foto VT Tiktok*  
+┃   ➤ .df link tiktok  
+┃   ➤ Contoh: .df https://www.tiktok.com/linkKamu  
+┃  
+┃ 🎮 *Top Up Game*  
+┃   ➤ topup ff  
+┃   ➤ topup ml  
+┃   ➤ topup genshin  
+┃   ➤ topup pubg  
+┃   ➤ topup valo  
+┃  
+┃ 📱 *Isi Pulsa & Kuota*  
+┃   ➤ beli pulsa  
+┃   ➤ beli kuota  
+┃ 
+┃ 👥 *Tag All Group Members*
+┃   ➤ tagall
+┃   ➤ (Admin Only)
+┃  
+┃ 🛍️ *Tambah Produk (Admin)*  
+┃   ➤ /tambah  
+┃   ➤ Tambah produk: topup / pulsa / kuota  
+┃  
+┃ 📜 *Riwayat Transaksi*  
+┃   ➤ /riwayat — Tampilkan 20 invoice terakhir  
+┃   ➤ /clear — Hapus semua invoice (Admin)  
+┃  
+┃ 🤖 *Beli Bot WA*  
+┃   ➤ beli bot — Lihat harga & fitur bot  
+┃  
+┃ ❓ *BINGUNG?? KETIK COMMAND INI AJA!!*  
+┃   ➤ tutorial  
+┃   ➤ admin — Hubungi langsung via WA  
+╰━━━━━━━━━━━━━━━━━━━━━━━╯  
 
-🧠 *Ketik sesuai menu ya adik-adik manis!*
-📌 _Hindari typo biar AURA gak Misskom 🤖🔥_
+🧠 *Ketik sesuai menu ya adick-adickk!*  
+📌 _Hindari typo biar AURA gak Misskom_ 🤖🔥
 `
       }, { quoted: msg })
       return true

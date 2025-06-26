@@ -67,6 +67,7 @@ if (lowerText === 'beli kuota') {
 
   switch (lowerText) {
     case '/menu':
+    case 'menu':
       await sock.sendMessage(sender, {
         text: 
 `╭━━━[ ✨ *AURA BOT MENU* ✨ ]━━━╮
@@ -88,11 +89,11 @@ if (lowerText === 'beli kuota') {
 ┃
 ┃ ⬇ *Download Sound VT Tiktok*
 ┃   ➤ .ds link tiktok
-┃   ➤ Contoh: .d https://www.tiktok.com/linkKamu
+┃   ➤ Contoh: .ds https://www.tiktok.com/linkKamu
 ┃
 ┃ ⬇ *Download Foto VT Tiktok*
 ┃   ➤ .df link tiktok
-┃   ➤ Contoh: .d https://www.tiktok.com/linkKamu
+┃   ➤ Contoh: .df https://www.tiktok.com/linkKamu
 ┃
 ┃ 🎮 *Top Up Game*
 ┃   ➤ topup ff
@@ -116,8 +117,8 @@ if (lowerText === 'beli kuota') {
 ┃ 🤖 *Beli Bot WA*
 ┃   ➤ beli bot — Lihat harga & fitur bot
 ┃
-┃ ❓ *Cara Pembelian*
-┃   ➤ .carabeli
+┃ ❓ *BINGUNG?? KETIK COMMAND INI AJA!!*
+┃   ➤ tutorial
 ┃   ➤ admin — Hubungi langsung via WA
 ╰━━━━━━━━━━━━━━━━━━━━━━━╯
 
@@ -127,9 +128,12 @@ if (lowerText === 'beli kuota') {
       }, { quoted: msg })
       return true
 
-    case '.carabeli':
+    case '.Tutorial':
+    case '.Tutor':
+    case '.tutorial':
+    case '.tutor':
       await sock.sendMessage(sender, {
-        text: `📖 *Petunjuk Cara Pembelian di AURA BOT*
+        text: `📖 *Petunjuk Cara Pembelian & Command di AURA BOT*
 
 1️⃣ *Topup Game*
    ➤ Ketik: topup ff / ml / genshin / pubg / valo
@@ -146,9 +150,26 @@ if (lowerText === 'beli kuota') {
    ➤ Pilih paket kuota: ketik angka misal 3
    ➤ Kirim Dengan Ketik nomor HP & bukti transfer
 
-📌 *Contoh Format Transfer:*
-Nomor: 08xxxxxxxxxx
-Bukti TF: (kirim foto)
+   📌 *Contoh Format Transfer:*
+  Nomor: 08xxxxxxxxxx
+  Bukti TF: (kirim foto)
+  
+   📌 *Contoh Format Transfer Topup:*
+  ID: 8384895 (ID SERVER JIKA ML)
+  server: asia (JIKA GENSHIN)
+  Bukti TF: (kirim foto)
+
+4️⃣*Menfess*
+   ➤ Ketik: /menfess
+   ➤ ketik nomor, nomor yang bisa di deteksi (62895, +6289-9889-xxx, 089879)
+   ➤ Ketik /batal jika tidak jadi
+   
+4️⃣*Download Tiktok*
+   ➤ Ketik: .d (*UNTUK VIDEO)*
+   ➤ Ketik: .ds (*UNTUK SOUND)*
+   ➤ Ketik: .df (*UNTUK FOTO)*
+   ➤ ketik .d, .ds, .df sesuai kemauan kamu lalu paste link tiktok kamu
+
 
 💡 *Tips:*
 - Jangan lupa pilih produk dulu sebelum transfer

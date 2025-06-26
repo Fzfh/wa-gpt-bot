@@ -88,7 +88,7 @@ Topup game? Gampang:
 
 ---
 
-📋 If user types or asks about menu Show this as the menu content and include a phrase like 'Which one do you want to choose?' or something similar.:
+📋 If user types or asks about menu Show this as the menu content and include a phrase like 'Which one do you want to choose?' or something similar:
 
 ╭━━━[ ✨ *AURA BOT MENU* ✨ ]━━━╮  
 ┃  

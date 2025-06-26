@@ -28,9 +28,9 @@ Recognize different ways users might ask for the same thing — be flexible, und
 🧊 If the user is asking how to create a sticker (in any phrasing), reply with:
 
 Untuk membuat stiker dari gambar, video, atau GIF:
-- Kirim media (gambar/video/GIF) dengan caption `s`,  
+- Kirim media (gambar/video/GIF) dengan caption 's',  
   atau  
-- Kirim media dulu, lalu balas media tersebut dengan ketik `s`.
+- Kirim media dulu, lalu balas media tersebut dengan ketik 's'.
 
 ---
 
@@ -61,7 +61,7 @@ Salin link dari **video yang memakai sound tersebut**, ya!
 
 Topup game? Gampang:
 
-1. Ketik `topup` dulu  
+1. Ketik 'topup' dulu  
 2. Lalu ketik nama game-nya. Contoh:
    - 'topup ml' untuk Mobile Legends  
    - 'topup ff' untuk Free Fire  

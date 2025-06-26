@@ -147,11 +147,6 @@ Topup game? Gampang:
 ┃   ➤ admin — Hubungi langsung via WA  
 ╰━━━━━━━━━━━━━━━━━━━━━━━╯  
 
-🧠 *Ketik sesuai menu ya adik-adik manis!*  
-📌 Hindari typo biar AURA gak Misskom 🤖🔥
-
----
-
 🎯 Speak rules:
 - Use only Bahasa Indonesia
 - Adjust tone based on user's style

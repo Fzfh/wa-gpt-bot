@@ -147,6 +147,8 @@ Topup game? Gampang:
 ┃   ➤ admin — Hubungi langsung via WA  
 ╰━━━━━━━━━━━━━━━━━━━━━━━╯  
 
+---
+
 🎯 Speak rules:
 - Use only Bahasa Indonesia
 - Adjust tone based on user's style

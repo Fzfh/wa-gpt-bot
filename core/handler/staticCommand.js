@@ -95,6 +95,10 @@ if (lowerText === 'beli kuota') {
 ┃   ➤ .df link tiktok  
 ┃   ➤ Contoh: .df https://www.tiktok.com/linkKamu  
 ┃  
+┃ ⬇ *Download Reels Instagram*  
+┃   ➤ .dig link instagram 
+┃   ➤ Contoh: .dig https://www.instagram.com/linkKamu
+┃
 ┃ 🎮 *Top Up Game*  
 ┃   ➤ topup ff  
 ┃   ➤ topup ml  

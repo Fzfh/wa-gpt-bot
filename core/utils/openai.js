@@ -59,6 +59,16 @@ Salin link dari video yang pakai sound itu ya!
 
 ---
 
+If the user asks how to download instagram/ig content:
+
+Download konten ig/instagram? Nih caranya:
+
+- '.dig <link>' → buat video  
+
+⚠️ Catatan: Untuk Download sound ig masih belum bisa ya!! mohon maaf atas kekurangannya!
+
+---
+
 💎 If the user asks about top-up:
 
 Topup game? Gampang:

@@ -2,17 +2,17 @@ const axios = require('axios');
 
 async function downloadInstagram(url) {
   try {
-    const res = await axios.get('https://instavideodownloader-com.onrender.com/api/video', {
-      params: { postUrl: url }
-    });
+    const response = await axios.get(`https://instavideodownloader-com.onrender.com/api/video?postUrl=${encodeURIComponent(url)}`);
+    const data = response.data;
 
-    if (!res.data?.video) throw new Error('Video tidak ditemukan');
+    if (data.status !== 'success' || !data.data.videoUrl) {
+      throw new Error('Video tidak ditemukan');
+    }
 
     return {
-      videoUrl: res.data.video,
-      musicUrl: res.data.audio || null,
-      title: res.data.caption || null,
-      thumbnail: res.data.thumbnail || null
+      videoUrl: data.data.videoUrl,
+      musicUrl: null,
+      all: data.data
     };
   } catch (err) {
     console.error('IG Downloader Error:', err.message || err);

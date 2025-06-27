@@ -1,22 +1,20 @@
-const axios = require('axios');
+const snapinsta = require('snapinsta');
 
 async function downloadInstagram(url) {
   try {
-    const { data } = await axios.get(`https://api.tiklydown.me/ig?url=${encodeURIComponent(url)}`);
-    
-    if (data.status !== 'ok' || !data.result || !data.result.url) {
-      throw new Error('Gagal mengambil data IG');
-    }
+    const items = await snapinsta.getLinks(url);
+    if (!items || items.length === 0) throw new Error('Konten tidak ditemukan.');
+
+    const video = items.find(item => item.mime?.includes('video'));
+    const audio = items.find(item => item.mime?.includes('audio')); // buat .dsig
 
     return {
-      videoUrl: data.result.url,
-      musicUrl: data.result.music,
-      title: data.result.caption || 'Video dari Instagram',
-      author: data.result.username || 'Instagram user',
-      thumbnail: data.result.thumbnail
+      videoUrl: video?.url || null,
+      musicUrl: audio?.url || null, // ini dipakai di .dsig
+      all: items
     };
   } catch (err) {
-    console.error('IG Downloader Error:', err);
+    console.error('SnapInsta Error:', err.message || err);
     return null;
   }
 }

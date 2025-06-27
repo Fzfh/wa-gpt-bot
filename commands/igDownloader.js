@@ -6,11 +6,11 @@ async function downloadInstagram(url) {
     if (!items || items.length === 0) throw new Error('Konten tidak ditemukan.');
 
     const video = items.find(item => item.mime?.includes('video'));
-    const audio = items.find(item => item.mime?.includes('audio')); // buat .dsig
+    const audio = items.find(item => item.mime?.includes('audio'));
 
     return {
       videoUrl: video?.url || null,
-      musicUrl: audio?.url || null, // ini dipakai di .dsig
+      musicUrl: audio?.url || null,
       all: items
     };
   } catch (err) {

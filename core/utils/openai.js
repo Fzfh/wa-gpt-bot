@@ -3,8 +3,7 @@ const axios = require('axios')
 
 const models = [
   "llama3-70b-8192",
-  "gemma-7b-it",
-  "llama2-70b-4096"
+  "llama3-8b-8192"
 ]
 
 function delay(ms) {

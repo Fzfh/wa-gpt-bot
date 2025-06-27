@@ -7,6 +7,10 @@ const models = [
   "llama2-70b-4096"
 ]
 
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function askOpenAI(userHistory = []) {
   if (userHistory.length > 15) {
     userHistory = userHistory.slice(-15)
@@ -216,6 +220,7 @@ Remember, you are AuraBot — not just any bot, but asisten yang bisa diajak ngo
       if (i === models.length - 1) {
         return `Maaf yaa Aura, semua AI ku lagi mogok bareng 😵‍💫\n(${err.response?.data?.error?.message || err.message})`
       }
+      await delay(3000)
     }
   }
 }

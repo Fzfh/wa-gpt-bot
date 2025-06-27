@@ -262,37 +262,6 @@ if (text.startsWith('/') || text.startsWith('.')) {
       return;
     }
     
-    if (text.startsWith('.dsig ')) {
-      const link = text.split(' ')[1];
-    
-      if (!link || !link.includes('instagram.com')) {
-        await sock.sendMessage(from, { text: '❌ Link Instagram tidak valid!' }, { quoted: msg });
-        return;
-      }
-    
-      await sock.sendMessage(from, { text: '🎧 Mengunduh audio dari Instagram...' }, { quoted: msg });
-    
-      try {
-        const result = await downloadInstagram(link);
-        if (!result || !result.musicUrl) {
-          await sock.sendMessage(from, { text: '❌ Gagal mengunduh audio Instagram.' }, { quoted: msg });
-          return;
-        }
-    
-        await sock.sendMessage(from, {
-          audio: { url: result.musicUrl },
-          mimetype: 'audio/mp4'
-        }, { quoted: msg });
-      } catch (e) {
-        console.error('❌ Error IG:', e);
-        await sock.sendMessage(from, { text: '⚠️ Terjadi kesalahan saat mengunduh audio IG.' }, { quoted: msg });
-      }
-    
-      return;
-    }
-
-
-    
     if (!text.startsWith('/')) {
     const sesi = sessionMap.get(sender);
 

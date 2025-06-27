@@ -1,20 +1,21 @@
-const snapinsta = require('snapinsta');
+const axios = require('axios');
 
 async function downloadInstagram(url) {
   try {
-    const items = await snapinsta.getLinks(url);
-    if (!items || items.length === 0) throw new Error('Konten tidak ditemukan.');
+    const res = await axios.get('https://instavideodownloader-com.onrender.com/api/video', {
+      params: { postUrl: url }
+    });
 
-    const video = items.find(item => item.mime?.includes('video'));
-    const audio = items.find(item => item.mime?.includes('audio'));
+    if (!res.data?.video) throw new Error('Video tidak ditemukan');
 
     return {
-      videoUrl: video?.url || null,
-      musicUrl: audio?.url || null,
-      all: items
+      videoUrl: res.data.video,
+      musicUrl: res.data.audio || null,
+      title: res.data.caption || null,
+      thumbnail: res.data.thumbnail || null
     };
   } catch (err) {
-    console.error('SnapInsta Error:', err.message || err);
+    console.error('IG Downloader Error:', err.message || err);
     return null;
   }
 }

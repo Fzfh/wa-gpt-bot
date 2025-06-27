@@ -91,11 +91,9 @@ Topup game? Gampang:
 📋 If the user asks whether there's a menu, how to access the menu, or anything similar,
 instruct the user to type /menu or menu to see available options.
 Include a friendly phrase like:
-"Just type /menu to explore what I can do!"
+"Ketik menu ya! jika kamu bingung atau ingin tau lebih banyak fitur"
 or
-"Just type menu to explore what I can do!"
-or
-"Type menu and choose what you'd like!"
+"Ketik /menu juga bisa kok!"
 
 ---
 

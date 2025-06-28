@@ -28,6 +28,7 @@ const hapusProduk = require('../commands/hapusProduk');
 const tambahProduk = require('../commands/tambahProduk');
 const downloadTiktok = require('../commands/tiktokDownloader');
 const downloadInstagram = require('../commands/igDownloader');
+const downloadYoutube = require('../commands/youtubeDownloader');
 const sendAll = require('../commands/sendAll');
 
 const greetedUsers = new Set()
@@ -141,6 +142,40 @@ if (text.startsWith('/') || text.startsWith('.')) {
       await sock.sendMessage(from, { text: '🔄 Mengirim ke semua kontak yang 1 grup...' }, { quoted: msg });
       await sendAll(sock, sender, pesan);
       await sock.sendMessage(from, { text: '✅ Pesan berhasil dikirim!' }, { quoted: msg });
+    }
+    if (body.startsWith('.dyt ')) {
+      const url = body.split(' ')[1];
+    
+      if (!url || !url.includes('youtube.com') && !url.includes('youtu.be')) {
+        await sock.sendMessage(from, { text: '❌ Link YouTube-nya nggak valid, bro!' }, { quoted: msg });
+        return;
+      }
+    
+      await sock.sendMessage(from, { text: '⏳ Lagi download videonya, sabar ya bro...' }, { quoted: msg });
+    
+      try {
+        const result = await downloadYoutube(url, 'mp4');
+    
+        if (result.success) {
+          const videoBuffer = fs.readFileSync(result.file);
+    
+          await sock.sendMessage(from, {
+            video: videoBuffer,
+            caption: '✅ Nih videonya bro!',
+          }, { quoted: msg });
+    
+          fs.unlinkSync(result.file); // hapus file setelah dikirim
+        } else {
+          await sock.sendMessage(from, {
+            text: `❌ Gagal download: ${result.error}`
+          }, { quoted: msg });
+        }
+      } catch (err) {
+        console.error('Error saat download:', err);
+        await sock.sendMessage(from, { text: '❌ Error internal saat download video.' }, { quoted: msg });
+      }
+    
+      return;
     }
 
     

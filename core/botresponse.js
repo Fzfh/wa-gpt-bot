@@ -397,12 +397,20 @@ if (text.startsWith('/') || text.startsWith('.')) {
   }
 }
 
+let groupUpdateListenerRegistered = false
+
 function registerGroupUpdateListener(sock) {
-  sock.ev.removeAllListeners('group-participants.update') 
+  if (groupUpdateListenerRegistered) return
+  groupUpdateListenerRegistered = true
+
+  sock.ev.removeAllListeners('group-participants.update')
   sock.ev.on('group-participants.update', async (update) => {
-    await handleWelcome(sock, update) 
+    await handleWelcome(sock, update)
   })
+
+  console.log('[✅] Listener grup berhasil didaftarkan')
 }
+
 
 module.exports = {
   handleResponder,

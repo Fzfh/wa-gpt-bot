@@ -12,7 +12,9 @@ async function downloadYoutube(url, format = 'mp4') {
 
     const options = {
       output: outputPath,
-      format: format === 'mp3' ? 'bestaudio' : 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4',
+      format: format === 'mp3'
+        ? 'bestaudio'
+        : 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4',
       extractAudio: format === 'mp3',
       audioFormat: format === 'mp3' ? 'mp3' : undefined,
       noCheckCertificates: true,
@@ -20,13 +22,10 @@ async function downloadYoutube(url, format = 'mp4') {
       preferFreeFormats: true,
       addMetadata: true,
       embedThumbnail: format === 'mp3',
-      o: outputPath,
     };
 
-    console.log(`[YTDL] Downloading: ${url} => ${outputPath}`);
-
     const info = await youtubedl(url, options);
-    
+
     return {
       success: true,
       file: outputPath,

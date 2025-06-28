@@ -137,10 +137,10 @@ if (lowerText === 'beli kuota') {
       }, { quoted: msg })
       return true
 
-    case '.Tutorial':
-    case '.Tutor':
-    case '.tutorial':
-    case '.tutor':
+    case 'Tutorial':
+    case 'Tutor':
+    case 'tutorial':
+    case 'tutor':
       await sock.sendMessage(sender, {
         text: `📖 *Petunjuk Cara Pembelian & Command di AURA BOT*
 
@@ -168,12 +168,12 @@ if (lowerText === 'beli kuota') {
   server: asia (JIKA GENSHIN)
   Bukti TF: (kirim foto)
 
-4️⃣*Menfess*
+4️⃣ *Menfess*
    ➤ Ketik: /menfess
    ➤ ketik nomor, nomor yang bisa di deteksi (62895, +6289-9889-xxx, 089879)
    ➤ Ketik /batal jika tidak jadi
    
-4️⃣*Download Tiktok*
+5️⃣ *Download Tiktok*
    ➤ Ketik: .d (*UNTUK VIDEO)*
    ➤ Ketik: .ds (*UNTUK SOUND)*
    ➤ Ketik: .df (*UNTUK FOTO)*

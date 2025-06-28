@@ -144,16 +144,16 @@ if (text.startsWith('/') || text.startsWith('.')) {
       await sock.sendMessage(from, { text: '✅ Pesan berhasil dikirim!' }, { quoted: msg });
     }
 
-    if (body.startsWith('.dyt ')) {
+   if (body.startsWith('.dyt ')) {
   const url = body.split(' ')[1];
   await sock.sendMessage(from, { text: '⏳ Downloading video...' }, { quoted: msg });
   const r = await downloadYoutube(url, 'mp4');
   if (r.success) {
     const buf = fs.readFileSync(r.file);
-    await sock.sendMessage(from, { video: buf, caption: '✅ Video ready!' }, { quoted: msg });
+    await sock.sendMessage(from, { video: buf, caption: '✅ Video siap!' }, { quoted: msg });
     fs.unlinkSync(r.file);
   } else {
-    await sock.sendMessage(from, { text: `❌ Failed: ${r.error}` }, { quoted: msg });
+    await sock.sendMessage(from, { text: `❌ Gagal: ${r.error}` }, { quoted: msg });
   }
 }
 
@@ -166,7 +166,7 @@ if (body.startsWith('.dyts ')) {
     await sock.sendMessage(from, { audio: buf, mimetype: 'audio/mp4' }, { quoted: msg });
     fs.unlinkSync(r.file);
   } else {
-    await sock.sendMessage(from, { text: `❌ Failed: ${r.error}` }, { quoted: msg });
+    await sock.sendMessage(from, { text: `❌ Gagal: ${r.error}` }, { quoted: msg });
   }
 }
     

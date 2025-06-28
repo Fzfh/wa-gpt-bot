@@ -1,47 +1,36 @@
-const { ytmp4, ytmp3v2 } = require('@ruhend/scraper');
-const path = require('path');
+const youtubedl = require('youtube-dl-exec');
 const fs = require('fs');
 const os = require('os');
+const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 
 async function downloadYoutube(url, format = 'mp4') {
   const id = uuidv4();
-  const tempDir = os.tmpdir();
   const ext = format === 'mp3' ? 'mp3' : 'mp4';
-  const outputPath = path.join(tempDir, `${id}.${ext}`);
+  const output = path.join(os.tmpdir(), `${id}.${ext}`);
+
+  const opts = {
+    output,
+    format: format === 'mp3'
+      ? 'bestaudio'
+      : 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4',
+    extractAudio: format === 'mp3',
+    audioFormat: format === 'mp3' ? 'mp3' : undefined,
+    noCheckCertificates: true,
+    noWarnings: true,
+    preferFreeFormats: true,
+    addMetadata: true,
+    // addHeader: ['referer:youtube.com', 'user-agent:googlebot'],
+  };
 
   try {
-    let data;
-    if (format === 'mp3') {
-      data = await ytmp3v2(url);
-      if (!data.audio) throw new Error('Audio URL tidak tersedia');
-      const res = await fetch(data.audio);
-      const buffer = await res.arrayBuffer();
-      fs.writeFileSync(outputPath, Buffer.from(buffer));
-    } else { // MP4
-      data = await ytmp4(url);
-      if (!data.video) throw new Error('Video URL tidak tersedia');
-      const res = await fetch(data.video);
-      const buffer = await res.arrayBuffer();
-      fs.writeFileSync(outputPath, Buffer.from(buffer));
-    }
+    await youtubedl.exec(url, opts);
 
-    return {
-      success: true,
-      file: outputPath,
-      info: {
-        title: data.title,
-        duration: data.duration,
-        size: data.size || null,
-        ext,
-      },
-    };
+    if (!fs.existsSync(output)) throw new Error('File tidak ditemukan setelah download');
+
+    return { success: true, file: output };
   } catch (err) {
-    console.error('Download error:', err);
-    return {
-      success: false,
-      error: err.message,
-    };
+    return { success: false, error: err.stderr || err.message };
   }
 }
 

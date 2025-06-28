@@ -1,4 +1,4 @@
-const { exec } = require('youtube-dl-exec');
+const { ytmp4, ytmp3v2 } = require('@ruhend/scraper');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -7,46 +7,40 @@ const { v4: uuidv4 } = require('uuid');
 async function downloadYoutube(url, format = 'mp4') {
   const id = uuidv4();
   const tempDir = os.tmpdir();
-  const outputPath = path.join(tempDir, `${id}.${format}`);
-
-  const options = {
-    output: outputPath,
-    noCheckCertificates: true,
-    noWarnings: true,
-    preferFreeFormats: true,
-    addMetadata: true,
-    format: format === 'mp3'
-      ? 'bestaudio'
-      : 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4',
-    cookies: path.join(__dirname, 'youtube-cookies.txt'),
-  };
-
-  if (format === 'mp3') {
-    options.extractAudio = true;
-    options.audioFormat = 'mp3';
-    options.embedThumbnail = true;
-  }
+  const ext = format === 'mp3' ? 'mp3' : 'mp4';
+  const outputPath = path.join(tempDir, `${id}.${ext}`);
 
   try {
-    await exec(url, options, {
-      youtubeDl: 'yt-dlp',
-    });
-
-    if (!fs.existsSync(outputPath)) {
-      throw new Error('File hasil download tidak ditemukan.');
+    let data;
+    if (format === 'mp3') {
+      data = await ytmp3v2(url);
+      if (!data.audio) throw new Error('Audio URL tidak tersedia');
+      const res = await fetch(data.audio);
+      const buffer = await res.arrayBuffer();
+      fs.writeFileSync(outputPath, Buffer.from(buffer));
+    } else { // MP4
+      data = await ytmp4(url);
+      if (!data.video) throw new Error('Video URL tidak tersedia');
+      const res = await fetch(data.video);
+      const buffer = await res.arrayBuffer();
+      fs.writeFileSync(outputPath, Buffer.from(buffer));
     }
 
     return {
       success: true,
       file: outputPath,
-      info: { url, format },
+      info: {
+        title: data.title,
+        duration: data.duration,
+        size: data.size || null,
+        ext,
+      },
     };
-  } catch (error) {
-    const msg = error.stderr || error.message || 'Unknown error';
-    console.error('❌ Download error:', msg);
+  } catch (err) {
+    console.error('Download error:', err);
     return {
       success: false,
-      error: msg,
+      error: err.message,
     };
   }
 }

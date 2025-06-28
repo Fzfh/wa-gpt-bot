@@ -14,7 +14,7 @@ async function downloadYoutube(url, format = 'mp4') {
     format: format === 'mp3'
       ? 'bestaudio'
       : 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4',
-    extractAudio: format === 'mp3',
+   extractAudio: format === 'mp3' ? true : false,
     audioFormat: format === 'mp3' ? 'mp3' : undefined,
     noCheckCertificates: true,
     noWarnings: true,

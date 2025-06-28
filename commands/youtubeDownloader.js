@@ -1,4 +1,4 @@
-const youtubedl = require('youtube-dl-exec').exec;
+const { exec } = require('youtube-dl-exec');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -9,38 +9,45 @@ async function downloadYoutube(url, format = 'mp4') {
   const tempDir = os.tmpdir();
   const outputPath = path.join(tempDir, `${id}.${format}`);
 
-  const options = {
+  const baseOptions = {
     output: outputPath,
-    format: format === 'mp3'
-      ? 'bestaudio'
-      : 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4',
-    extractAudio: format === 'mp3',
-    audioFormat: format === 'mp3' ? 'mp3' : undefined,
-    embedThumbnail: format === 'mp3',
-    addMetadata: true,
-    preferFreeFormats: true,
     noCheckCertificates: true,
     noWarnings: true,
-    // verbose: true,
+    preferFreeFormats: true,
+    addMetadata: true,
   };
 
+  const formatOptions =
+    format === 'mp3'
+      ? {
+          extractAudio: true,
+          audioFormat: 'mp3',
+          embedThumbnail: true,
+          format: 'bestaudio',
+        }
+      : {
+          format: 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4',
+        };
+
   try {
-    await youtubedl(url, options, {
-      shell: true,
-      youtubeDl: 'yt-dlp'
+    await exec(url, {
+      ...baseOptions,
+      ...formatOptions,
+    }, {
+      youtubeDl: 'yt-dlp',
     });
 
     if (!fs.existsSync(outputPath)) {
-      throw new Error('File hasil download tidak ditemukan!');
+      throw new Error('File hasil download tidak ditemukan.');
     }
 
     return {
       success: true,
       file: outputPath,
-      info: { url },
+      info: { url, format },
     };
   } catch (error) {
-    console.error('❌ Download error:', error);
+    console.error('❌ Download error:', error.stderr || error.message);
     return {
       success: false,
       error: error.stderr || error.message || 'Unknown error',

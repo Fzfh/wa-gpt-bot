@@ -60,9 +60,11 @@ async function handlePulsa(sock, msg) {
 💰 Harga: Rp${item.harga.toLocaleString('id-ID')}
 
 💳 Silakan transfer ke salah satu metode berikut:
-• Dana: 08xxxxxxxxxx
-• Gopay: 08xxxxxxxxxx
-• BCA: 1234567890 a.n. AURA SHOP
+💸 Dana: 0895326679840
+💳 Gopay: 0895326679840
+📱 OVO: 0895326679840
+🛍 ShopeePay: 0895326679840
+🏦 BCA: *BELUM TERSEDIA
 
 📸 Kirim:
 - Nomor HP tujuan

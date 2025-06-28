@@ -9,31 +9,26 @@ async function downloadYoutube(url, format = 'mp4') {
   const tempDir = os.tmpdir();
   const outputPath = path.join(tempDir, `${id}.${format}`);
 
-  const baseOptions = {
+  const options = {
     output: outputPath,
     noCheckCertificates: true,
     noWarnings: true,
     preferFreeFormats: true,
     addMetadata: true,
+    format: format === 'mp3'
+      ? 'bestaudio'
+      : 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4',
+    cookies: path.join(__dirname, 'youtube-cookies.txt'),
   };
 
-  const formatOptions =
-    format === 'mp3'
-      ? {
-          extractAudio: true,
-          audioFormat: 'mp3',
-          embedThumbnail: true,
-          format: 'bestaudio',
-        }
-      : {
-          format: 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4',
-        };
+  if (format === 'mp3') {
+    options.extractAudio = true;
+    options.audioFormat = 'mp3';
+    options.embedThumbnail = true;
+  }
 
   try {
-    await exec(url, {
-      ...baseOptions,
-      ...formatOptions,
-    }, {
+    await exec(url, options, {
       youtubeDl: 'yt-dlp',
     });
 
@@ -47,10 +42,11 @@ async function downloadYoutube(url, format = 'mp4') {
       info: { url, format },
     };
   } catch (error) {
-    console.error('❌ Download error:', error.stderr || error.message);
+    const msg = error.stderr || error.message || 'Unknown error';
+    console.error('❌ Download error:', msg);
     return {
       success: false,
-      error: error.stderr || error.message || 'Unknown error',
+      error: msg,
     };
   }
 }

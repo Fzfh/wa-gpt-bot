@@ -1,39 +1,23 @@
-const youtubedl = require('youtube-dl-exec');
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
+const axios = require('axios');
 
-async function downloadYoutube(url, format = 'mp4') {
-  const id = uuidv4();
-  const ext = format === 'mp3' ? 'mp3' : 'mp4';
-  const output = path.join(os.tmpdir(), `${id}.${ext}`);
-
-  const opts = {
-    output,
-    format: format === 'mp3'
-      ? 'bestaudio'
-      : 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4',
-    extractAudio: format === 'mp3',
-    audioFormat: format === 'mp3' ? 'mp3' : undefined,
-    noCheckCertificates: true,
-    noWarnings: true,
-    preferFreeFormats: true,
-    addMetadata: true,
-    embedThumbnail: format === 'mp3',
-    cookies: path.resolve(__dirname, '../core/utils/cookies.txt'), 
-  };
-
+async function downloadYoutubeViaApi(url, format = 'mp4') {
   try {
-    await youtubedl(url, opts);
+    const res = await axios.get(`https://y2mate.guru/api/convert`, {
+      params: { url }
+    });
 
-    if (!fs.existsSync(output)) throw new Error('❌ File tidak ditemukan setelah download');
+    const data = res.data;
 
-    return { success: true, file: output };
+    if (!data || !data.url) throw new Error('❌ Link download tidak ditemukan');
+
+    const downloadUrl = format === 'mp3' ? data.audio : data.video;
+
+    if (!downloadUrl) throw new Error('❌ Format tidak tersedia');
+
+    return { success: true, url: downloadUrl };
   } catch (err) {
-    console.error('❌ Download error:', err);
-    return { success: false, error: err.stderr || err.message };
+    return { success: false, error: err.message };
   }
 }
 
-module.exports = downloadYoutube;
+module.exports = downloadYoutubeViaApi;

@@ -1,44 +1,28 @@
-const axios = require('axios');
-const { v4: uuidv4 } = require('uuid');
+const ytdl = require('ytdl-core');
 const fs = require('fs');
 const path = require('path');
-const https = require('https');
-
-function downloadFile(url, output) {
-  return new Promise((resolve, reject) => {
-    const file = fs.createWriteStream(output);
-    https.get(url, (response) => {
-      response.pipe(file);
-      file.on('finish', () => {
-        file.close(() => resolve(output));
-      });
-    }).on('error', (err) => {
-      fs.unlinkSync(output);
-      reject(err);
-    });
-  });
-}
+const { v4: uuidv4 } = require('uuid');
 
 async function downloadYoutube(url, format = 'mp4') {
   try {
-    const res = await axios.get(`https://www.y2mate.is/mates/en68/analyze/ajax`, {
-      params: { url },
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    const info = await ytdl.getInfo(url);
+    const ext = format === 'mp3' ? 'mp3' : 'mp4';
+    const file = path.join('/tmp', `${uuidv4()}.${ext}`);
+
+    const formatFilter = format === 'mp3'
+      ? ytdl.filterFormats(info.formats, 'audioonly')
+      : ytdl.filterFormats(info.formats, 'audioandvideo');
+
+    const chosen = ytdl.chooseFormat(formatFilter, { quality: format === 'mp4' ? 'highestvideo' : 'highestaudio' });
+    if (!chosen || !chosen.url) throw new Error('Tidak ada format tersedia');
+
+    const writeStream = fs.createWriteStream(file);
+    ytdl.downloadFromInfo(info, { format: chosen }).pipe(writeStream);
+
+    return await new Promise((resolve, reject) => {
+      writeStream.on('finish', () => resolve({ success: true, file }));
+      writeStream.on('error', reject);
     });
-
-    const videoId = res.data.vid || '';
-    const links = res.data.links?.mp4 || res.data.links?.mp3;
-
-    if (!links) throw new Error('Link download tidak ditemukan');
-
-    // Ambil kualitas terbaik
-    const best = Object.values(links).sort((a, b) => b.size - a.size)[0];
-    const downloadUrl = best.url;
-
-    const tmpFile = path.join('/tmp', `${uuidv4()}.${format}`);
-    await downloadFile(downloadUrl, tmpFile);
-
-    return { success: true, file: tmpFile };
   } catch (err) {
     return { success: false, error: err.message };
   }

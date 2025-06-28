@@ -143,40 +143,64 @@ if (text.startsWith('/') || text.startsWith('.')) {
       await sendAll(sock, sender, pesan);
       await sock.sendMessage(from, { text: '✅ Pesan berhasil dikirim!' }, { quoted: msg });
     }
-    if (body.startsWith('.dyt ')) {
-      const url = body.split(' ')[1];
-    
-      if (!url || !url.includes('youtube.com') && !url.includes('youtu.be')) {
-        await sock.sendMessage(from, { text: '❌ Link YouTube-nya nggak valid, bro!' }, { quoted: msg });
-        return;
-      }
-    
-      await sock.sendMessage(from, { text: '⏳ Sedang Mengunduh video Youtube...' }, { quoted: msg });
-    
-      try {
-        const result = await downloadYoutube(url, 'mp4');
-    
-        if (result.success) {
-          const videoBuffer = fs.readFileSync(result.file);
-    
-          await sock.sendMessage(from, {
-            video: videoBuffer,
-            caption: '✅ Nih videonya bro!',
-          }, { quoted: msg });
-    
-          fs.unlinkSync(result.file); // hapus file setelah dikirim
-        } else {
-          await sock.sendMessage(from, {
-            text: `❌ Gagal download: ${result.error}`
-          }, { quoted: msg });
-        }
-      } catch (err) {
-        console.error('Error saat download:', err);
-        await sock.sendMessage(from, { text: '❌ Error internal saat download video.' }, { quoted: msg });
-      }
-    
-      return;
+if (body.startsWith('.dyt ')) {
+  const url = body.split(' ')[1];
+  if (!url || !url.includes('youtu')) {
+    await sock.sendMessage(from, { text: '❌ Kirim link YouTube yang valid bro!' }, { quoted: msg });
+    return;
+  }
+
+  await sock.sendMessage(from, { text: '📥 Sedang download video YouTube-nya, tunggu sebentar bro...' }, { quoted: msg });
+
+  try {
+    const result = await downloadYoutube(url, 'mp4');
+    if (result.success) {
+      const videoBuffer = fs.readFileSync(result.file);
+      await sock.sendMessage(from, {
+        video: videoBuffer,
+        caption: `✅ Berhasil download: ${result.info.title || 'Video'}`
+      }, { quoted: msg });
+      fs.unlinkSync(result.file); // hapus file setelah dikirim
+    } else {
+      await sock.sendMessage(from, { text: `❌ Gagal download: ${result.error}` }, { quoted: msg });
     }
+  } catch (err) {
+    await sock.sendMessage(from, { text: '❌ Error saat download video.' }, { quoted: msg });
+    console.error(err);
+  }
+
+  return;
+}
+
+if (body.startsWith('.dyts ')) {
+  const url = body.split(' ')[1];
+  if (!url || !url.includes('youtu')) {
+    await sock.sendMessage(from, { text: '❌ Kirim link YouTube yang valid bro!' }, { quoted: msg });
+    return;
+  }
+
+  await sock.sendMessage(from, { text: '🎵 Sedang download audio-nya, tunggu sebentar bro...' }, { quoted: msg });
+
+  try {
+    const result = await downloadYoutube(url, 'mp3');
+    if (result.success) {
+      const audioBuffer = fs.readFileSync(result.file);
+      await sock.sendMessage(from, {
+        audio: audioBuffer,
+        mimetype: 'audio/mp4',
+        ptt: false,
+      }, { quoted: msg });
+      fs.unlinkSync(result.file);
+    } else {
+      await sock.sendMessage(from, { text: `❌ Gagal download: ${result.error}` }, { quoted: msg });
+    }
+  } catch (err) {
+    await sock.sendMessage(from, { text: '❌ Error saat download audio.' }, { quoted: msg });
+    console.error(err);
+  }
+
+  return;
+}
 
     
     if (text.startsWith('.d ')) {

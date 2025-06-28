@@ -24,7 +24,11 @@ async function downloadYoutube(url, format = 'mp4') {
       embedThumbnail: format === 'mp3',
     };
 
-    const info = await youtubedl(url, options);
+   const info = await youtubedl(url, {
+      ...options,
+      youtubeDl: 'yt-dlp',
+    });
+
 
     return {
       success: true,

@@ -151,7 +151,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
         return;
       }
     
-      await sock.sendMessage(from, { text: '⏳ Lagi download videonya, sabar ya bro...' }, { quoted: msg });
+      await sock.sendMessage(from, { text: '⏳ Sedang Mengunduh video Youtube...' }, { quoted: msg });
     
       try {
         const result = await downloadYoutube(url, 'mp4');

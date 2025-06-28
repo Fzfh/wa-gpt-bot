@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const sessionMap = require('../core/sessionStore');
+const { adminList } = require('../setting/setting');
+
 
 const DATA_PATHS = {
   topup: path.join(__dirname, '../data/topup.json'),
@@ -18,16 +20,13 @@ module.exports = async function hapusProduk(sock, msg, from, body,  userId) {
     body || '';
   const lower = textAsli.toLowerCase().trim();
 
-  // Admin check
-  if (from.endsWith('@g.us')) {
-    const metadata = await sock.groupMetadata(from);
-    const isAdmin = metadata.participants.some(p => p.id === sender && (p.admin === 'admin' || p.admin === 'superadmin'));
-    if (!isAdmin) {
-      return sock.sendMessage(chat, {
-        text: `🚫 Maaf yaa, fitur *Hapus Produk* cuma bisa dipake admin grup 😎`
-      }, { quoted: msg });
-    }
+  const isSuperAdmin = adminList.includes(sender);
+  if (!isSuperAdmin) {
+    return sock.sendMessage(chat, {
+      text: `🚫 Maaf yaa, fitur *Tambah Produk* hanya untuk admin utama 😎`,
+    }, { quoted: msg });
   }
+
 
   // 🌟 Keluar dari sesi
   if (lower === '/keluar') {

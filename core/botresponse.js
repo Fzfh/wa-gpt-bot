@@ -145,29 +145,30 @@ if (text.startsWith('/') || text.startsWith('.')) {
     }
 
     if (body.startsWith('.dyt ')) {
-      const url = body.split(' ')[1];
-      await sock.sendMessage(from, { text: '⏳ Sedang mendownload video...' }, { quoted: msg });
-      const r = await downloadYoutube(url, 'mp4');
-      if (r.success) {
-        const buf = fs.readFileSync(r.file);
-        await sock.sendMessage(from, { video: buf, caption: '✅ Video berhasil didownload!' }, { quoted: msg });
-        fs.unlinkSync(r.file);
-      } else {
-        await sock.sendMessage(from, { text: `❌ Gagal download video: ${r.error}` }, { quoted: msg });
-      }
-    }
-    if (body.startsWith('.dyts ')) {
-      const url = body.split(' ')[1];
-      await sock.sendMessage(from, { text: '🎵 Sedang mendownload audio...' }, { quoted: msg });
-      const r = await downloadYoutube(url, 'mp3');
-      if (r.success) {
-        const buf = fs.readFileSync(r.file);
-        await sock.sendMessage(from, { audio: buf, mimetype: 'audio/mp4' }, { quoted: msg });
-        fs.unlinkSync(r.file);
-      } else {
-        await sock.sendMessage(from, { text: `❌ Gagal download audio: ${r.error}` }, { quoted: msg });
-      }
-    }
+  const url = body.split(' ')[1];
+  await sock.sendMessage(from, { text: '⏳ Downloading video...' }, { quoted: msg });
+  const r = await downloadYoutube(url, 'mp4');
+  if (r.success) {
+    const buf = fs.readFileSync(r.file);
+    await sock.sendMessage(from, { video: buf, caption: '✅ Video ready!' }, { quoted: msg });
+    fs.unlinkSync(r.file);
+  } else {
+    await sock.sendMessage(from, { text: `❌ Failed: ${r.error}` }, { quoted: msg });
+  }
+}
+
+if (body.startsWith('.dyts ')) {
+  const url = body.split(' ')[1];
+  await sock.sendMessage(from, { text: '🎶 Downloading audio...' }, { quoted: msg });
+  const r = await downloadYoutube(url, 'mp3');
+  if (r.success) {
+    const buf = fs.readFileSync(r.file);
+    await sock.sendMessage(from, { audio: buf, mimetype: 'audio/mp4' }, { quoted: msg });
+    fs.unlinkSync(r.file);
+  } else {
+    await sock.sendMessage(from, { text: `❌ Failed: ${r.error}` }, { quoted: msg });
+  }
+}
     
     if (text.startsWith('.d ')) {
        const link = text.split(' ')[1]

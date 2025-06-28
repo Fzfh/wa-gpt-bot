@@ -14,22 +14,24 @@ async function downloadYoutube(url, format = 'mp4') {
     format: format === 'mp3'
       ? 'bestaudio'
       : 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4',
-   extractAudio: format === 'mp3' ? true : false,
+    extractAudio: format === 'mp3',
     audioFormat: format === 'mp3' ? 'mp3' : undefined,
     noCheckCertificates: true,
     noWarnings: true,
     preferFreeFormats: true,
     addMetadata: true,
-    // addHeader: ['referer:youtube.com', 'user-agent:googlebot'],
+    embedThumbnail: format === 'mp3',
+    cookies: path.resolve(__dirname, '../core/utils/cookies.txt'), 
   };
 
   try {
-    await youtubedl.exec(url, opts);
+    await youtubedl(url, opts);
 
-    if (!fs.existsSync(output)) throw new Error('File tidak ditemukan setelah download');
+    if (!fs.existsSync(output)) throw new Error('❌ File tidak ditemukan setelah download');
 
     return { success: true, file: output };
   } catch (err) {
+    console.error('❌ Download error:', err);
     return { success: false, error: err.stderr || err.message };
   }
 }

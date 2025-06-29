@@ -144,12 +144,16 @@ if (text.startsWith('/') || text.startsWith('.')) {
       await sock.sendMessage(from, { text: '✅ Pesan berhasil dikirim!' }, { quoted: msg });
     }
 
-  if (text.startsWith('.dyt ')) {
-  const url = text.split('.dyt ')[1].trim();
+ if (text.startsWith('.dyt ')) {
+  const rawUrl = text.split('.dyt ')[1].trim();
   try {
-    const { filePath, title } = await downloadYoutube.downloadYouTubeVideo(url, 'video');
-    const media = MessageMedia.fromFilePath(filePath);
-    await sock.sendMessage(sender, media, { caption: `🎥 ${title}` });
+    const { filePath, title } = await downloadYoutube.downloadYouTubeVideo(rawUrl, 'video');
+    const media = fs.readFileSync(filePath);
+    await sock.sendMessage(sender, {
+      video: media,
+      mimetype: 'video/mp4',
+      caption: `🎥 ${title}`,
+    }, { quoted: msg });
     fs.unlinkSync(filePath);
   } catch (e) {
     await sock.sendMessage(sender, { text: '❌ Gagal download video!\n' + e.message }, { quoted: msg });
@@ -157,16 +161,22 @@ if (text.startsWith('/') || text.startsWith('.')) {
 }
 
 if (text.startsWith('.dyts ')) {
-  const url = text.split('.dyts ')[1].trim();
+  const rawUrl = text.split('.dyts ')[1].trim();
   try {
-    const { filePath, title } = await downloadYoutube.downloadYouTubeVideo(url, 'audio');
-    const media = MessageMedia.fromFilePath(filePath);
-    await sock.sendMessage(sender, media, { caption: `🎵 ${title}` });
+    const { filePath, title } = await downloadYoutube.downloadYouTubeVideo(rawUrl, 'audio');
+    const media = fs.readFileSync(filePath);
+    await sock.sendMessage(sender, {
+      audio: media,
+      mimetype: 'audio/mp4',
+      ptt: false,
+      caption: `🎵 ${title}`,
+    }, { quoted: msg });
     fs.unlinkSync(filePath);
   } catch (e) {
     await sock.sendMessage(sender, { text: '❌ Gagal download audio!\n' + e.message }, { quoted: msg });
   }
 }
+
 
     
     if (text.startsWith('.d ')) {

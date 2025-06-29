@@ -107,7 +107,7 @@ if (lowerText === 'beli kuota') {
 ┃   ➤ topup valo  
 ┃  
 ┃ 📱 *Isi Pulsa & Kuota*  
-┃   ➤ beli pulsa  
+┃   ➤ .pulsa (beli pulsa)  
 ┃   ➤ beli kuota  
 ┃ 
 ┃ 👥 *Tag All Group Members*

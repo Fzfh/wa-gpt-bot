@@ -1,4 +1,3 @@
-require('./globals')
 const spamTracker = new Map()
 const mutedUsers = new Map()
 const memoryMap = new Map()

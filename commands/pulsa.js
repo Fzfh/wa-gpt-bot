@@ -90,7 +90,7 @@ Bukti TF: (foto)`
   }
 
   // 🟢 Mulai sesi baru
-  if (text === '.kouta' || text === 'beli kouta') {
+  if (text === '.pulsa' || text === 'beli pulsa') {
     clearPulsaSession(userId)
 
     const list = getKoutaList()

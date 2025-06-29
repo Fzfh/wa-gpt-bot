@@ -9,7 +9,7 @@ const {
 const { clearPulsaSession } = require('../core/clearhelper')
 
 // Load data kouta dari file JSON
-function getPulsaList() {
+function getKoutaList() {
   const filePath = path.join(__dirname, '../data/pulsa.json')
   try {
     const rawData = fs.readFileSync(filePath, 'utf-8')
@@ -29,8 +29,8 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
 
   // ❌ Keluar dari sesi
   if (text === '/keluar') {
-    produkkoutaMap.delete(userId)
-    selectedkoutaMap.delete(userId)
+    produkKoutaMap.delete(userId)
+    selectedKoutaMap.delete(userId)
     lastKoutaMap.delete(userId)
     await sock.sendMessage(from, {
       text: '❌ Kamu telah keluar dari sesi pembelian kouta.'
@@ -83,7 +83,7 @@ Bukti TF: (foto)`
 
     // ⛔ User dalam sesi tapi bukan angka
     await sock.sendMessage(from, {
-      text: '⚠️ Kamu masih dalam sesi pembelian kuota. Ketik angka untuk memilih atau */keluar* untuk keluar.',
+      text: '⚠️ Kamu masih dalam sesi pembelian Pulsa. Ketik angka untuk memilih atau */keluar* untuk keluar.',
       quoted: msg
     })
     return true
@@ -93,7 +93,7 @@ Bukti TF: (foto)`
   if (text === '.pulsa' || text === 'beli pulsa') {
     clearPulsaSession(userId)
 
-    const list = getPulsaList()
+    const list = getKoutaList()
     if (!Array.isArray(list) || list.length === 0) {
       await sock.sendMessage(from, {
         text: '❌ Tidak ada produk Pulsa tersedia.'

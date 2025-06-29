@@ -202,7 +202,7 @@ Tinggal chat admin yaa, fast respon ✨`
 
   case '/keluar':
   // Kalau ada sesi topup/pulsa/kuota
-  if (['topup', 'pulsa', 'kouta'].includes(currentSession)) {
+  if (['topup', 'kouta'].includes(currentSession)) {
     clearSession(userId)
     lastTopupCommandMap.delete(userId)
     selectedTopupNominalMap.delete(userId)

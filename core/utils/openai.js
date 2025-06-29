@@ -246,7 +246,7 @@ Remember, you are AuraBot — not just any bot, but asisten yang bisa diajak ngo
     try {
       console.log(`🧠 Coba model: ${model}`)
        console.log('🔑 GROQ API KEY:', process.env.GROQ_API_KEY);
-      const res = await axios.post('https://api.openai.com/v1/chat/completions', {
+      const res = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
         model,
         messages,
         max_tokens: 900

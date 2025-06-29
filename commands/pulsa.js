@@ -4,7 +4,7 @@ const path = require('path')
 const {
   produkKoutaMap,
   selectedKoutaMap,
-  lastkoutaMap
+  lastKoutaMap
 } = require('../core/state')
 const { clearPulsaSession } = require('../core/clearhelper')
 

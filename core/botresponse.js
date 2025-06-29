@@ -23,6 +23,12 @@ const { getProdukDariTabel } = require('../commands/produk')
 const { handlePulsa, selectedNominalMap: pulsaNominalMap, lastCommandMap: pulsaCommandMap } = require('../commands/pulsa')
 const { handlekouta, selectedKoutaNominalMap, lastKoutaCommandMap } = require('../commands/kouta')
 const sessionMap = require('../core/sessionStore');
+const {  produkPulsaMap,
+  selectedPulsaMap,
+  lastPulsaMap,
+  produkKoutaMap,
+  selectedKoutaMap,
+  lastKoutaMap } = require('./state)
 const hapusProduk = require('../commands/hapusProduk');
 const tambahProduk = require('../commands/tambahProduk');
 const downloadTiktok = require('../commands/tiktokDownloader');

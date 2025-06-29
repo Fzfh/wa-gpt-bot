@@ -200,17 +200,17 @@ Tinggal chat admin yaa, fast respon ✨`
       }, { quoted: msg })
       return true
 
-  case '/keluar':
-  // Kalau ada sesi topup/pulsa/kuota
-  if (['topup', 'pulsa', 'kouta'].includes(currentSession)) {
-    clearSession(userId)
-    lastTopupCommandMap.delete(userId)
-    selectedTopupNominalMap.delete(userId)
-    await sock.sendMessage(sender, {
-      text: `✅ Sesi *${currentSession}* kamu sudah diakhiri.`
-    }, { quoted: msg })
-    return true
-  }
+  // case '/keluar':
+  // // Kalau ada sesi topup/pulsa/kuota
+  // if (['topup', 'pulsa', 'kouta'].includes(currentSession)) {
+  //   clearSession(userId)
+  //   lastTopupCommandMap.delete(userId)
+  //   selectedTopupNominalMap.delete(userId)
+  //   await sock.sendMessage(sender, {
+  //     text: `✅ Sesi *${currentSession}* kamu sudah diakhiri.`
+  //   }, { quoted: msg })
+  //   return true
+  // }
 
   // Kalau ada sesi tambahan dari fitur tambahProduk
   if (sessionMap.has(userId)) {

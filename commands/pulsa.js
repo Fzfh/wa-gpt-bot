@@ -20,7 +20,7 @@ function getKoutaList() {
   }
 }
 
-async function handlekouta(sock, msg, lowerText, userId, from) {
+async function handlePulsa(sock, msg, lowerText, userId, from) {
   const text = (
     msg.message?.conversation ||
     msg.message?.extendedTextMessage?.text ||

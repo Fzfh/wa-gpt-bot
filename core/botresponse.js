@@ -161,8 +161,8 @@ if (text.startsWith('/') || text.startsWith('.')) {
 if (text.startsWith('.dyts ')) {
   const url = text.split('.dyts ')[1].trim();
   try {
-    await sock.sendMessage(from, { text: '🎧 Mengunduh audio dari YouTube... (via API)' }, { quoted: msg });
-    const { filePath, title } = await downloadYouTubeMP3(url);
+    await sock.sendMessage(from, { text: '🎧 Mengunduh audio dari YouTube...' }, { quoted: msg });
+    const { filePath, title } = await downloadMP3FromYouTube(url);
     await sock.sendMessage(from, {
       audio: { url: filePath },
       mimetype: 'audio/mp4',
@@ -170,11 +170,10 @@ if (text.startsWith('.dyts ')) {
     }, { quoted: msg });
     fs.unlinkSync(filePath);
   } catch (e) {
-    console.error('❌ Error .dyts:', e.message);
-    await sock.sendMessage(from, { text: '❌ Gagal download audio!\n' + e.message }, { quoted: msg });
+    await sock.sendMessage(from, { text: e.message }, { quoted: msg });
   }
-  return;
 }
+
 
 
     

@@ -27,7 +27,7 @@ const hapusProduk = require('../commands/hapusProduk');
 const tambahProduk = require('../commands/tambahProduk');
 const downloadTiktok = require('../commands/tiktokDownloader');
 const downloadInstagram = require('../commands/igDownloader');
-const downloadYouTubeVideo = require('../commands/youtubeDownloader');;
+const downloadYouTubeMP3 = require('../commands/youtubeDownloader');;
 const sendAll = require('../commands/sendAll');
 
 const greetedUsers = new Set()
@@ -143,20 +143,20 @@ if (text.startsWith('/') || text.startsWith('.')) {
       await sock.sendMessage(from, { text: '✅ Pesan berhasil dikirim!' }, { quoted: msg });
     }
 
-if (text.startsWith('.dyt ')) {
-  const url = text.split('.dyt ')[1].trim();
-  try {
-    await sock.sendMessage(from, { text: '🔄 Sedang mengunduh video dari YouTube...' }, { quoted: msg })
-    const { filePath, title } = await downloadYouTubeVideo(url, 'video');
-    await sock.sendMessage(from, {
-      video: { url: filePath },
-      caption: `🎥 ${title}`
-    }, { quoted: msg });
-    fs.unlinkSync(filePath);
-  } catch (e) {
-    await sock.sendMessage(from, { text: '❌ Gagal download video!\n' + e.message }, { quoted: msg });
-  }
-}
+// if (text.startsWith('.dyt ')) {
+//   const url = text.split('.dyt ')[1].trim();
+//   try {
+//     await sock.sendMessage(from, { text: '🔄 Sedang mengunduh video dari YouTube...' }, { quoted: msg })
+//     const { filePath, title } = await downloadYouTubeVideo(url, 'video');
+//     await sock.sendMessage(from, {
+//       video: { url: filePath },
+//       caption: `🎥 ${title}`
+//     }, { quoted: msg });
+//     fs.unlinkSync(filePath);
+//   } catch (e) {
+//     await sock.sendMessage(from, { text: '❌ Gagal download video!\n' + e.message }, { quoted: msg });
+//   }
+// }
 
 if (text.startsWith('.dyts ')) {
   const url = text.split('.dyts ')[1].trim();

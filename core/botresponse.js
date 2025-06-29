@@ -28,7 +28,7 @@ const {  produkPulsaMap,
   lastPulsaMap,
   produkKoutaMap,
   selectedKoutaMap,
-  lastKoutaMap } = require('./state)
+  lastKoutaMap } = require('./state')
 const hapusProduk = require('../commands/hapusProduk');
 const tambahProduk = require('../commands/tambahProduk');
 const downloadTiktok = require('../commands/tiktokDownloader');

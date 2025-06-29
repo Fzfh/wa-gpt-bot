@@ -27,3 +27,4 @@ async function downloadYouTubeMP3(url) {
     throw new Error(`❌ Gagal download: ${err.message}`);
   }
 }
+module.exports = downloadYouTubeMP3;

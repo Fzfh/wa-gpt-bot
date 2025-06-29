@@ -1,4 +1,4 @@
-const { handlePulsa, selectedPulsaMap, lastPulsaMap } = require('../../commands/pulsa')
+const { handlePulsa, selectedKoutaMap, lastKoutaMa } = require('../../commands/pulsa')
 const { handlekouta, selectedKoutaMap, lastKoutaMap } = require('../../commands/kouta')
 const { listTopup, getHargaFromDB, selectedTopupNominalMap: topupNominalMap, lastTopupCommandMap: topupCommandMap } = require('../../commands/topup')
 

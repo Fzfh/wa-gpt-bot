@@ -33,7 +33,7 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
     selectedKoutaMap.delete(userId)
     lastKoutaMap.delete(userId)
     await sock.sendMessage(from, {
-      text: '❌ Kamu telah keluar dari sesi pembelian kouta.'
+      text: '❌ Kamu telah keluar dari sesi pembelian Pulsa.'
     }, { quoted: msg })
     return true
   }
@@ -96,7 +96,7 @@ Bukti TF: (foto)`
     const list = getKoutaList()
     if (!Array.isArray(list) || list.length === 0) {
       await sock.sendMessage(from, {
-        text: '❌ Tidak ada produk kuota tersedia.'
+        text: '❌ Tidak ada produk Pulsa tersedia.'
       }, { quoted: msg })
       return true
     }

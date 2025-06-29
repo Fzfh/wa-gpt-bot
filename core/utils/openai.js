@@ -2,7 +2,8 @@ require('dotenv').config({ path: __dirname + '/.env' })
 const axios = require('axios')
 
 const models = [
-  "gpt-4.1"
+ "llama3-70b-8192",
+ "llama3-8b-8192"
 ]
 
 function delay(ms) {
@@ -251,7 +252,7 @@ Remember, you are AuraBot — not just any bot, but asisten yang bisa diajak ngo
         max_tokens: 900
       }, {
         headers: {
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
           'Content-Type': 'application/json'
         },
         timeout: 10000

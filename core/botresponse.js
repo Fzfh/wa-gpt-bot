@@ -27,7 +27,7 @@ const hapusProduk = require('../commands/hapusProduk');
 const tambahProduk = require('../commands/tambahProduk');
 const downloadTiktok = require('../commands/tiktokDownloader');
 const downloadInstagram = require('../commands/igDownloader');
-const downloadYoutube = require('../commands/youtubeDownloader');
+const downloadYouTubeVideo = require('../commands/youtubeDownloader');;
 const sendAll = require('../commands/sendAll');
 
 const greetedUsers = new Set()

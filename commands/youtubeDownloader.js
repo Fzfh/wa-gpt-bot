@@ -8,7 +8,7 @@ async function downloadMP3FromYouTube(url) {
   try {
     const response = await axios.get(`https://api.vevioz.com/api/button/mp3?url=${encodeURIComponent(url)}`);
     const $ = cheerio.load(response.data);
-    const downloadLink = $('a.btn.btn-success.btn-sm').attr('href');
+    const downloadLink = $('a[href^="/get/"]:contains("Download")').attr('href');
 
     if (!downloadLink) throw new Error('Gagal ambil link MP3');
 

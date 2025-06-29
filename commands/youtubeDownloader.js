@@ -1,30 +1,33 @@
 const axios = require('axios');
+const cheerio = require('cheerio');
 const fs = require('fs');
 const path = require('path');
+const { v4: uuidv4 } = require('uuid');
 
-async function downloadYouTubeMP3(url) {
-  const api = `https://youtube-mp3-download.vercel.app/api?url=${encodeURIComponent(url)}`;
-
+async function downloadMP3FromYouTube(url) {
   try {
-    const res = await axios.get(api);
-    if (!res.data || !res.data.link) throw new Error('Gagal ambil link download');
+    const response = await axios.get(`https://api.vevioz.com/api/button/mp3?url=${encodeURIComponent(url)}`);
+    const $ = cheerio.load(response.data);
+    const downloadLink = $('a.btn.btn-success.btn-sm').attr('href');
 
-    const audioUrl = res.data.link;
-    const title = res.data.title.replace(/[^\w\s]/gi, '');
-    const filePath = path.join(__dirname, '../temp', `${title}.mp3`);
+    if (!downloadLink) throw new Error('Gagal ambil link MP3');
 
+    const id = uuidv4();
+    const filePath = path.join(__dirname, '../temp', `${id}.mp3`);
     const writer = fs.createWriteStream(filePath);
-    const audioRes = await axios.get(audioUrl, { responseType: 'stream' });
-    audioRes.data.pipe(writer);
+
+    const audioStream = await axios.get(downloadLink, { responseType: 'stream' });
+    audioStream.data.pipe(writer);
 
     await new Promise((resolve, reject) => {
       writer.on('finish', resolve);
       writer.on('error', reject);
     });
 
-    return { filePath, title };
+    return { filePath, title: `Audio dari YT` };
   } catch (err) {
-    throw new Error(`❌ Gagal download: ${err.message}`);
+    throw new Error(`❌ Gagal download audio: ${err.message}`);
   }
 }
-module.exports = downloadYouTubeMP3;
+
+module.exports = downloadMP3FromYouTube;

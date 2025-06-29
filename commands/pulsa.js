@@ -136,7 +136,7 @@ Bukti TF: (foto)`
 }
 
 module.exports = {
-  handlekouta,
+  handlePulsa,
   selectedKoutaMap,
   lastKoutaMap
 }

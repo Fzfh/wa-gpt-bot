@@ -144,29 +144,27 @@ if (text.startsWith('/') || text.startsWith('.')) {
       await sock.sendMessage(from, { text: '✅ Pesan berhasil dikirim!' }, { quoted: msg });
     }
 
-   if (body.startsWith('.dyt ')) {
-  const url = body.split(' ')[1];
-  await sock.sendMessage(from, { text: '⏳ Downloading video...' }, { quoted: msg });
-  const r = await downloadYoutube(url, 'mp4');
-  if (r.success) {
-    const buf = fs.readFileSync(r.file);
-    await sock.sendMessage(from, { video: buf, caption: '✅ Video siap!' }, { quoted: msg });
-    fs.unlinkSync(r.file);
-  } else {
-    await sock.sendMessage(from, { text: `❌ Gagal: ${r.error}` }, { quoted: msg });
+  if (message.body.startsWith('.dyt ')) {
+  const url = message.body.split('.dyt ')[1].trim();
+  try {
+    const { filePath, title } = await downloadYouTubeVideo(url, 'video');
+    const media = MessageMedia.fromFilePath(filePath);
+    await client.sendMessage(message.from, media, { caption: `🎥 ${title}` });
+    fs.unlinkSync(filePath);
+  } catch (e) {
+    await message.reply('❌ Gagal download video!\n' + e.message);
   }
 }
 
-if (body.startsWith('.dyts ')) {
-  const url = body.split(' ')[1];
-  await sock.sendMessage(from, { text: '🎶 Downloading audio...' }, { quoted: msg });
-  const r = await downloadYoutube(url, 'mp3');
-  if (r.success) {
-    const buf = fs.readFileSync(r.file);
-    await sock.sendMessage(from, { audio: buf, mimetype: 'audio/mp4' }, { quoted: msg });
-    fs.unlinkSync(r.file);
-  } else {
-    await sock.sendMessage(from, { text: `❌ Gagal: ${r.error}` }, { quoted: msg });
+if (message.body.startsWith('.dyts ')) {
+  const url = message.body.split('.dyts ')[1].trim();
+  try {
+    const { filePath, title } = await downloadYouTubeVideo(url, 'audio');
+    const media = MessageMedia.fromFilePath(filePath);
+    await client.sendMessage(message.from, media, { caption: `🎵 ${title}` });
+    fs.unlinkSync(filePath);
+  } catch (e) {
+    await message.reply('❌ Gagal download audio!\n' + e.message);
   }
 }
     

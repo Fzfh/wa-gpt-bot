@@ -2,9 +2,9 @@ const fs = require('fs')
 const path = require('path')
 
 const {
-  produkPulsaMap,
-  selectedPulsaMap,
-  lastPulsaMap
+  produkKoutaMap,
+  selectedKoutaMap,
+  lastkoutaMap
 } = require('../core/state')
 const { clearPulsaSession } = require('../core/clearhelper')
 
@@ -29,9 +29,9 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
 
   // ❌ Keluar dari sesi
   if (text === '/keluar') {
-    produkPulsaMap.delete(userId)
-    selectedPulsaMap.delete(userId)
-    lastPulsaMap.delete(userId)
+    produkkoutaMap.delete(userId)
+    selectedkoutaMap.delete(userId)
+    lastKoutaMap.delete(userId)
     await sock.sendMessage(from, {
       text: '❌ Kamu telah keluar dari sesi pembelian kouta.'
     }, { quoted: msg })
@@ -39,8 +39,8 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
   }
 
   // ✅ Tangani input angka jika masih dalam sesi
-  if (produkPulsaMap.has(userId)) {
-    const list = produkPulsaMap.get(userId)
+  if (produkKoutaMap.has(userId)) {
+    const list = produkKoutaMap.get(userId)
     if (Array.isArray(list) && /^\d+$/.test(text)) {
       const pilihIndex = parseInt(text)
       const item = list.find(i => i.nomor === pilihIndex)
@@ -48,9 +48,9 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
       if (!item) return false
 
       const harga = parseInt(item.harga) || 0
-      selectedPulsaMap.set(userId, harga)
-      lastPulsaMap.set(userId, `${item.provider} ${item.produk}`)
-      produkPulsaMap.delete(userId)
+      selectedKoutaMap.set(userId, harga)
+      lastKoutaMap.set(userId, `${item.provider} ${item.produk}`)
+      produkKoutaMap.delete(userId)
 
       const info = `✅ Kamu memilih *${item.provider} - ${item.produk}*
 💰 Harga: Rp${harga.toLocaleString('id-ID')}
@@ -127,7 +127,7 @@ Bukti TF: (foto)`
     output += `Ketik angka (contoh: 3) untuk memilih kuota.`
     output += `\nKetik */keluar* untuk membatalkan sesi ini.`
 
-    produkPulsaMap.set(userId, flatList)
+    produkKoutaMap.set(userId, flatList)
     await sock.sendMessage(from, { text: output }, { quoted: msg })
     return true
   }
@@ -137,6 +137,6 @@ Bukti TF: (foto)`
 
 module.exports = {
   handlePulsa,
-  selectedPulsaMap,
-  lastPulsaMap
+  selectedkoutaMap,
+  lastKoutaMap
 }

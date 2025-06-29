@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 
 const {
-  produkPuksaMap,
+  produkPulsaMap,
   selectedPulsaMap,
   lastPulsaMap
 } = require('../core/state')

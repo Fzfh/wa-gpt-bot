@@ -143,38 +143,37 @@ if (text.startsWith('/') || text.startsWith('.')) {
       await sock.sendMessage(from, { text: '✅ Pesan berhasil dikirim!' }, { quoted: msg });
     }
 
- if (text.startsWith('.dyt ')) {
-  const rawUrl = text.split('.dyt ')[1].trim();
+if (text.startsWith('.dyt ')) {
+  const url = text.split('.dyt ')[1].trim();
   try {
-    const { filePath, title } = await downloadYoutube.downloadYouTubeVideo(rawUrl, 'video');
-    const media = fs.readFileSync(filePath);
-    await sock.sendMessage(sender, {
-      video: media,
-      mimetype: 'video/mp4',
-      caption: `🎥 ${title}`,
+    await sock.sendMessage(from, { text: '🔄 Sedang mengunduh video dari YouTube...' }, { quoted: msg })
+    const { filePath, title } = await downloadYouTubeVideo(url, 'video');
+    await sock.sendMessage(from, {
+      video: { url: filePath },
+      caption: `🎥 ${title}`
     }, { quoted: msg });
     fs.unlinkSync(filePath);
   } catch (e) {
-    await sock.sendMessage(sender, { text: '❌ Gagal download video!\n' + e.message }, { quoted: msg });
+    await sock.sendMessage(from, { text: '❌ Gagal download video!\n' + e.message }, { quoted: msg });
   }
 }
 
 if (text.startsWith('.dyts ')) {
-  const rawUrl = text.split('.dyts ')[1].trim();
+  const url = text.split('.dyts ')[1].trim();
   try {
-    const { filePath, title } = await downloadYoutube.downloadYouTubeVideo(rawUrl, 'audio');
-    const media = fs.readFileSync(filePath);
-    await sock.sendMessage(sender, {
-      audio: media,
+    await sock.sendMessage(from, { text: '🎧 Mengunduh audio dari YouTube...' }, { quoted: msg });
+    const { filePath, title } = await downloadYouTubeVideo(url, 'audio');
+    await sock.sendMessage(from, {
+      audio: { url: filePath },
       mimetype: 'audio/mp4',
-      ptt: false,
-      caption: `🎵 ${title}`,
+      ptt: false
     }, { quoted: msg });
     fs.unlinkSync(filePath);
   } catch (e) {
-    await sock.sendMessage(sender, { text: '❌ Gagal download audio!\n' + e.message }, { quoted: msg });
+    await sock.sendMessage(from, { text: '❌ Gagal download audio!\n' + e.message }, { quoted: msg });
   }
 }
+
     
     if (text.startsWith('.d ')) {
        const link = text.split(' ')[1]

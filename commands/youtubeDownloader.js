@@ -1,33 +1,28 @@
-const axios = require('axios');
-const cheerio = require('cheerio');
+const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 
-async function downloadMP3FromYouTube(url) {
-  try {
-    const response = await axios.get(`https://api.vevioz.com/api/button/mp3?url=${encodeURIComponent(url)}`);
-    const $ = cheerio.load(response.data);
-    const downloadLink = $('a[href^="/get/"]:contains("Download")').attr('href');
-
-    if (!downloadLink) throw new Error('Gagal ambil link MP3');
-
+async function downloadYouTubeMP3(url) {
+  return new Promise((resolve, reject) => {
     const id = uuidv4();
-    const filePath = path.join(__dirname, '../temp', `${id}.mp3`);
-    const writer = fs.createWriteStream(filePath);
+    const filename = `${id}.mp3`;
+    const filepath = path.join(__dirname, '../../temp', filename);
 
-    const audioStream = await axios.get(downloadLink, { responseType: 'stream' });
-    audioStream.data.pipe(writer);
+    const command = `yt-dlp -x --audio-format mp3 -o "${filepath}" "${url}"`;
 
-    await new Promise((resolve, reject) => {
-      writer.on('finish', resolve);
-      writer.on('error', reject);
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        return reject(new Error(stderr || error.message));
+      }
+
+      if (!fs.existsSync(filepath)) {
+        return reject(new Error('File tidak ditemukan setelah proses unduhan.'));
+      }
+
+      resolve({ filePath: filepath, title: path.basename(filename) });
     });
-
-    return { filePath, title: `Audio dari YT` };
-  } catch (err) {
-    throw new Error(`❌ Gagal download audio: ${err.message}`);
-  }
+  });
 }
 
-module.exports = downloadMP3FromYouTube;
+module.exports = downloadYouTubeMP3;

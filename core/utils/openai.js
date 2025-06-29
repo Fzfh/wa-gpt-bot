@@ -2,7 +2,7 @@ require('dotenv').config({ path: __dirname + '/.env' })
 const axios = require('axios')
 
 const models = [
-  "gpt-3.5-turbo"
+  "gpt-o4-mini"
 ]
 
 function delay(ms) {

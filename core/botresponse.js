@@ -176,8 +176,6 @@ if (text.startsWith('.dyts ')) {
     await sock.sendMessage(sender, { text: '❌ Gagal download audio!\n' + e.message }, { quoted: msg });
   }
 }
-
-
     
     if (text.startsWith('.d ')) {
        const link = text.split(' ')[1]

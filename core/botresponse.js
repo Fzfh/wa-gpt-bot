@@ -119,12 +119,6 @@ if (text.startsWith('/') || text.startsWith('.')) {
     const handledInvoice = await handleInvoiceTopupWrapper(sock, msg, lowerText, userId, sender)
     if (handledInvoice) return
 
-    // await handleAutoKick(sock, msg)
-
-    sock.ev.on('group-participants.update', async (update) => {
-      await handleWelcome(sock, update);
-    });
-
      const handledMenfess = await menfess(sock, msg, text)
     if (handledMenfess) return
 
@@ -418,7 +412,9 @@ module.exports = {
   botFirstResponse,
   handlePulsa,
   handlekouta,
-  selectedNominalMap: selectedKoutaNominalMap,
-  lastCommandMap: lastKoutaCommandMap,
+  selectedPulsaMap,
+  lastPulsaMap,
+  selectedKoutaMap,
+  lastKoutaMap,
   registerGroupUpdateListener
 }

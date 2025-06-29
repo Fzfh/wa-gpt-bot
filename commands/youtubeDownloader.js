@@ -1,32 +1,27 @@
-const axios = require('axios');
+const ytdl = require('ytdl-core');
 const fs = require('fs');
 const path = require('path');
-const { v4: uuidv4 } = require('uuid');
 
-async function downloadYoutube(url, type = 'mp4') {
-  try {
-    const res = await axios.get(`https://ytdl.damn.dev/api/ytdl?url=${encodeURIComponent(url)}`);
-    const data = res.data;
+async function downloadYouTubeVideo(url, type = 'video') {
+  if (!ytdl.validateURL(url)) throw new Error('❌ URL tidak valid');
 
-    if (!data || !data[type]) {
-      return { success: false, error: 'Link download tidak ditemukan' };
-    }
+  const info = await ytdl.getInfo(url);
+  const title = info.videoDetails.title.replace(/[^\w\s]/gi, '').slice(0, 30);
+  const fileName = `${title}-${Date.now()}.${type === 'video' ? 'mp4' : 'mp3'}`;
+  const filePath = path.join(__dirname, '../temp', fileName);
 
-    const downloadUrl = data[type];
-    const file = path.join('/tmp', `${uuidv4()}.${type}`);
-    const response = await axios.get(downloadUrl, { responseType: 'stream' });
+  const stream = ytdl(url, {
+    filter: type === 'video' ? 'videoandaudio' : 'audioonly',
+    quality: type === 'video' ? 'highestvideo' : 'highestaudio',
+  });
 
-    await new Promise((resolve, reject) => {
-      const writer = fs.createWriteStream(file);
-      response.data.pipe(writer);
-      writer.on('finish', resolve);
-      writer.on('error', reject);
-    });
+  await new Promise((resolve, reject) => {
+    stream.pipe(fs.createWriteStream(filePath))
+      .on('finish', resolve)
+      .on('error', reject);
+  });
 
-    return { success: true, file };
-  } catch (err) {
-    return { success: false, error: err.message || 'Unknown error' };
-  }
+  return { filePath, title };
 }
 
-module.exports = downloadYoutube;
+module.exports = { downloadYouTubeVideo };

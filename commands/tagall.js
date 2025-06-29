@@ -17,7 +17,6 @@ module.exports = async function tagall(sock, msg, text, isGroup) {
       }, { quoted: msg })
     }
 
-    // ✅ Cek apakah pengirim adalah admin grup WA
     const isSenderAdmin = metadata.participants.some(p =>
       p.id === userId && (p.admin === 'admin' || p.admin === 'superadmin')
     )
@@ -29,7 +28,10 @@ module.exports = async function tagall(sock, msg, text, isGroup) {
     }
 
     const mentions = metadata.participants.map(p => p.id)
-    const customMsg = text.split(' ').slice(1).join(' ') || '📢 Hai semua, yuk kumpul dulu!'
+
+    const tagger = '@' + userId.split('@')[0]
+
+    const customMsg = text.split(' ').slice(1).join(' ') || `📢 Di tag oleh ${tagger}`
 
     return sock.sendMessage(groupId, {
       text: customMsg,

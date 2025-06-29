@@ -206,8 +206,6 @@ Tinggal chat admin yaa, fast respon ✨`
     clearSession(userId)
     lastTopupCommandMap.delete(userId)
     selectedTopupNominalMap.delete(userId)
-    selectedPulsaMap.delete(userId)
-    lastPulsaMap.delete(userId)
     await sock.sendMessage(sender, {
       text: `✅ Sesi *${currentSession}* kamu sudah diakhiri.`
     }, { quoted: msg })

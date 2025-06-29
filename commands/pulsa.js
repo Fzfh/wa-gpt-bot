@@ -6,7 +6,7 @@ const {
   selectedPulsaMap,
   lastPulsaMap
 } = require('../core/state')
-const { clearKoutaSession } = require('../core/clearhelper')
+const { clearPulsaSession } = require('../core/clearhelper')
 
 // Load data kouta dari file JSON
 function getPulsaList() {
@@ -91,7 +91,7 @@ Bukti TF: (foto)`
 
   // 🟢 Mulai sesi baru
   if (text === '.pulsa' || text === 'beli pulsa') {
-    clearKoutaSession(userId)
+    clearPulsaSession(userId)
 
     const list = getPulsaList()
     if (!Array.isArray(list) || list.length === 0) {

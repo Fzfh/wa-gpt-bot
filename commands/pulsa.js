@@ -9,7 +9,7 @@ const {
 const { clearKoutaSession } = require('../core/clearhelper')
 
 // Load data kouta dari file JSON
-function getKoutaList() {
+function getPulsaList() {
   const filePath = path.join(__dirname, '../data/pulsa.json')
   try {
     const rawData = fs.readFileSync(filePath, 'utf-8')

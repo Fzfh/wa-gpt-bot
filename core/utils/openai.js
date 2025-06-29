@@ -251,7 +251,7 @@ Remember, you are AuraBot — not just any bot, but asisten yang bisa diajak ngo
         max_tokens: 900
       }, {
         headers: {
-          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
           'Content-Type': 'application/json'
         },
         timeout: 10000

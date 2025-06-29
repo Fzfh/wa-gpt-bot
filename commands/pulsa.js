@@ -114,7 +114,7 @@ Bukti TF: (foto)`
     let counter = 1
 
     for (const provider in grouped) {
-      output `+= 📡 *${provider}*\n`
+      output += `📡 *${provider}*\n`
       grouped[provider].forEach(item => {
         const produk = item.produk || ''
         const harga = parseInt(item.harga) || 0

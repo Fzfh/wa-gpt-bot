@@ -27,7 +27,7 @@ const hapusProduk = require('../commands/hapusProduk');
 const tambahProduk = require('../commands/tambahProduk');
 const downloadTiktok = require('../commands/tiktokDownloader');
 const downloadInstagram = require('../commands/igDownloader');
-const downloadMP3FromYouTube = require('../commands/youtubeDownloader');;
+const downloadYouTubeMP3 = require('../commands/youtubeDownloader');;
 const sendAll = require('../commands/sendAll');
 
 const greetedUsers = new Set()
@@ -162,7 +162,7 @@ if (text.startsWith('.dyts ')) {
   const url = text.split('.dyts ')[1].trim();
   try {
     await sock.sendMessage(from, { text: '🎧 Mengunduh audio dari YouTube...' }, { quoted: msg });
-    const { filePath, title } = await downloadMP3FromYouTube(url);
+    const { filePath, title } = await downloadYouTubeMP3(url);
     await sock.sendMessage(from, {
       audio: { url: filePath },
       mimetype: 'audio/mp4',
@@ -170,9 +170,11 @@ if (text.startsWith('.dyts ')) {
     }, { quoted: msg });
     fs.unlinkSync(filePath);
   } catch (e) {
-    await sock.sendMessage(from, { text: e.message }, { quoted: msg });
+    console.error('❌ Gagal download audio:', e);
+    await sock.sendMessage(from, { text: `❌ Gagal download audio:\n${e.message}` }, { quoted: msg });
   }
 }
+
 
 
 

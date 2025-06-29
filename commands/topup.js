@@ -61,7 +61,7 @@ async function listTopup(sock, msg, inputGame) {
     }, { quoted: msg })
   }
 
-  let list = `🛒 *Daftar Produk ${gameData.game.toUpperCase()}*\n\n`
+  let list = `🛒 *Daftar Produk ${gameData.game.toUpperCase()}*\n\nMohon Ketik /keluar Ketika Sudah Selesai Transaksi Atau Tidak jadi Beli\n`
   gameData.items.forEach((item, i) => {
     const nominal = item.nominal || 'Tidak diketahui'
     const harga = isNaN(parseInt(item.harga)) ? 0 : parseInt(item.harga)

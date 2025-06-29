@@ -1,4 +1,4 @@
-const ytdl = require('ytdl-core');
+const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
@@ -8,28 +8,25 @@ function sanitizeFilename(name) {
 }
 
 async function downloadYouTubeVideo(url, type = 'video') {
-  if (!ytdl.validateURL(url)) {
-    throw new Error('❌ URL YouTube tidak valid.');
-  }
+  return new Promise((resolve, reject) => {
+    const id = uuidv4();
+    const ext = type === 'audio' ? 'mp3' : 'mp4';
+    const tempFile = path.join(__dirname, '../temp', `${id}.${ext}`);
 
-  const info = await ytdl.getInfo(url);
-  const title = sanitizeFilename(info.videoDetails.title);
-  const id = uuidv4();
-  const ext = type === 'audio' ? 'mp3' : 'mp4';
-  const filePath = path.join(__dirname, '../temp', `${id}.${ext}`);
+    const cmd = type === 'audio'
+      ? `yt-dlp -f bestaudio --extract-audio --audio-format mp3 -o "${tempFile}" "${url}"`
+      : `yt-dlp -f bestvideo+bestaudio -o "${tempFile}" "${url}"`;
 
-  const stream = ytdl(url, {
-    quality: type === 'audio' ? 'highestaudio' : 'highestvideo',
-    filter: type === 'audio' ? 'audioonly' : 'audioandvideo'
+    exec(cmd, (err, stdout, stderr) => {
+      if (err) return reject(new Error(stderr || stdout || err.message));
+      if (!fs.existsSync(tempFile)) return reject(new Error('File tidak ditemukan setelah download.'));
+
+      const titleMatch = stdout.match(/title: (.+)/i);
+      const title = sanitizeFilename(titleMatch?.[1] || 'Video YouTube');
+
+      resolve({ filePath: tempFile, title });
+    });
   });
-
-  await new Promise((resolve, reject) => {
-    stream.pipe(fs.createWriteStream(filePath))
-      .on('finish', resolve)
-      .on('error', reject);
-  });
-
-  return { filePath, title };
 }
 
 module.exports = downloadYouTubeVideo;

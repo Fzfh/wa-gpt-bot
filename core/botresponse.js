@@ -412,8 +412,8 @@ module.exports = {
   botFirstResponse,
   handlePulsa,
   handlekouta,
-  selectedPulsaMap,
-  lastPulsaMap,
+  // selectedPulsaMap,
+  // lastPulsaMap,
   selectedKoutaMap,
   lastKoutaMap,
   registerGroupUpdateListener

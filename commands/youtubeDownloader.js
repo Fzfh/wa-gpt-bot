@@ -1,37 +1,46 @@
+// commands/youtubeDownloader.js
+const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-const ytdl = require('ytdl-core');
-
-const tempFolder = path.join(__dirname, '../temp');
-if (!fs.existsSync(tempFolder)) {
-  fs.mkdirSync(tempFolder);
-}
-
-function sanitizeYouTubeUrl(url) {
-  return url.split('?')[0];
-}
 
 async function downloadYouTubeVideo(rawUrl, type = 'video') {
-  const url = sanitizeYouTubeUrl(rawUrl);
+  const url = rawUrl.split('?')[0]; // bersihkan URL dari ?si=
 
-  if (!ytdl.validateURL(url)) throw new Error('❌ URL YouTube tidak valid.');
+  // Gunakan savefrom unofficial API
+  const api = `https://api.vevioz.com/api/button/${type === 'audio' ? 'mp3' : 'mp4'}/${encodeURIComponent(url)}`;
 
-  const info = await ytdl.getInfo(url);
-  const title = info.videoDetails.title.replace(/[^\w\s]/gi, '').substring(0, 50);
-  const fileName = `${title}.${type === 'video' ? 'mp4' : 'mp3'}`;
-  const filePath = path.join(tempFolder, fileName);
+  const res = await axios.get(api);
+  const html = res.data;
 
-  const format = ytdl.chooseFormat(info.formats, {
-    quality: type === 'video' ? 'highestvideo' : 'highestaudio',
+  // Cari link download dari HTML
+  const match = html.match(/href="(https:\/\/[^"]+\.googlevideo\.com[^"]+)"/);
+
+  if (!match) throw new Error('❌ Gagal mendapatkan link unduhan dari API.');
+
+  const downloadUrl = match[1];
+
+  // Ambil judul
+  const titleMatch = html.match(/<title>(.*?)<\/title>/);
+  const title = titleMatch
+    ? titleMatch[1].replace(/ - SaveFrom.net$/, '').trim()
+    : 'yt-download';
+
+  const ext = type === 'audio' ? 'mp3' : 'mp4';
+  const fileName = `${title.substring(0, 40).replace(/[^\w\s]/gi, '')}.${ext}`;
+  const filePath = path.join(__dirname, '../temp', fileName);
+
+  // Download file
+  const writer = fs.createWriteStream(filePath);
+  const videoStream = await axios({
+    url: downloadUrl,
+    method: 'GET',
+    responseType: 'stream',
   });
 
-  const stream = ytdl.downloadFromInfo(info, { format });
-
   await new Promise((resolve, reject) => {
-    const file = fs.createWriteStream(filePath);
-    stream.pipe(file);
-    stream.on('end', resolve);
-    stream.on('error', reject);
+    videoStream.data.pipe(writer);
+    writer.on('finish', resolve);
+    writer.on('error', reject);
   });
 
   return { filePath, title };

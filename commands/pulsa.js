@@ -2,11 +2,11 @@ const fs = require('fs')
 const path = require('path')
 
 const {
-  produkKoutaMap,
-  selectedKoutaMap,
-  lastKoutaMap
+  produkPuksaMap,
+  selectedPulsaMap,
+  lastPulsaMap
 } = require('../core/state')
-const { clearPulsaSession } = require('../core/clearhelper')
+const { clearKoutaSession } = require('../core/clearhelper')
 
 // Load data kouta dari file JSON
 function getKoutaList() {
@@ -29,9 +29,9 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
 
   // ❌ Keluar dari sesi
   if (text === '/keluar') {
-    produkKoutaMap.delete(userId)
-    selectedKoutaMap.delete(userId)
-    lastKoutaMap.delete(userId)
+    produkPulsaMap.delete(userId)
+    selectedPulsaMap.delete(userId)
+    lastPulsaMap.delete(userId)
     await sock.sendMessage(from, {
       text: '❌ Kamu telah keluar dari sesi pembelian kouta.'
     }, { quoted: msg })
@@ -39,8 +39,8 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
   }
 
   // ✅ Tangani input angka jika masih dalam sesi
-  if (produkKoutaMap.has(userId)) {
-    const list = produkKoutaMap.get(userId)
+  if (produkPulsaMap.has(userId)) {
+    const list = produkPulsaMap.get(userId)
     if (Array.isArray(list) && /^\d+$/.test(text)) {
       const pilihIndex = parseInt(text)
       const item = list.find(i => i.nomor === pilihIndex)
@@ -48,9 +48,9 @@ async function handlePulsa(sock, msg, lowerText, userId, from) {
       if (!item) return false
 
       const harga = parseInt(item.harga) || 0
-      selectedKoutaMap.set(userId, harga)
-      lastKoutaMap.set(userId, `${item.provider} ${item.produk}`)
-      produkKoutaMap.delete(userId)
+      selectedPulsaMap.set(userId, harga)
+      lastPulsaMap.set(userId, `${item.provider} ${item.produk}`)
+      produkPulsaMap.delete(userId)
 
       const info = `✅ Kamu memilih *${item.provider} - ${item.produk}*
 💰 Harga: Rp${harga.toLocaleString('id-ID')}
@@ -91,12 +91,12 @@ Bukti TF: (foto)`
 
   // 🟢 Mulai sesi baru
   if (text === '.pulsa' || text === 'beli pulsa') {
-    clearPulsaSession(userId)
+    clearKoutaSession(userId)
 
-    const list = getKoutaList()
+    const list = getPulsaList()
     if (!Array.isArray(list) || list.length === 0) {
       await sock.sendMessage(from, {
-        text: '❌ Tidak ada produk kuota tersedia.'
+        text: '❌ Tidak ada produk Pulsa tersedia.'
       }, { quoted: msg })
       return true
     }
@@ -127,7 +127,7 @@ Bukti TF: (foto)`
     output += `Ketik angka (contoh: 3) untuk memilih kuota.`
     output += `\nKetik */keluar* untuk membatalkan sesi ini.`
 
-    produkKoutaMap.set(userId, flatList)
+    produkPulsaMap.set(userId, flatList)
     await sock.sendMessage(from, { text: output }, { quoted: msg })
     return true
   }
@@ -137,6 +137,6 @@ Bukti TF: (foto)`
 
 module.exports = {
   handlePulsa,
-  selectedKoutaMap,
-  lastKoutaMap
+  selectedPulsaMap,
+  lastPulsaMap
 }

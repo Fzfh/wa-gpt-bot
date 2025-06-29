@@ -56,9 +56,11 @@ async function handlekouta(sock, msg, lowerText, userId, from) {
 💰 Harga: Rp${harga.toLocaleString('id-ID')}
 
 Silakan transfer ke metode berikut:
-• Dana: 08xxxxxxxxxx
-• Gopay: 08xxxxxxxxxx
-• BCA: 1234567890 a.n. AURA SHOP
+💸 Dana: \`0895326679840\`
+💳 Gopay: \`0895326679840\`
+📱 OVO: \`0895326679840\`
+🛍 ShopeePay: \`0895326679840\`
+🏦 BCA: *BELUM TERSEDIA*
 
 📷 QRIS Allpay tersedia di bawah ini!
 
@@ -106,7 +108,7 @@ Bukti TF: (foto)`
       grouped[provider].push(item)
     })
 
-    let output = `📶 *Daftar Kuota Tersedia:*\n\n`
+    let output = `📶 *Daftar Kuota Tersedia:*\n*Mohon Ketik \`/keluar\` Ketika Sudah*\n*Selesai Transaksi Atau Tidak jadi Beli*\n\n`
     let flatList = []
     let counter = 1
 

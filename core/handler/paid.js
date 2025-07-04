@@ -1,5 +1,5 @@
 const { getInvoiceByMsgIdAsync, setPaidByMsgId } = require('../invoices');
-const { adminList } = require('../setting/setting');
+const { adminList } = require('../../setting/setting');
 
 async function handleMarkPaid(sock, msg, lowerText, userId, sender) {
   if (lowerText !== 'done') return false;

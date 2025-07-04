@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config();
 const {
   default: makeWASocket,
   useMultiFileAuthState,
@@ -6,11 +6,11 @@ const {
   fetchLatestBaileysVersion,
   DisconnectReason,
 } = require('@whiskeysockets/baileys');
-const { handleResponder, registerGroupUpdateListener } = require('./core/botresponse') 
+const { handleResponder, registerGroupUpdateListener } = require('./core/botresponse');
 const express = require('express');
 const fs = require('fs');
 const P = require('pino');
-const qrcode = require('qrcode');
+const qrcode = require('qrcode-terminal');
 const chalk = require('chalk');
 
 const tampilkanBanner = require('./core/utils/tampilanbanner');
@@ -49,21 +49,10 @@ async function startBot() {
     sock.ev.on('connection.update', async (update) => {
       const { connection, lastDisconnect, qr } = update;
 
-if (qr) {
-  console.log(chalk.yellowBright('\n🔌 Scan QR ini untuk login:\n'));
-
-  // Simpan QR ke file HTML untuk diakses via web
-  qrcode.toDataURL(qr, (err, url) => {
-    if (err) return console.error('❌ Gagal buat QR ke HTML:', err);
-    const html = `
-      <html><body style="text-align:center;font-family:sans-serif;">
-        <h2>Silakan Scan QR WA Kamu</h2>
-        <img src="${url}" style="width:300px;" />
-      </body></html>`;
-    fs.writeFileSync('./qr.html', html);
-  });
-}
-
+      if (qr) {
+        console.log(chalk.yellowBright('\n🎛️ Scan QR berikut ini di terminal untuk login:\n'));
+        qrcode.generate(qr, { small: true });
+      }
 
       if (connection === 'close') {
         const reason = lastDisconnect?.error?.output?.statusCode;
@@ -77,8 +66,8 @@ if (qr) {
         }
       } else if (connection === 'open') {
         console.log(chalk.greenBright('\n✅ Bot berhasil terhubung ke WhatsApp!'));
-        console.log(chalk.cyanBright('✨ Siap menerima perintah, Auraa sayang~ 💬\n'));
-        registerGroupUpdateListener(sock) 
+        console.log(chalk.cyanBright('AURABOT SUDAH AKTIF! SELAMAT MENIKMATI FITUR KAMI\n'));
+        registerGroupUpdateListener(sock);
       }
     });
 
@@ -89,7 +78,6 @@ if (qr) {
 
       const sender = msg.key.remoteJid;
       const { text, realMsg } = extractMessageContent(msg);
-      // console.log(chalk.magenta(`📩 Pesan dari ${sender}: ${text}`));
 
       try {
         msg.message = realMsg;
@@ -103,21 +91,13 @@ if (qr) {
   }
 }
 
-// Start Web Server
 app.get('/qr', (req, res) => {
-  if (fs.existsSync('./qr.html')) {
-    const qrHtml = fs.readFileSync('./qr.html', 'utf8');
-    res.send(qrHtml);
-  } else {
-    res.send('⚠️ QR belum tersedia. Tunggu sebentar...');
-  }
+  res.send('🛑 Sekarang QR ditampilkan langsung di terminal.');
 });
 
-
 app.listen(PORT, '0.0.0.0', () =>
-  console.log(chalk.cyanBright(`🌐 Web server aktif di http://localhost:${PORT} dan /qr untuk scan`))
+  console.log(chalk.cyanBright(`🌐 Web server aktif di http://localhost:${PORT} (/qr optional)`))
 );
-
 
 tampilkanBanner();
 startBot();

@@ -194,32 +194,66 @@ if (text.startsWith('/') || text.startsWith('.')) {
       }
     }
     
-    if (text.startsWith('.d ')) {
-       const link = text.split(' ')[1]
-     if (!link || !link.includes('tiktok.com')) {
-         await sock.sendMessage(from, { text: '❌ Link TikTok tidak valid!' }, { quoted: msg })
-         return
-       }
-         await sock.sendMessage(from, { text: '⏳ Sedang mengunduh video TikTok...' }, { quoted: msg })
+          if (text.startsWith('.d ')) {
+          const link = text.split(' ')[1];
           
-          try {
-           const result = await downloadTiktok(link)
-            if (!result || !result.videoUrl) {
-               await sock.sendMessage(from, { text: '❌ Gagal mengunduh video TikTok.' }, { quoted: msg })
-              return
-            }
-          
-              await sock.sendMessage(from, {
-                video: { url: result.videoUrl }
-              }, { quoted: msg })
-            } catch (e) {
-              console.error('❌ Error TikTok:', e)
-              await sock.sendMessage(from, { text: '⚠️ Terjadi kesalahan saat mengunduh TikTok.' }, { quoted: msg })
-            }
-          
-            return
+          if (!link || !link.includes('tiktok.com')) {
+            await sock.sendMessage(from, {
+              text: '❌ Link TikTok tidak valid!',
+            }, { quoted: msg });
+            return;
           }
-      
+        
+          await sock.sendMessage(from, {
+            text: '⏳ Sedang memproses link TikTok...',
+          }, { quoted: msg });
+        
+          try {
+            const result = await downloadTiktok(link);
+        
+            if (!result) {
+              await sock.sendMessage(from, {
+                text: '❌ Gagal mengambil data dari TikTok.',
+              }, { quoted: msg });
+              return;
+            }
+        
+            if (result.isPhoto && result.images.length > 0) {
+              await sock.sendMessage(from, {
+                text: '📷 Link kamu adalah Foto. ⬇️ Sedang Mengunduh...',
+              }, { quoted: msg });
+        
+              for (const imageUrl of result.images) {
+                await sock.sendMessage(from, {
+                  image: { url: imageUrl },
+                }, { quoted: msg });
+              }
+        
+            } else if (result.videoUrl) {
+              await sock.sendMessage(from, {
+                text: '🎞️ Link kamu adalah video. ⬇️ Sedang Mengunduh...',
+              }, { quoted: msg });
+        
+              await sock.sendMessage(from, {
+                video: { url: result.videoUrl },
+              }, { quoted: msg });
+        
+            } else {
+              await sock.sendMessage(from, {
+                text: '❌ Tidak ada media yang bisa diunduh dari link ini, Pastikan Link nya benar.',
+              }, { quoted: msg });
+            }
+        
+          } catch (e) {
+            console.error('❌ Error TikTok:', e);
+            await sock.sendMessage(from, {
+              text: '⚠️ Terjadi kesalahan saat memproses link TikTok.',
+            }, { quoted: msg });
+          }
+        
+          return;
+        }
+
         if (text.startsWith('.ds ')) {
           const link = text.split(' ')[1]
         
@@ -248,38 +282,6 @@ if (text.startsWith('/') || text.startsWith('.')) {
         
           return
         }
-
-      if (text.startsWith('.df ')) {
-        const link = text.split(' ')[1];
-      
-        if (!link || !link.includes('tiktok.com')) {
-          await sock.sendMessage(from, { text: '❌ Link TikTok tidak valid!' }, { quoted: msg });
-          return;
-        }
-  
-        await sock.sendMessage(from, { text: '📷 Mengunduh foto TikTok...' }, { quoted: msg });
-  
-        try {
-          const result = await downloadTiktok(link);
-      
-          if (!result || !result.isPhoto || result.images.length === 0) {
-            await sock.sendMessage(from, { text: '❌ Gagal mengunduh foto TikTok.' }, { quoted: msg });
-            return;
-          }
-      
-          // Kirim sebagai album (jika mendukung)
-          for (const imageUrl of result.images) {
-            await sock.sendMessage(from, {
-              image: { url: imageUrl }
-            }, { quoted: msg });
-          }
-        } catch (e) {
-          console.error('❌ Error TikTok Foto:', e);
-          await sock.sendMessage(from, { text: '⚠️ Terjadi kesalahan saat mengunduh foto TikTok.' }, { quoted: msg });
-        }
-      
-        return;
-      }
 
 
         if (text.startsWith('.dig ')) {

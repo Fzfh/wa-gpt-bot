@@ -5,22 +5,24 @@ const { promisify } = require('util');
 const { exec } = require('child_process');
 const { v4: uuidv4 } = require('uuid');
 const { downloadMediaMessage } = require('@whiskeysockets/baileys');
-const { createCanvas, registerFont } = require('canvas');
+const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const { Sticker, StickerTypes } = require('wa-sticker-formatter');
-// const { StickerTypes, Sticker } = require('wa-sticker-formatter');
-// const Jimp = require('jimp');
+const twemoji = require('twemoji');
+const emojiDir = path.join(process.cwd(), 'media', 'emoji');
+
+if (typeof fetch !== 'function') {
+  global.fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+}
 
 const writeFile = promisify(fs.writeFile);
 const readFile = promisify(fs.readFile);
 
-// === Stiker Gambar/Video ===
 async function createStickerFromMessage(sock, msg) {
   try {
     const messageContent = msg.message;
     const type = Object.keys(messageContent)[0];
 
     let mediaMessage;
-
     if (type === 'imageMessage' || type === 'videoMessage') {
       mediaMessage = msg;
     } else if (
@@ -29,7 +31,7 @@ async function createStickerFromMessage(sock, msg) {
       messageContent.extendedTextMessage.contextInfo.quotedMessage
     ) {
       const quoted = messageContent.extendedTextMessage.contextInfo;
-      const quotedMsg = {
+      mediaMessage = {
         key: {
           remoteJid: msg.key.remoteJid,
           id: quoted.stanzaId,
@@ -38,18 +40,9 @@ async function createStickerFromMessage(sock, msg) {
         },
         message: quoted.quotedMessage,
       };
-
-      if (
-        quoted.quotedMessage.imageMessage ||
-        quoted.quotedMessage.videoMessage
-      ) {
-        mediaMessage = quotedMsg;
-      }
     }
 
-    if (!mediaMessage) {
-      throw new Error('❌ Tidak ada media untuk dijadikan stiker.');
-    }
+    if (!mediaMessage) throw new Error('❌ Tidak ada media untuk dijadikan stiker.');
 
     const buffer = await downloadMediaMessage(mediaMessage, 'buffer', {}, {
       logger: sock.logger,
@@ -57,23 +50,16 @@ async function createStickerFromMessage(sock, msg) {
     });
 
     const isVideo = type === 'videoMessage' || mediaMessage.message?.videoMessage;
-    let stickerBuffer;
+    const stickerBuffer = isVideo
+      ? await convertVideoToSticker(buffer)
+      : await new Sticker(buffer, {
+          pack: 'AuraBot',
+          author: 'AURA',
+          type: StickerTypes.DEFAULT,
+          quality: 70,
+        }).toBuffer();
 
-    if (isVideo) {
-      stickerBuffer = await convertVideoToSticker(buffer);
-    } else {
-      const sticker = new Sticker(buffer, {
-        pack: 'AuraBot',
-        author: 'AURA',
-        type: StickerTypes.DEFAULT,
-        quality: 70,
-      });
-      stickerBuffer = await sticker.toBuffer();
-    }
-
-    await sock.sendMessage(msg.key.remoteJid, {
-      sticker: stickerBuffer,
-    }, { quoted: msg });
+    await sock.sendMessage(msg.key.remoteJid, { sticker: stickerBuffer }, { quoted: msg });
 
   } catch (err) {
     console.error('❌ Error saat bikin stiker:', err);
@@ -83,7 +69,6 @@ async function createStickerFromMessage(sock, msg) {
   }
 }
 
-// === Konversi Video ke Stiker ===
 async function convertVideoToSticker(buffer) {
   const tempId = uuidv4();
   const inputPath = path.join(tmpdir(), `${tempId}.mp4`);
@@ -92,104 +77,122 @@ async function convertVideoToSticker(buffer) {
   try {
     await writeFile(inputPath, buffer);
 
-    const safeInput = `"${inputPath.replace(/\\/g, "/")}"`;
-    const safeOutput = `"${outputPath.replace(/\\/g, "/")}"`;
-
-    const ffmpegCmd = `ffmpeg -i ${safeInput} -vf "scale=320:320:force_original_aspect_ratio=decrease,pad=320:320:(ow-iw)/2:(oh-ih)/2:color=black,fps=10" -ss 0 -t 6 -an -loop 0 -y ${safeOutput}`;
+    const ffmpegCmd = `ffmpeg -i "${inputPath}" -vf "fps=12,scale=iw*min(512/iw\\,512/ih):ih*min(512/iw\\,512/ih):flags=lanczos,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x00000000" -ss 0 -t 6 -an -loop 0 -y "${outputPath}"`;
 
     await execPromise(ffmpegCmd);
 
-    if (!fs.existsSync(outputPath)) {
-      throw new Error(`❌ FFmpeg gagal membuat file: ${outputPath}`);
-    }
+    if (!fs.existsSync(outputPath)) throw new Error(`❌ FFmpeg gagal membuat file: ${outputPath}`);
 
-    const stickerBuffer = await readFile(outputPath);
-    return stickerBuffer;
-
-  } catch (err) {
-    console.error('❌ Gagal konversi video ke sticker:', err);
-    throw err;
+    return await readFile(outputPath);
   } finally {
     cleanupFiles([inputPath, outputPath]);
   }
 }
 
+
+
+// Fungsi wrap teks di canvas
 function wrapText(ctx, text, maxWidth) {
   const words = text.split(' ');
   const lines = [];
   let line = '';
-
-  for (let word of words) {
+  for (const word of words) {
     const testLine = line + word + ' ';
-    const { width } = ctx.measureText(testLine);
-    if (width > maxWidth && line !== '') {
+    const width = ctx.measureText(testLine).width;
+    if (width > maxWidth && line) {
       lines.push(line.trim());
       line = word + ' ';
     } else {
       line = testLine;
     }
   }
-
   if (line) lines.push(line.trim());
   return lines;
 }
 
+// 🛠️ ALIGN TENGAH teks sticker
 async function createStickerFromText(text) {
-  const width = 512;
-  const height = 512;
-  const shortTextThreshold = 10;
-  const isShort = text.trim().length <= shortTextThreshold;
-
-  const fontSize = isShort ? 64 : 48;
-  const padding = 30;
-
-  const canvas = createCanvas(width, height);
+  const W = 512, H = 512, fontSize = 44, pad = 30;
+  const canvas = createCanvas(W, H);
   const ctx = canvas.getContext('2d');
-
   ctx.fillStyle = 'white';
-  ctx.fillRect(0, 0, width, height);
-
+  ctx.fillRect(0, 0, W, H);
   ctx.fillStyle = 'black';
-  ctx.font = `bold ${fontSize}px Sans`;
+  ctx.font = `${fontSize}px Segoe UI`;
   ctx.textBaseline = 'top';
+  ctx.textAlign = 'left'; // KEMBALI RATA KIRI
 
-  const lines = wrapText(ctx, text, width - padding * 2);
-  const lineHeight = fontSize + 10;
-  const totalHeight = lines.length * lineHeight;
-  const startY = (height - totalHeight) / 2;
+  const lines = wrapText(ctx, text, W - pad * 2);
+  const lh = fontSize + 18;
+  const startY = (H - lines.length * lh) / 2;
 
-  lines.forEach((line, i) => {
-    ctx.fillText(line, padding, startY + i * lineHeight);
-  });
+  for (let i = 0; i < lines.length; i++) {
+    const y = startY + i * lh;
+    const parts = twemoji.parse(lines[i]).split(/(<img.*?>)/g).filter(Boolean);
+    let x = pad;
 
-  const buffer = canvas.toBuffer('image/png');
+    for (const part of parts) {
+      if (part.startsWith('<img')) {
+        const match = part.match(/alt="([^"]+)"/);
+        if (match) {
+          const codepoint = twemoji.convert.toCodePoint(match[1]);
+          let filePath = path.join(emojiDir, `${codepoint}.png`);
 
-  const sticker = new Sticker(buffer, {
+          if (!fs.existsSync(filePath)) {
+            const fallbackCode = codepoint.replace(/-fe0f/g, '');
+            const fallbackPath = path.join(emojiDir, `${fallbackCode}.png`);
+            if (fs.existsSync(fallbackPath)) filePath = fallbackPath;
+            else {
+              const first = codepoint.split('-')[0];
+              const finalFallback = path.join(emojiDir, `${first}.png`);
+              if (fs.existsSync(finalFallback)) filePath = finalFallback;
+              else {
+                ctx.fillText('?', x, y);
+                x += fontSize;
+                continue;
+              }
+            }
+          }
+
+          try {
+            const img = await loadImage(filePath);
+            ctx.drawImage(img, x, y + 4, fontSize, fontSize);
+            x += fontSize;
+          } catch (err) {
+            ctx.fillText('?', x, y);
+            x += fontSize;
+          }
+        }
+      } else {
+        ctx.fillText(part, x, y);
+        x += ctx.measureText(part).width;
+      }
+    }
+  }
+
+  const imgBuf = canvas.toBuffer('image/png');
+  const sticker = new Sticker(imgBuf, {
     pack: 'AuraBot',
     author: 'AURA',
     type: StickerTypes.DEFAULT,
-    quality: 100,
+    quality: 10
   });
-
-  return await sticker.toBuffer();
+  return sticker.toBuffer();
 }
 
 
-// === Utils ===
 function execPromise(command) {
   return new Promise((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
-      if (error) return reject(stderr || stdout);
-      resolve(stdout);
+      if (error) reject(stderr || stdout);
+      else resolve(stdout);
     });
   });
 }
 
 function cleanupFiles(filePaths) {
   for (const file of filePaths) {
-    if (fs.existsSync(file)) {
-      fs.unlinkSync(file);
-    }
+    if (fs.existsSync(file)) fs.unlinkSync(file);
   }
 }
 

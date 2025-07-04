@@ -27,7 +27,7 @@ module.exports = async function kick(sock, msg, text, isGroup) {
       }, { quoted: msg })
     }
 
-    // 🔍 Cek apakah reply ke pesan user
+    // Cek apakah reply ke pesan user gey
     const quotedInfo = msg.message?.extendedTextMessage?.contextInfo
     const repliedUser = quotedInfo?.participant
     let target = repliedUser

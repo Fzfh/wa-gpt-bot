@@ -1,4 +1,4 @@
-const toxicWords = [''] // Contoh, bisa kamu ubah
+const toxicWords = [''] // ini buat kata kata toxic nya gey
 const bannedLinkKeywords = ['bokep', 'hentai', 'jav', 'xxx', '18+', 'judol', 'vn viral', 'tante', 'sex']
 
 async function handleAutoKick(sock, msg) {

@@ -10,6 +10,7 @@ module.exports = {
         botName: 'AuraBot',
         botMenu: '/menu'
       },
+      // INI GAGUNA CO GW MALES APUS
       botResponsePatterns: [
         { command: 'topup', isAdmin: false },
         { command: 'joki', isAdmin: false },

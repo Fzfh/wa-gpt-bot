@@ -77,8 +77,24 @@ function setPaidByMsgId(msgId) {
     console.log('⚠️ Invoice tidak ditemukan.')
   }
 }
+// Hapus satu invoice berdasarkan ID
+function deleteInvoiceById(invoiceId) {
+  const invoices = readInvoices()
+  const filtered = invoices.filter(i => i.invoiceId !== invoiceId)
+
+  if (filtered.length === invoices.length) {
+    console.log('⚠️ Invoice ID tidak ditemukan:', invoiceId)
+    return false
+  }
+
+  writeInvoices(filtered)
+  console.log('🗑 Invoice', invoiceId, 'berhasil dihapus.')
+  return true
+}
+
 
 module.exports = {
+  readInvoices,
   addInvoice,
   getInvoiceByMsgId,
   setPaidByMsgId,
@@ -86,5 +102,6 @@ module.exports = {
   getAllInvoices,
   generateInvoiceId,
   getLastUnpaidInvoice,
-  clearAllInvoices
+  clearAllInvoices,
+  deleteInvoiceById
 }

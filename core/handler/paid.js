@@ -3,27 +3,37 @@ const { getInvoiceByMsgIdAsync, setPaidByMsgId } = require('../invoices')
 async function handleMarkPaid(sock, msg, lowerText, userId, sender) {
   if (lowerText !== 'done') return false
 
-  const metadata = await sock.groupMetadata(sender)
-  const groupAdmins = metadata.participants
-  .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
-  .map(p => p.id)
-  console.log('🔍 Admin Grup:', groupAdmins)
-console.log('👤 User:', userId)
+  const isGroup = sender.endsWith('@g.us')
+  const authorId = msg.key.participant || msg.participant || sender
+  let isAdmin = true // default: true kalau bukan grup
 
-  const isAdmin = groupAdmins.includes(userId)
+  if (isGroup) {
+    try {
+      const metadata = await sock.groupMetadata(sender)
+      const groupAdmins = metadata.participants
+        .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
+        .map(p => p.id)
 
+      console.log('🔍 Admin Grup:', groupAdmins)
+      console.log('👤 Author:', authorId)
 
-  if (!isAdmin) {
-    await sock.sendMessage(sender, { text: '❌ Hanya admin yang boleh mengetik *done*.' }, { quoted: msg })
-    return true
+      isAdmin = groupAdmins.includes(authorId)
+    } catch (err) {
+      console.error('❌ Gagal ambil metadata grup:', err)
+      isAdmin = false
+    }
+
+    if (!isAdmin) {
+      await sock.sendMessage(sender, {
+        text: '❌ Hanya admin yang boleh mengetik *done*.'
+      }, { quoted: msg })
+      return true
+    }
   }
 
   const targetMsgId = msg.message?.extendedTextMessage?.contextInfo?.stanzaId
   if (!targetMsgId) {
-    await sock.sendMessage(sender, {
-      text: '⚠️ Balas pesan invoice yang ingin di-mark sebagai *PAID* lalu ketik *done*.'
-    }, { quoted: msg })
-    return true
+    return true // diem aja kalau gak reply pesan
   }
 
   const invoice = await getInvoiceByMsgIdAsync(targetMsgId)

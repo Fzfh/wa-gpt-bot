@@ -1,11 +1,14 @@
 const fs = require('fs')
 const path = require('path')
 
-const produkMap = new Map()
-const selectedKoutaNominalMap = new Map()
-const lastKoutaCommandMap = new Map()
+const {
+  produkKoutaMap,
+  selectedKoutaMap,
+  lastKoutaMap
+} = require('../core/state')
+const { clearPulsaSession } = require('../core/clearhelper')
 
-// 🔄 Load data kouta dari file JSON
+// Load data kouta dari file JSON
 function getKoutaList() {
   const filePath = path.join(__dirname, '../data/kouta.json')
   try {
@@ -17,23 +20,85 @@ function getKoutaList() {
   }
 }
 
-async function handlekouta(sock, msg) {
-  const from = msg.key.remoteJid
-  const userId = msg.key.participant || msg.key.remoteJid
+async function handlekouta(sock, msg, lowerText, userId, from) {
   const text = (
     msg.message?.conversation ||
     msg.message?.extendedTextMessage?.text ||
     ''
   ).toLowerCase().trim()
 
-  // STEP 1: Tampilkan daftar kuota
+  // ❌ Keluar dari sesi
+  if (text === '/keluar' && produkKoutaMap.has(userId)) {
+    produkKoutaMap.delete(userId)
+    selectedKoutaMap.delete(userId)
+    lastKoutaMap.delete(userId)
+    await sock.sendMessage(from, {
+      text: '❌ Kamu telah keluar dari sesi pembelian kouta.'
+    }, { quoted: msg })
+    return true
+  }
+
+  // ✅ Tangani input angka jika masih dalam sesi
+  if (produkKoutaMap.has(userId)) {
+    const list = produkKoutaMap.get(userId)
+    if (Array.isArray(list) && /^\d+$/.test(text)) {
+      const pilihIndex = parseInt(text)
+      const item = list.find(i => i.nomor === pilihIndex)
+
+      if (!item) return false
+
+      const harga = parseInt(item.harga) || 0
+      selectedKoutaMap.set(userId, harga)
+      lastKoutaMap.set(userId, `${item.provider} ${item.produk}`)
+      produkKoutaMap.delete(userId)
+
+      const info = `✅ Kamu memilih *${item.provider} - ${item.produk}*
+💰 Harga: Rp${harga.toLocaleString('id-ID')}
+
+Silakan transfer ke metode berikut:
+💸 Dana: \`0895326679840\`
+💳 Gopay: \`0895326679840\`
+📱 OVO: \`0895326679840\`
+🛍 ShopeePay: \`0895326679840\`
+🏦 BCA: *BELUM TERSEDIA*
+
+📷 QRIS Allpay tersedia di bawah ini!
+
+Setelah transfer, kirim:
+- Nomor HP tujuan
+- Bukti transfer
+
+======= *CONTOH* =======
+Nomor: 08123456789
+Bukti TF: (foto)`
+
+      await sock.sendMessage(from, { text: info }, { quoted: msg })
+      await sock.sendMessage(from, {
+        image: { url: './media/q.jpg' },
+        caption: `💳 Total: Rp${harga.toLocaleString('id-ID')}`,
+      }, { quoted: msg })
+
+      return true
+    }
+
+    // ⛔ User dalam sesi tapi bukan angka
+    await sock.sendMessage(from, {
+      text: '⚠️ Kamu masih dalam sesi pembelian kuota. Ketik angka untuk memilih atau */keluar* untuk keluar.',
+      quoted: msg
+    })
+    return true
+  }
+
+  // 🟢 Mulai sesi baru
   if (text === '.kouta' || text === 'beli kouta') {
-    console.log('🔥 KOUTA command diterima:', text)
-    console.log('📁 Isi kouta.json:', getKoutaList())
+    clearPulsaSession(userId)
 
     const list = getKoutaList()
     if (!Array.isArray(list) || list.length === 0) {
-      return sock.sendMessage(from, { text: '❌ Tidak ada produk kuota tersedia.' }, { quoted: msg })
+      await sock.sendMessage(from, {
+        text: '❌ Tidak ada produk kuota tersedia.'
+      }, { quoted: msg })
+      return true
     }
 
     const grouped = {}
@@ -43,7 +108,7 @@ async function handlekouta(sock, msg) {
       grouped[provider].push(item)
     })
 
-    let output = `📶 *Daftar Kuota Tersedia:*\n\n`
+    let output = `📶 *Daftar Kuota Tersedia:*\n*Mohon Ketik \`/keluar\` Ketika Sudah*\n*Selesai Transaksi Atau Tidak jadi Beli*\n\n`
     let flatList = []
     let counter = 1
 
@@ -60,57 +125,18 @@ async function handlekouta(sock, msg) {
     }
 
     output += `Ketik angka (contoh: 3) untuk memilih kuota.`
+    output += `\nKetik */keluar* untuk membatalkan sesi ini.`
 
-    produkMap.set(userId, flatList)
+    produkKoutaMap.set(userId, flatList)
     await sock.sendMessage(from, { text: output }, { quoted: msg })
     return true
   }
 
-  // STEP 2: Tangani input pilihan angka
-  const list = produkMap.get(userId)
-  if (!Array.isArray(list) || list.length === 0) return false
-
-  const pilihIndex = parseInt(text)
-  const item = list.find(i => i.nomor === pilihIndex)
-
-  if (!item) return false
-
-  selectedKoutaNominalMap.set(userId, parseInt(item.harga) || 0)
-  lastKoutaCommandMap.set(userId, `${item.provider} ${item.produk}`)
-  produkMap.delete(userId)
-
-  const harga = parseInt(item.harga) || 0
-
-  const info = `✅ Kamu memilih *${item.provider} - ${item.produk}*
-💰 Harga: Rp${harga.toLocaleString('id-ID')}
-
-Silakan transfer ke metode berikut:
-• Dana: 08xxxxxxxxxx
-• Gopay: 08xxxxxxxxxx
-• BCA: 1234567890 a.n. AURA SHOP
-
-📷 QRIS Allpay tersedia di bawah ini!
-
-Setelah transfer, kirim:
-- Nomor HP tujuan
-- Bukti transfer
-
-======= *CONTOH* =======
-Nomor: 08123456789
-Bukti TF: (foto)`
-
-  await sock.sendMessage(from, { text: info }, { quoted: msg })
-
-  await sock.sendMessage(from, {
-    image: { url: './media/q.jpg' },
-    caption: `💳 Total: Rp${harga.toLocaleString('id-ID')}`,
-  }, { quoted: msg })
-
-  return true
+  return false
 }
 
 module.exports = {
   handlekouta,
-  selectedKoutaNominalMap,
-  lastKoutaCommandMap
+  selectedKoutaMap,
+  lastKoutaMap
 }

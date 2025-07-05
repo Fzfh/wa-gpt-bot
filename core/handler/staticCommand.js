@@ -162,7 +162,7 @@ if (body.toLowerCase().startsWith('/clearid')) {
     case 'caranya':
     case 'cara nya':
       await sock.sendMessage(sender, {
-        text: `╭━━━[ 🎀 *PANDUAN PENGGUNAAN AURA BOT* 🎀 ]━━━╮
+        text: `╭━━━[ *PANDUAN PENGGUNAAN* ]━━━╮
 
 🔰 *1. Topup Game Favoritmu!*
    ➤ Ketik: *topup* ff/ml/genshin/pubg/valo
@@ -171,8 +171,11 @@ if (body.toLowerCase().startsWith('/clearid')) {
 
 📱 *2. Beli Pulsa / Kuota*
    ➤ Ketik: *beli pulsa* / *beli kuota*
-   ➤ Pilih angka (1️⃣, 2️⃣, 3️⃣...)
-   ➤ Kirim nomor HP + bukti transfer
+   ➤ Pilih angka (1, 2, 3...)
+   ➤ Kirim Dengan mengetik nomor HP + bukti transfer
+   ➤ Contoh:
+   ➤ Nomor: 0898796797
+      Bukti: Done
 
 🎨 *3. Bikin Stiker dari Teks!*
    ➤ Ketik: *stickertext* (teks kamu)
@@ -204,7 +207,7 @@ if (body.toLowerCase().startsWith('/clearid')) {
 🚪 *8. Keluar Sesi*
    ➤ Ketik: */keluar* untuk akhiri sesi transaksi
 
-╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━╯
 ✨ *Selamat Menikmati Fitur AuraBot yaaa* ✨`
       }, { quoted: msg })
       return true

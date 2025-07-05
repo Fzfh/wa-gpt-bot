@@ -142,8 +142,8 @@ if (body.toLowerCase().startsWith('/clearid')) {
 ┃   ➤ beli bot — Lihat harga & fitur bot  
 ┃  
 ┃ ❓ BINGUNG?? KETIK COMMAND INI AJA!!  
-┃   ➤ tutorial  
-┃   ➤ admin — Hubungi langsung via WA  
+┃   ➤ tutorial/tutor
+┃   ➤ admin Bot — Hubungi langsung via WA  
 ╰━━━━━━━━━━━━━━━━━━━━━━━╯  
 
 🧠 Ketik sesuai menu ya adick-adickk!  

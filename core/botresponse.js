@@ -36,6 +36,7 @@ const mapsQR = require('../commands/mapqr');
 const linkMap = require('../commands/linkmap');
 const waifuhen = require('../commands/waifuhen')
 const waifu = require('../commands/waifu')
+const stickerToMedia = require('./commands/stickerToMedia');
 
 const greetedUsers = new Set()
 // const lastCommandMap = new Map()
@@ -144,7 +145,10 @@ if (text.startsWith('/') || text.startsWith('.')) {
       return await waifu(sock, msg, args.join(' '));
     }
 
-
+    if (text.startsWith('.sm')) {
+      await stickerToMedia(sock, msg);
+      return;
+    }
     
     if (text.startsWith('.linkmap')) {
       const isi = text.split('.linkmap')[1]?.trim() || '';

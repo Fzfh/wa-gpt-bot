@@ -144,8 +144,17 @@ Jika user bertanya "Gimana cara beli topup?", jawablah seperti ini:
    - Atau bisa juga ketik angka saja kalau sudah ada daftar pilihannya.
 
 4️⃣ Terakhir, kirim format transfer seperti ini: 
-Nomor: 088123456789
+id: 976979
 Bukti tf done
+
+kalau topup ml format nya dengan id zone:
+id: 9969769 (9090)
+bukti tf done
+
+kalau topup genshin sertakan server nya:
+id: 800000
+server: asia
+bukti tf done
 
 Bot akan cek dan proses transaksimu yaa 💖"
 

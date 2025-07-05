@@ -112,7 +112,7 @@ if (body.toLowerCase().startsWith('/clearid')) {
 ┃  \`IG DOWNLOAD 1 MENIT, JANGAN SPAM!\`
 ┃   ➤ \`.dig\` link instagram 
 ┃   ➤ Contoh: 
-┃   ➤\`.dig\` https://instagram.com/linkKamu
+┃   ➤ \`.dig\` https://instagram.com/linkKamu
 ┃
 ┃ 🎮 Top Up Game  
 ┃   ➤ topup ff  
@@ -156,15 +156,56 @@ if (body.toLowerCase().startsWith('/clearid')) {
     case 'tutor':
     case 'Tutorial':
     case 'Tutor':
+    case 'Tutpr':
+    case 'Titor':
+    case 'Tytor':
+    case 'caranya':
+    case 'cara nya':
       await sock.sendMessage(sender, {
-        text: `📖 *Petunjuk Penggunaan AURA BOT*\n\n
-        1️⃣ Topup Game\n➤ Ketik: topup ff/ml/genshin/pubg/valo\n➤ Pilih nominal\n➤ Kirim ID & bukti TF\n\n
-        2️⃣ Beli Pulsa/Kuota\n➤ Ketik: beli pulsa / beli kuota\n➤ Pilih nominal (1, 2, 3...)\n➤ Kirim nomor HP + bukti transfer\n\n
-        ❗ Jangan lupa ketik */keluar* kalau sedang dalam sesi!\n\n
-        3️⃣ Menfess\n➤ Ketik: /menfess\n➤ Isi nomor & pesan\n➤ Ketik: /batal untuk membatalkan menfess\n\n
-        4️⃣ Download Video\n\`Tiktok\`\n➤ .d (foto & video) / .ds (sound) / + link\n\n
-        \`Instagram\`\n➤ .dig + link\n\n
-        Contoh Penggunaan: .d/ds/dig https://linkkamu`
+        text: `╭━━━[ 🎀 *PANDUAN PENGGUNAAN AURA BOT* 🎀 ]━━━╮
+
+🔰 *1. Topup Game Favoritmu!*
+   ➤ Ketik: *topup* ff/ml/genshin/pubg/valo
+   ➤ Pilih nominal
+   ➤ Kirim ID & bukti transfer
+
+📱 *2. Beli Pulsa / Kuota*
+   ➤ Ketik: *beli pulsa* / *beli kuota*
+   ➤ Pilih angka (1️⃣, 2️⃣, 3️⃣...)
+   ➤ Kirim nomor HP + bukti transfer
+
+🎨 *3. Bikin Stiker dari Teks!*
+   ➤ Ketik: *stickertext* (teks kamu)
+   ➤ Atau pakai singkatan: *st* hello world!
+   ➤ Contoh: *stickertext Halo Auraa!*
+
+🖼️ *4. Bikin Stiker dari Foto/Video*
+   ➤ Kirim foto/video dengan caption: *s* atau *sticker*
+   ➤ Atau reply media dengan "s" untuk mengubah jadi stiker otomatis!
+
+👩‍🎨 *5. Cari Waifu Lucu~*
+   ➤ Ketik: *.waifu* (kategori/nama waifu)
+   ➤ Contoh: *.waifu kamisato-ayaka*
+
+💌 *6. Kirim Menfess Anonim*
+   ➤ Ketik: */menfess*
+   ➤ Isi nomor tujuan & isi pesan
+   ➤ Ketik: */batal* untuk membatalkan
+
+🎞️ *7. Download Video & Musik*
+   🎵 *TikTok*
+      ➤ *.d* — otomatis deteksi foto/video
+      ➤ *.ds* — hanya musik
+   📷 *Instagram*
+      ➤ *.dig* + link
+
+🔗 *Contoh:* .d https://vt.tiktok.com/abc123
+
+🚪 *8. Keluar Sesi*
+   ➤ Ketik: */keluar* untuk akhiri sesi transaksi
+
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+✨ *Selamat Menikmati Fitur AuraBot yaaa* ✨`
       }, { quoted: msg })
       return true
 

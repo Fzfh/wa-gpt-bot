@@ -75,7 +75,6 @@ if (body.toLowerCase().startsWith('/clearid')) {
   return true
 }
 
-  // Handle command statis
   switch (lowerText) {
     case '/menu':
     case 'menu':
@@ -101,22 +100,19 @@ if (body.toLowerCase().startsWith('/clearid')) {
 ┃   ➤ \`.waifu\` <jenis waifu>
 ┃   ➤ Contoh: \`.waifu\` neko
 ┃
-┃ ⬇ Download VT Tiktok  
-┃   ➤ \`.d\` link tiktok  
+┃ ⬇ Download VT Tiktok (Foto & Video)
+┃   ➤ \`.d\` link tiktok 
 ┃   ➤ Contoh: .d https://tiktok.com/linkKamu  
 ┃ 
 ┃ ⬇ Download Sound VT Tiktok  
 ┃   ➤ \`.ds\` link tiktok  
 ┃   ➤ Contoh: \`.ds\` https://tiktok.com/linkKamu  
-┃  
-┃ ⬇ Download Foto VT Tiktok  
-┃   ➤ \`.df\` link tiktok  
-┃   ➤ Contoh: \`.df\` https://tiktok.com/linkKamu  
-┃  
+┃   
 ┃ ⬇ Download Reels Instagram  
 ┃  \`IG DOWNLOAD 1 MENIT, JANGAN SPAM!\`
 ┃   ➤ \`.dig\` link instagram 
-┃   ➤ Contoh: \`.dig\` https://instagram.com/linkKamu
+┃   ➤ Contoh: 
+┃   ➤\`.dig\` https://instagram.com/linkKamu
 ┃
 ┃ 🎮 Top Up Game  
 ┃   ➤ topup ff  
@@ -161,13 +157,20 @@ if (body.toLowerCase().startsWith('/clearid')) {
     case 'Tutorial':
     case 'Tutor':
       await sock.sendMessage(sender, {
-        text: `📖 *Petunjuk Penggunaan AURA BOT*\n\n1️⃣ Topup Game\n➤ Ketik: topup ff/ml/genshin/pubg/valo\n➤ Pilih nominal\n➤ Kirim ID & bukti TF\n\n2️⃣ Beli Pulsa/Kuota\n➤ Ketik: beli pulsa / beli kuota\n➤ Pilih nominal (1, 2, 3...)\n➤ Kirim nomor HP + bukti transfer\n\n3️⃣ Menfess\n➤ Ketik: /menfess\n➤ Isi nomor & pesan\n➤ Ketik: /batal untuk batal\n\n4️⃣ Download Video\n➤ .d / .ds / .df + link\n\n❗ Jangan lupa ketik */keluar* kalau sedang dalam sesi!`
+        text: `📖 *Petunjuk Penggunaan AURA BOT*\n\n
+        1️⃣ Topup Game\n➤ Ketik: topup ff/ml/genshin/pubg/valo\n➤ Pilih nominal\n➤ Kirim ID & bukti TF\n\n
+        2️⃣ Beli Pulsa/Kuota\n➤ Ketik: beli pulsa / beli kuota\n➤ Pilih nominal (1, 2, 3...)\n➤ Kirim nomor HP + bukti transfer\n\n
+        ❗ Jangan lupa ketik */keluar* kalau sedang dalam sesi!\n\n
+        3️⃣ Menfess\n➤ Ketik: /menfess\n➤ Isi nomor & pesan\n➤ Ketik: /batal untuk membatalkan menfess\n\n
+        4️⃣ Download Video\n\`Tiktok\`\n➤ .d (foto & video) / .ds (sound) / + link\n\n
+        \`Instagram\`\n➤ .dig + link\n\n
+        Contoh Penggunaan: .d/ds/dig https://linkkamu`
       }, { quoted: msg })
       return true
 
     case 'admin':
       await sock.sendMessage(sender, {
-        text: `👩‍💻 *Hubungi Admin AURA BOT:*\n\n📞 wa.me/62895326679840\n🕐 Online: 09.00 - 22.00 WIB\n\nButuh bantuan? Ketik aja "admin" yaa! ✨`
+        text: `👩‍💻 *Hubungi Admin AURA BOT:*\n\n📞 wa.me/62895326679840\n🕐 Online: 09.00 - 22.00 WIB\n\nButuh bantuan? Ketik aja "admin" yaa! Fast Respon! ✨`
       }, { quoted: msg })
       return true
 

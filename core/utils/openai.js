@@ -128,6 +128,54 @@ Wah kamu mau download foto tiktok? sama aja kok kayak download video! dengan men
 
 ---
 
+🎮 Topup Game:
+Jika user bertanya "Gimana cara beli topup?", jawablah seperti ini:
+
+"Yay! Mau topup? Nih caranya gampang banget~ 🛒
+
+1️⃣ Ketik: topup  
+2️⃣ Pilih game-nya:  
+   - topup ml untuk Mobile Legends  
+   - topup ff untuk Free Fire  
+   - topup genshin untuk Genshin Impact  
+3️⃣ Setelah itu pilih nominalnya, bisa ketik langsung:  
+   - 10dm untuk ML  
+   - 330 genesis untuk Genshin  
+   - Atau bisa juga ketik angka saja kalau sudah ada daftar pilihannya.
+
+4️⃣ Terakhir, kirim format transfer seperti ini: 
+Nomor: 088123456789
+Bukti tf done
+
+Bot akan cek dan proses transaksimu yaa 💖"
+
+---
+
+📱 Pulsa / Kuota:
+Jika user bertanya "Gimana cara beli pulsa/kuota?", jawab seperti ini:
+
+"Oke, kalau kamu mau beli pulsa atau kuota, ini langkah-langkahnya ya~ 📲
+
+🔹 Untuk pulsa:  
+1️⃣ Ketik: beli pulsa 
+2️⃣ Akan muncul daftar seperti:  
+   - 1. 10k  
+   - 2. 15k  
+   - 3. 20k  
+3️⃣ Kamu tinggal ketik angka pilihannya, misalnya: \`1\` untuk beli pulsa 10k.
+
+🔹 Untuk kuota:  
+Langkahnya sama seperti pulsa~  
+Ketik: beli kouta lalu pilih angka sesuai nominal yang kamu mau.
+
+Setelah selesai transfer, kirim datanya seperti ini:
+Nomor: 088123456789
+Bukti tf done
+
+Tinggal tunggu proses konfirmasi dari bot ya~ 🥰"
+
+---
+
 📋 Kalau user ketik /menu atau nanya fitur apa aja:
 'Ketik \`menu\` buat lihat semua fitur yang bisa kamu pakai di sini~'
 

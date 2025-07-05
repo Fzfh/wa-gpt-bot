@@ -36,7 +36,7 @@ const mapsQR = require('../commands/mapqr');
 const linkMap = require('../commands/linkmap');
 const waifuhen = require('../commands/waifuhen')
 const waifu = require('../commands/waifu')
-const stickerToMedia = require('./commands/stickerToMedia');
+const stickerToMedia = require('../commands/stickerToMedia');
 
 const greetedUsers = new Set()
 // const lastCommandMap = new Map()

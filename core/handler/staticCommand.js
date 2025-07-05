@@ -81,15 +81,15 @@ if (body.toLowerCase().startsWith('/clearid')) {
       await sock.sendMessage(sender, {
         text: `╭━━━[ ✨ AURA BOT MENU ✨ ]━━━╮  
 ┃  
-┃ 🖼 Sticker dari Gambar/Video  
+┃  🖼 Sticker dari Gambar/Video  
 ┃   ➤ Kirim media (foto/video)  
 ┃   ➤ Tambahkan caption: \`s\` atau \`sticker\`
 ┃  
-┃ ✍ Sticker dari Teks  
+┃  ✍ Sticker dari Teks  
 ┃   ➤ Ketik: \`stickertext\` teks  
 ┃   ➤ Contoh: \`stickertext\` AuraBot  
 ┃  
-┃ 💌 Menfess Anonim  
+┃  💌 Menfess Anonim  
 ┃   ➤ \`/menfess\` 
 ┃  
 ┃  🗺️ Cari Lokasi Google Maps
@@ -205,10 +205,18 @@ if (body.toLowerCase().startsWith('/clearid')) {
 
 🔗 *Contoh:* .d https://vt.tiktok.com/abc123
 
-🚪 *8. Keluar Sesi*
+🗺️ *8. Cari Atau Generate Lokasi*
+    *Cari Lokasi*
+    ➤ .linkmap (nama daerah)
+    ➤ contoh: .linkmap Monas Jakarta
+
+    *Reply Ke shareloc*
+    ➤ Reply shareloc dan ketik .linkmap untuk generate link ke google maps
+
+🚪 *9. Keluar Sesi*
    ➤ Ketik: */keluar* untuk akhiri sesi transaksi
 
-╰━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+╰━━━━━━━━━━━━━━━━━━━━━━━╯
 ✨ *Selamat Menikmati Fitur AuraBot yaaa* ✨`
       }, { quoted: msg })
       return true

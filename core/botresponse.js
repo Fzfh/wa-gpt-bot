@@ -385,13 +385,17 @@ if (text.startsWith('/') || text.startsWith('.')) {
     }
 
     if (text === '.reset') {
-      if (!adminList.includes(sender)){
-        return sock.sendMessage(sender, { text: '❌ Maaf, hanya admin yang boleh reset ingatan AuraBot 🙅‍♂️' })
+      if (!adminList.includes(actualUserId)) {
+        return sock.sendMessage(sender, {
+          text: '❌ Maaf, hanya admin yang boleh reset ingatan AuraBot 🙅‍♂️'
+        }, { quoted: msg });
       }
-      memoryMap.delete(sender)
-      return sock.sendMessage(sender, { text: 'Ingatan AuraBot Telah Direset, Ayo Buat Obrolan Baru!' })
-    }
 
+      memoryMap.delete(actualUserId)
+      return sock.sendMessage(sender, {
+        text: '🧠 Ingatan AuraBot Telah Direset, Ayo Buat Obrolan Baru~!'
+      }, { quoted: msg });
+    }
 
     if (text.startsWith('/') && !['/menu', '/reset', '/riwayat', '/clear'].includes(lowerText)) {
       return sock.sendMessage(sender, { text: 'Maaf, aku gak ngerti perintah itu 😵. Coba ketik /menu yaa!' }, { quoted: msg })

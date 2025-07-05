@@ -94,7 +94,8 @@ if (body.toLowerCase().startsWith('/clearid')) {
 ┃  
 ┃  🗺️ Cari Lokasi Google Maps
 ┃   ➤ \`.linkmap\` <nama daerah> 
-┃   ➤ Contoh: \`.linkmap\` monas Jakarta
+┃   ➤ Contoh: \`.linkmap\` monas Jakarta Atau Reply Shareloc!
+┃
 ┃
 ┃  👰🏻 Cari Waifu Kamu!
 ┃   ➤ \`.waifu\` <jenis waifu>

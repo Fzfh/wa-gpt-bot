@@ -47,30 +47,17 @@ module.exports = async function stickerToMedia(sock, msg) {
     fs.writeFileSync(webpPath, mediaBuffer);
 
     if (isAnimated) {
-      const mp4Path = path.join(tmpdir(), `${fileName}.mp4`);
-      const ffmpegCmd = `ffmpeg -y -i "${webpPath}" -loop 0 -t 3 -movflags faststart -pix_fmt yuv420p "${mp4Path}"`;
+  // Langsung kirim aja .webp nya
+  await sock.sendMessage(sender, {
+    document: { url: webpPath },
+    mimetype: 'image/webp',
+    fileName: 'sticker_animated.webp',
+    caption: '🎞️ Ini dia animasi stiker kamu dalam format asli (webp)',
+  }, { quoted: msg });
 
-      exec(ffmpegCmd, async (err) => {
-        if (err) {
-          console.error('❌ Gagal konversi WebP ke MP4:', err);
-          await sock.sendMessage(sender, {
-            text: '⚠️ Gagal konversi stiker animasi ke video. Pastikan VPS sudah install ffmpeg!',
-          }, { quoted: msg });
-          return;
-        }
-
-        await sock.sendMessage(sender, {
-          video: { url: mp4Path },
-          caption: '🎥 Ini dia video dari stiker kamu~',
-        }, { quoted: msg });
-
-        setTimeout(() => {
-          if (fs.existsSync(webpPath)) fs.unlinkSync(webpPath);
-          if (fs.existsSync(mp4Path)) fs.unlinkSync(mp4Path);
-        }, 10_000);
-      });
-
-    } else {
+  setTimeout(() => fs.existsSync(webpPath) && fs.unlinkSync(webpPath), 10000);
+}
+ else {
       await sock.sendMessage(sender, {
         image: { url: webpPath },
         caption: '🖼️ Ini dia gambar dari stiker kamu~',

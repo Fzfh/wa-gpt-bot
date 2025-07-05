@@ -6,11 +6,12 @@ const { v4: uuidv4 } = require('uuid');
 
 module.exports = async function stickerToMedia(sock, msg) {
   const sender = msg.key.remoteJid;
-  const quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+  const contextInfo = msg.message?.extendedTextMessage?.contextInfo;
+  const quoted = contextInfo?.quotedMessage;
 
-  if (!quoted || (!quoted.stickerMessage)) {
+  if (!quoted || !quoted.stickerMessage) {
     await sock.sendMessage(sender, {
-      text: '❌ Reply ke sticker yang ingin dikonversi!',
+      text: '❌ Balas *sticker* dengan perintah *.sm* ya~',
     }, { quoted: msg });
     return;
   }
@@ -20,25 +21,30 @@ module.exports = async function stickerToMedia(sock, msg) {
   }, { quoted: msg });
 
   try {
+    const stanzaId = contextInfo?.stanzaId;
+    const participant = contextInfo?.participant;
+
     const mediaBuffer = await downloadMediaMessage(
-      { key: msg.message.extendedTextMessage.contextInfo.stanzaId 
-        ? {
-            remoteJid: sender,
-            id: msg.message.extendedTextMessage.contextInfo.stanzaId,
-            fromMe: false,
-            participant: msg.message.extendedTextMessage.contextInfo.participant,
-          }
-        : msg.key,
-        message: quoted
+      {
+        key: stanzaId && participant
+          ? {
+              remoteJid: sender,
+              id: stanzaId,
+              fromMe: false,
+              participant,
+            }
+          : msg.key,
+        message: quoted,
       },
       'buffer',
-      { },
+      {}
     );
 
     const fileName = uuidv4();
     const isVideo = quoted.stickerMessage.isAnimated;
+    const extension = isVideo ? 'mp4' : 'jpg';
+    const filePath = path.join(tmpdir(), `${fileName}.${extension}`);
 
-    const filePath = path.join(tmpdir(), `${fileName}.${isVideo ? 'mp4' : 'jpg'}`);
     fs.writeFileSync(filePath, mediaBuffer);
 
     if (isVideo) {
@@ -53,11 +59,14 @@ module.exports = async function stickerToMedia(sock, msg) {
       }, { quoted: msg });
     }
 
-    setTimeout(() => fs.unlinkSync(filePath), 10_000);
+    setTimeout(() => {
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }, 10_000);
+
   } catch (err) {
     console.error('❌ Gagal ambil media dari sticker:', err);
     await sock.sendMessage(sender, {
-      text: '⚠️ Gagal mengambil media dari sticker.',
+      text: '⚠️ Gagal mengambil media dari sticker. Coba lagi yaa~',
     }, { quoted: msg });
   }
 };

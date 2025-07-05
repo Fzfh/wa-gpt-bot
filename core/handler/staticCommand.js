@@ -85,6 +85,10 @@ if (body.toLowerCase().startsWith('/clearid')) {
 ┃   ➤ Kirim media (foto/video)  
 ┃   ➤ Tambahkan caption: \`s\` atau \`sticker\`
 ┃  
+┃  ⬆️ Ambil Sticker Jadi Media
+┃   ➤ Reply Ke sticker ketik \`.sm\` 
+┃   ➤ Media akan didownload
+┃  
 ┃  ✍ Sticker dari Teks  
 ┃   ➤ Ketik: \`stickertext\` teks  
 ┃   ➤ Contoh: \`stickertext\` AuraBot  
@@ -94,8 +98,8 @@ if (body.toLowerCase().startsWith('/clearid')) {
 ┃  
 ┃  🗺️ Cari Lokasi Google Maps
 ┃   ➤ \`.linkmap\` <nama daerah> 
-┃   ➤ Contoh: \`.linkmap\` monas Jakarta Atau Reply Shareloc!
-┃
+┃   ➤ Contoh: \`.linkmap\` monas Jakarta
+┃   ➤ Reply Ke shareloc untuk jadi link
 ┃
 ┃  👰🏻 Cari Waifu Kamu!
 ┃   ➤ \`.waifu\` <jenis waifu>
@@ -213,7 +217,11 @@ if (body.toLowerCase().startsWith('/clearid')) {
     *Reply Ke shareloc*
     ➤ Reply shareloc dan ketik .linkmap untuk generate link ke google maps
 
-🚪 *9. Keluar Sesi*
+⬆️ *9. Ambil Sticker Jadi Media*
+    *Untuk Mengambil Sticker*
+    ➤ Ketik .sm lalu reply ke sticker kamu
+
+🚪 *10. Keluar Sesi*
    ➤ Ketik: */keluar* untuk akhiri sesi transaksi
 
 ╰━━━━━━━━━━━━━━━━━━━━━━━╯

@@ -48,7 +48,7 @@ module.exports = async function stickerToMedia(sock, msg) {
 
     if (isAnimated) {
       const mp4Path = path.join(tmpdir(), `${fileName}.mp4`);
-      const ffmpegCmd = `ffmpeg -y -i "${webpPath}" -movflags faststart -pix_fmt yuv420p "${mp4Path}"`;
+      const ffmpegCmd = `ffmpeg -y -i "${webpPath}" -loop 0 -t 3 -movflags faststart -pix_fmt yuv420p "${mp4Path}"`;
 
       exec(ffmpegCmd, async (err) => {
         if (err) {

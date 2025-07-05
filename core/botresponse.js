@@ -385,6 +385,9 @@ if (text.startsWith('/') || text.startsWith('.')) {
     }
 
     if (text === '.reset') {
+      if (!adminList.includes(sender)){
+        return sock.sendMessage(sender, { text: '❌ Maaf, hanya admin yang boleh reset ingatan AuraBot 🙅‍♂️' })
+      }
       memoryMap.delete(sender)
       return sock.sendMessage(sender, { text: 'Ingatan AuraBot Telah Direset, Ayo Buat Obrolan Baru!' })
     }

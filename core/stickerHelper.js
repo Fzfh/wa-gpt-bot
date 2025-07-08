@@ -5,7 +5,7 @@ const { promisify } = require('util');
 const { exec } = require('child_process');
 const { v4: uuidv4 } = require('uuid');
 const { downloadMediaMessage } = require('@whiskeysockets/baileys');
-const { createCanvas, loadImage, registerFont } = require('@napi-rs/canvas');
+const { createCanvas, loadImage, registerFont } = require('canvas');
 registerFont(path.join(__dirname, 'media/fonts/ArialNarrow.ttf'), {
   family: 'Arial Narrow'
 });

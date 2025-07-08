@@ -176,7 +176,7 @@ async function createStickerFromText(text) {
     }
   }
 
-  const imgBuf = canvas.toBuffer('image/jpeg', { quality: 0.4 }); 
+  const imgBuf = canvas.toBuffer('image/jpeg', { quality: 0.2 }); 
   const sticker = new Sticker(imgBuf, {
     pack: 'AuraBot',
     author: 'AURA',

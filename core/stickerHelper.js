@@ -126,10 +126,10 @@ async function createStickerFromText(text) {
   ctx.fillStyle = 'black';
   ctx.font = `${fontSize}px "Arial Narrow", Arial`;
   ctx.textBaseline = 'top';
-  ctx.textAlign = 'left'; // KEMBALI RATA KIRI
+  ctx.textAlign = 'left';
 
   const lines = wrapText(ctx, text, W - pad * 2);
-  const lh = fontSize + 18;
+  const lh = fontSize * 0.85;
   const startY = (H - lines.length * lh) / 2;
 
   for (let i = 0; i < lines.length; i++) {

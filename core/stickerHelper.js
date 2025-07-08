@@ -118,7 +118,7 @@ async function createStickerFromText(text) {
   ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, W, H);
   ctx.fillStyle = 'black';
-  ctx.font = `${fontSize}px Segoe UI`;
+  ctx.font = `${fontSize}px "Arial Narrow", Arial`;
   ctx.textBaseline = 'top';
   ctx.textAlign = 'left'; // KEMBALI RATA KIRI
 

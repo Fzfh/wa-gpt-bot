@@ -6,9 +6,12 @@ const { exec } = require('child_process');
 const { v4: uuidv4 } = require('uuid');
 const { downloadMediaMessage } = require('@whiskeysockets/baileys');
 const { createCanvas, loadImage, registerFont } = require('canvas');
-registerFont(path.join(__dirname, 'media/fonts/ArialNarrow.ttf'), {
+const fontPath = path.join(__dirname, '..', 'media', 'fonts', 'ArialNarrow.ttf');
+
+registerFont(fontPath, {
   family: 'Arial Narrow'
 });
+
 const { Sticker, StickerTypes } = require('wa-sticker-formatter');
 const twemoji = require('twemoji');
 const emojiDir = path.join(process.cwd(), 'media', 'emoji');

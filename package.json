@@ -4,6 +4,7 @@
     "start": "node bot.js"
   },
   "dependencies": {
+    "@canvas-fonts/arial-narrow": "^1.0.4",
     "@napi-rs/canvas": "^0.1.73",
     "@twemoji/api": "^16.0.1",
     "@whiskeysockets/baileys": "^6.7.18",

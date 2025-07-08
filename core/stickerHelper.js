@@ -118,7 +118,7 @@ function wrapText(ctx, text, maxWidth) {
 
 // 🛠️ ALIGN TENGAH teks sticker
 async function createStickerFromText(text) {
-  const W = 512, H = 512, fontSize = 60, pad = 30;
+  const W = 512, H = 512, fontSize = 70, pad = 30;
   const canvas = createCanvas(W, H);
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = 'white';

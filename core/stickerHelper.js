@@ -129,7 +129,7 @@ async function createStickerFromText(text) {
   ctx.textAlign = 'left';
 
   const lines = wrapText(ctx, text, W - pad * 2);
-  const lh = fontSize * 0.85;
+  const lh = fontSize + 5;
   const startY = (H - lines.length * lh) / 2;
 
   for (let i = 0; i < lines.length; i++) {

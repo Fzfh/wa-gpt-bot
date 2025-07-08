@@ -5,12 +5,12 @@
   },
   "dependencies": {
     "@canvas-fonts/arial-narrow": "^1.0.4",
-    "@napi-rs/canvas": "^0.1.73",
     "@twemoji/api": "^16.0.1",
     "@whiskeysockets/baileys": "^6.7.18",
     "@zxing/library": "^0.21.3",
     "axios": "^1.9.0",
     "boxen": "^5.1.2",
+    "canvas": "^3.1.2",
     "chalk": "^4.1.2",
     "dotenv": "^17.0.0",
     "express": "^5.1.0",
